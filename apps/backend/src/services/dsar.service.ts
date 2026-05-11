@@ -1,0 +1,231 @@
+import { prisma } from '@db';
+import { AppError } from '../utils/errors';
+import { decryptJson } from '../utils/encryption';
+
+interface UserDataExport {
+  exportedAt: string;
+  user: {
+    email: string;
+    role: string;
+    createdAt: string;
+    lastLoginAt: string | null;
+    emailVerified: string | null;
+  };
+  patient: {
+    firstName: string | null;
+    lastName: string | null;
+    sex: string | null;
+    birthYear: number | null;
+    heightCm: number | null;
+    weightKg: number | null;
+  } | null;
+  consents: Array<{
+    type: string;
+    granted: boolean;
+    documentVersion: string;
+    acceptedAt: string;
+    revokedAt: string | null;
+  }>;
+  interviews: Array<{
+    id: string;
+    createdAt: string;
+    answers: unknown;
+    medicalFlags: unknown;
+  }>;
+  dietPlans: Array<{
+    id: string;
+    source: string;
+    status: string;
+    createdAt: string;
+    content: unknown;
+    macros: {
+      kcal: number | null;
+      proteinG: number | null;
+      fatG: number | null;
+      carbsG: number | null;
+    };
+  }>;
+  orders: Array<{
+    id: string;
+    productType: string;
+    status: string;
+    createdAt: string;
+  }>;
+  subscription: {
+    plan: string;
+    status: string;
+    currentPeriodEnd: string | null;
+  } | null;
+  auditLog: Array<{
+    action: string;
+    createdAt: string;
+    ip: string | null;
+  }>;
+}
+
+/**
+ * GDPR Art. 15 (access) and Art. 20 (portability).
+ * Export ALL personal data for the requesting user.
+ */
+export async function exportUserData(userId: string): Promise<UserDataExport> {
+  const user = await prisma.user.findFirst({
+    where: { id: userId, deletedAt: null },
+  });
+
+  if (!user) {
+    throw new AppError(404, 'USER_NOT_FOUND', 'User not found');
+  }
+
+  // Fetch all related data in parallel
+  const [patient, consents, subscription, auditLogs] = await Promise.all([
+    prisma.patient.findUnique({ where: { userId } }),
+    prisma.userConsent.findMany({
+      where: { userId },
+      orderBy: { acceptedAt: 'desc' },
+    }),
+    prisma.subscription.findUnique({ where: { userId } }),
+    prisma.auditLog.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: 1000,
+      select: {
+        action: true,
+        createdAt: true,
+        ip: true,
+      },
+    }),
+  ]);
+
+  // Interviews and dietPlans require patientId
+  let interviews: Array<{
+    id: string;
+    createdAt: Date;
+    answers: unknown;
+    medicalFlags: unknown;
+  }> = [];
+  let dietPlans: Array<{
+    id: string;
+    source: string;
+    status: string;
+    createdAt: Date;
+    content: unknown;
+    kcal: number | null;
+    proteinG: number | null;
+    fatG: number | null;
+    carbsG: number | null;
+  }> = [];
+  let orders: Array<{
+    id: string;
+    productType: string;
+    status: string;
+    createdAt: Date;
+  }> = [];
+
+  if (patient) {
+    const [rawInterviews, rawDietPlans, rawOrders] = await Promise.all([
+      prisma.interview.findMany({
+        where: { patientId: patient.id },
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          createdAt: true,
+          answers: true,
+          medicalFlags: true,
+        },
+      }),
+      prisma.dietPlan.findMany({
+        where: { patientId: patient.id },
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          source: true,
+          status: true,
+          createdAt: true,
+          content: true,
+          kcal: true,
+          proteinG: true,
+          fatG: true,
+          carbsG: true,
+        },
+      }),
+      prisma.order.findMany({
+        where: { patientId: patient.id },
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          productType: true,
+          status: true,
+          createdAt: true,
+        },
+      }),
+    ]);
+    interviews = rawInterviews;
+    dietPlans = rawDietPlans;
+    orders = rawOrders;
+  }
+
+  return {
+    exportedAt: new Date().toISOString(),
+    user: {
+      email: user.email,
+      role: user.role,
+      createdAt: user.createdAt.toISOString(),
+      lastLoginAt: user.lastLoginAt?.toISOString() ?? null,
+      emailVerified: user.emailVerified?.toISOString() ?? null,
+    },
+    patient: patient
+      ? {
+          firstName: patient.firstName,
+          lastName: patient.lastName,
+          sex: patient.sex,
+          birthYear: patient.birthYear,
+          heightCm: patient.heightCm,
+          weightKg: patient.weightKg ? Number(patient.weightKg) : null,
+        }
+      : null,
+    consents: consents.map((c) => ({
+      type: c.consentType,
+      granted: c.granted,
+      documentVersion: c.documentVersion,
+      acceptedAt: c.acceptedAt.toISOString(),
+      revokedAt: c.revokedAt?.toISOString() ?? null,
+    })),
+    interviews: interviews.map((i) => ({
+      id: i.id,
+      createdAt: i.createdAt.toISOString(),
+      answers: decryptJson(i.answers),
+      medicalFlags: i.medicalFlags ? decryptJson(i.medicalFlags) : null,
+    })),
+    dietPlans: dietPlans.map((dp) => ({
+      id: dp.id,
+      source: dp.source,
+      status: dp.status,
+      createdAt: dp.createdAt.toISOString(),
+      content: decryptJson(dp.content),
+      macros: {
+        kcal: dp.kcal,
+        proteinG: dp.proteinG,
+        fatG: dp.fatG,
+        carbsG: dp.carbsG,
+      },
+    })),
+    orders: orders.map((o) => ({
+      id: o.id,
+      productType: o.productType,
+      status: o.status,
+      createdAt: o.createdAt.toISOString(),
+    })),
+    subscription: subscription
+      ? {
+          plan: subscription.plan,
+          status: subscription.status,
+          currentPeriodEnd: subscription.currentPeriodEnd?.toISOString() ?? null,
+        }
+      : null,
+    auditLog: auditLogs.map((a) => ({
+      action: a.action,
+      createdAt: a.createdAt.toISOString(),
+      ip: a.ip,
+    })),
+  };
+}

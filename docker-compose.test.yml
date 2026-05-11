@@ -1,0 +1,40 @@
+# Isolated test environment for smoke tests
+# Ports: postgres→5433, redis→6380 (no conflict with dev)
+#
+# Usage:
+#   docker compose -f docker-compose.test.yml up -d
+#   DATABASE_URL=postgresql://bambooit:bambooit_test@localhost:5433/bambooit_test?schema=public \
+#     node scripts/seed-smoke-fixtures.js
+#   docker compose -f docker-compose.test.yml down -v
+
+version: "3.8"
+
+services:
+  postgres-test:
+    image: postgres:15-alpine
+    container_name: bambooit_postgres_test
+    environment:
+      POSTGRES_USER: bambooit
+      POSTGRES_PASSWORD: bambooit_test
+      POSTGRES_DB: bambooit_test
+    ports:
+      - "5433:5432"
+    tmpfs:
+      - /var/lib/postgresql/data   # ephemeral — no disk persistence
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bambooit -d bambooit_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis-test:
+    image: redis:7-alpine
+    container_name: bambooit_redis_test
+    ports:
+      - "6380:6379"
+    command: redis-server --save ""  # disable persistence
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10

@@ -1,0 +1,75 @@
+import type { RuleSeed } from './types';
+
+export const KIDNEY_SEEDS: RuleSeed[] = [
+  // ─── Kidney rules (27.7) ──────────────────────────────────────────────────
+  // 27.7.1 CKD — Przewlekła choroba nerek
+  {
+    name: 'Przewlekła choroba nerek (CKD)',
+    description: 'CKD — białko stage-dependent (0.6-0.8g/kg st.3-5 bez dializy), ograniczenie potasu, fosforu, sodu',
+    type: 'POLICY', severity: 'HIGH', priority: 85,
+    version: '1.0', category: 'kidney',
+    sources: [{ ref: 'KDOQI Clinical Practice Guideline for Nutrition in CKD', year: 2020 }, { ref: 'KDIGO CKD Guidelines', year: 2024 }, { ref: 'ESPEN Guideline on Clinical Nutrition in CKD', year: 2021 }],
+    conflictsWith: ['Zespół nerczycowy'],
+    conditions: { type: 'HAS_CONDITION', terms: ['ckd', 'przewlekła choroba nerek', 'przewlekla choroba nerek', 'chronic kidney disease', 'niewydolność nerek', 'niewydolnosc nerek', 'kidney disease', 'renal failure', 'choroba nerek'] },
+    effects: [
+      { type: 'MODIFY_TARGETS', field: 'targetProteinG', operation: 'SET', value: 0.8 },
+      { type: 'NUTRIENT_LIMIT', nutrient: 'sodium', scope: 'DAILY_TOTAL', max: 2000 },
+      { type: 'NUTRIENT_LIMIT', nutrient: 'potassium', scope: 'DAILY_TOTAL', max: 2500 },
+      { type: 'NUTRIENT_LIMIT', nutrient: 'phosphorus', scope: 'DAILY_TOTAL', max: 800 },
+      { type: 'NUTRIENT_LIMIT', nutrient: 'fiber', scope: 'DAILY_TOTAL', min: 20, max: 30 },
+      { type: 'PREFER_PRODUCTS', flagKey: 'lowSodium', flagValue: true },
+      { type: 'EXCLUDE_KEYWORDS', keywords: ['podroby', 'wątróbka', 'nerki', 'offal', 'liver', 'kidney', 'parówka', 'kiełbasa', 'kabanos', 'sausage', 'hot dog', 'solone', 'marynowane', 'konserwy', 'canned', 'salted', 'pickled', 'cola', 'kakao', 'czekolada', 'cocoa', 'chocolate', 'banan', 'banana', 'suszone owoce', 'dried fruit'] },
+      { type: 'CLINICAL_NOTE', note: 'CKD st.3-5 (bez dializy): białko 0.6-0.8g/kg/d (KDOQI 2020), potas <2500mg/d, fosfor <800mg/d, sód <2000mg/d. Unikać produktów wysoko przetworzonych (fosforany jako dodatki E338-E341, E450-E452). Źródło: KDOQI 2020, KDIGO 2024, ESPEN 2021 CKD', category: 'RESTRICTION' },
+      { type: 'CLINICAL_NOTE', note: 'CKD na dializie: białko wyższe 1.0-1.2g/kg/d (katabolizm dializy). Potasu i fosforu nadal ograniczać. Energia 25-35 kcal/kg/d. Nocna przekąska przeciw katabolizmowi.', category: 'INFO' },
+      { type: 'CLINICAL_NOTE', note: 'Źródła fosforu do ograniczenia: cola, kakao, czekolada, sery topione, wędliny, konserwy (fosforany dodane mają wchłanialność ~100% vs ~40-60% z naturalnych źródeł).', category: 'RECOMMENDATION' },
+      { type: 'SUGGEST_SUPPLEMENT', name: 'Witamina D3', dose: '1000-2000 IU/d', reason: 'Zaburzenia metabolizmu wit. D w CKD, niedobór u >80% pacjentów (KDIGO 2017)' },
+      { type: 'SUGGEST_SUPPLEMENT', name: 'Żelazo (przy anemii)', dose: 'wg zaleceń lekarza', reason: 'Anemia nerkopochodna częsta w CKD st.3-5 (KDIGO Anemia 2012)' },
+      { type: 'SUGGEST_SUPPLEMENT', name: 'Kwas foliowy', dose: '400-800 µg/d', reason: 'Częsty niedobór w CKD, zwłaszcza na dializie' },
+    ],
+  },
+  // 27.7.2 Kamica nerkowa
+  {
+    name: 'Kamica nerkowa',
+    description: 'Kamica nerkowa — nawodnienie 2.5-3L/d, ograniczenie sodu i oksalatów, cytrynian',
+    type: 'POLICY', severity: 'LOW', priority: 68,
+    version: '1.0', category: 'kidney',
+    sources: [{ ref: 'AUA/EAU Urolithiasis Guidelines', year: 2022 }, { ref: 'EAU Guidelines on Urolithiasis', year: 2022 }],
+    conditions: { type: 'HAS_CONDITION', terms: ['kamica nerkowa', 'kamienie nerkowe', 'kidney stones', 'nephrolithiasis', 'urolithiasis', 'kamica', 'renal stones', 'kamica szczawianowa', 'kamica moczanowa', 'kamica wapniowa'] },
+    effects: [
+      { type: 'NUTRIENT_LIMIT', nutrient: 'sodium', scope: 'DAILY_TOTAL', max: 2300 },
+      { type: 'NUTRIENT_LIMIT', nutrient: 'sugar', scope: 'PER_100G', max: 8 },
+      { type: 'EXCLUDE_KEYWORDS', keywords: ['szpinak', 'rabarbar', 'szczaw', 'burak', 'spinach', 'rhubarb', 'sorrel', 'beet', 'solone', 'salted', 'cola', 'napój gazowany', 'soda'] },
+      { type: 'CLINICAL_NOTE', note: 'Kamica nerkowa: nawodnienie ≥2.5-3L/d (diureza >2L/d — najważniejsza interwencja!), sód <2300mg/d (natriureza zwiększa kalciurię), białko umiarkowane (0.8-1.0g/kg). Źródło: AUA/EAU 2022 Urolithiasis Guidelines', category: 'RESTRICTION' },
+      { type: 'CLINICAL_NOTE', note: 'Kamica szczawianowa (najczęstsza ~75%): ograniczenie oksalatów (szpinak, rabarbar, szczaw, burak, kakao, orzechy, herbata czarna). Wapń z dietą NIE ograniczać (1000-1200mg/d — wiąże oksalaty w jelicie). Źródło: EAU 2022', category: 'RECOMMENDATION' },
+      { type: 'CLINICAL_NOTE', note: 'Kamica moczanowa: alkalizacja moczu (owoce cytrusowe, warzywa), ograniczenie puryn (jak dna), nawodnienie. Kamica wapniowa: ograniczyć sód i białko zwierzęce, utrzymać wapń z dietą.', category: 'INFO' },
+      { type: 'CLINICAL_NOTE', note: 'Owoce cytrusowe (cytryny, limonki, pomarańcze) — cytrynian hamuje krystalizację! Zalecać sok z 2 cytryn/dzień rozcieńczony w wodzie.', category: 'RECOMMENDATION' },
+      { type: 'SUGGEST_SUPPLEMENT', name: 'Cytrynian potasu', dose: '30-60 mEq/d (wg pH moczu)', reason: 'Alkalizacja moczu i hamowanie krystalizacji szczawianu wapnia (AUA 2022)' },
+      { type: 'SUGGEST_SUPPLEMENT', name: 'Magnez', dose: '300-400 mg/d', reason: 'Inhibitor krystalizacji oksalatów, częsty niedobór' },
+    ],
+  },
+  // 27.7.3 Zespół nerczycowy
+  {
+    name: 'Zespół nerczycowy',
+    description: 'Zespół nerczycowy — sód <2g, białko 0.8-1.0g/kg, RED FLAG HIGH',
+    type: 'POLICY', severity: 'HIGH', priority: 80,
+    version: '1.0', category: 'kidney',
+    sources: [{ ref: 'KDIGO Clinical Practice Guideline for Glomerulonephritis', year: 2021 }, { ref: 'ESPEN Guideline on Clinical Nutrition in CKD', year: 2021 }],
+    conflictsWith: ['Przewlekła choroba nerek (CKD)'],
+    conditions: { type: 'HAS_CONDITION', terms: ['zespół nerczycowy', 'zespol nerczycowy', 'nephrotic syndrome', 'nephrotic', 'nerczycowy'] },
+    effects: [
+      { type: 'MODIFY_TARGETS', field: 'targetProteinG', operation: 'SET', value: 0.8 },
+      { type: 'NUTRIENT_LIMIT', nutrient: 'sodium', scope: 'DAILY_TOTAL', max: 2000 },
+      { type: 'NUTRIENT_LIMIT', nutrient: 'saturatedFat', scope: 'DAILY_TOTAL', max: 20 },
+      { type: 'NUTRIENT_LIMIT', nutrient: 'cholesterol', scope: 'DAILY_TOTAL', max: 200 },
+      { type: 'PREFER_PRODUCTS', flagKey: 'lowSodium', flagValue: true },
+      { type: 'PREFER_PRODUCTS', flagKey: 'lowSugar', flagValue: true },
+      { type: 'EXCLUDE_KEYWORDS', keywords: ['solone', 'marynowane', 'konserwy', 'wędliny', 'parówka', 'kiełbasa', 'salted', 'pickled', 'canned', 'sausage', 'hot dog', 'fast food', 'chipsy', 'chips', 'pretzels', 'precle'] },
+      { type: 'CLINICAL_NOTE', note: 'Zespół nerczycowy: białko 0.8-1.0g/kg/d (nie więcej — nasila białkomocz!), sód <2g/d (obrzęki), ograniczenie tłuszczów nasyconych i cholesterolu (częsta dyslipidemia wtórna). Energia adekwatna (35 kcal/kg/d). Źródło: KDIGO 2021 GN, ESPEN CKD 2021', category: 'RESTRICTION' },
+      { type: 'CLINICAL_NOTE', note: 'UWAGA: Proteinuria powoduje utratę albumin → obrzęki, utratę immunoglobulin → infekcje, utratę białek wiążących → niedobory (D3, żelazo, cynk). Monitorować poziom albumin i suplementować wg deficytów.', category: 'WARNING' },
+      { type: 'CLINICAL_NOTE', note: 'Preferować białko roślinne (soja, rośliny strączkowe) — mniejszy wpływ na filtrację kłębuszkową niż białko zwierzęce. Źródło: KDIGO 2021', category: 'RECOMMENDATION' },
+      { type: 'SUGGEST_SUPPLEMENT', name: 'Witamina D3', dose: '2000-4000 IU/d', reason: 'Utrata białka wiążącego wit. D z moczem → niedobór (KDIGO 2021)' },
+      { type: 'SUGGEST_SUPPLEMENT', name: 'Omega-3 (EPA+DHA)', dose: '1-2 g/d', reason: 'Działanie nefroprotekcyjne i redukcja dyslipidemii' },
+      { type: 'SUGGEST_SUPPLEMENT', name: 'Żelazo + kwas foliowy', dose: 'wg badań (ferrytyna, TIBC)', reason: 'Utrata transferyny z moczem → anemia niedoborowa' },
+    ],
+  },
+];

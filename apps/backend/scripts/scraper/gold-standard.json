@@ -1,0 +1,157 @@
+{
+  "_description": "S-12 gold standard dataset for scraper regression. 4 recipes per domain. When a scraper run changes behavior, run `gold-standard.test.ts` to catch drift. Add mojegotowanie once S-4 lands.",
+  "_updatedAt": "2026-04-20",
+  "entries": [
+    {
+      "domain": "aniagotuje.pl",
+      "url": "https://aniagotuje.pl/przepis/kopytka-z-serem",
+      "expected": {
+        "titleContains": "Kopytka",
+        "minIngredients": 4,
+        "minSteps": 3,
+        "hasNutrition": true
+      }
+    },
+    {
+      "domain": "aniagotuje.pl",
+      "url": "https://aniagotuje.pl/przepis/babeczki-lesny-mech",
+      "expected": {
+        "titleContains": "Babeczki",
+        "minIngredients": 5,
+        "minSteps": 3,
+        "hasNutrition": true
+      }
+    },
+    {
+      "domain": "aniagotuje.pl",
+      "url": "https://aniagotuje.pl/przepis/szakszuka-ze-szpinakiem",
+      "expected": {
+        "titleContains": "Szakszuka",
+        "minIngredients": 5,
+        "minSteps": 3,
+        "hasNutrition": true
+      }
+    },
+    {
+      "domain": "aniagotuje.pl",
+      "url": "https://aniagotuje.pl/przepis/faworki",
+      "expected": {
+        "titleContains": "Faworki",
+        "minIngredients": 4,
+        "minSteps": 3,
+        "hasNutrition": true
+      }
+    },
+
+    {
+      "domain": "kwestiasmaku.com",
+      "url": "https://www.kwestiasmaku.com/przepis/coq-au-vin-kurczak-w-winie",
+      "expected": {
+        "titleContains": "Coq au vin",
+        "minIngredients": 5,
+        "minSteps": 3
+      }
+    },
+    {
+      "domain": "kwestiasmaku.com",
+      "url": "https://www.kwestiasmaku.com/przepis/golabki-bez-zawijania",
+      "expected": {
+        "titleContains": "Gołąbki",
+        "minIngredients": 5,
+        "minSteps": 3
+      }
+    },
+    {
+      "domain": "kwestiasmaku.com",
+      "url": "https://www.kwestiasmaku.com/przepis/brukselka-zapiekana-z-serem-halloumi",
+      "expected": {
+        "titleContains": "Brukselka",
+        "minIngredients": 4,
+        "minSteps": 2
+      }
+    },
+    {
+      "domain": "kwestiasmaku.com",
+      "url": "https://www.kwestiasmaku.com/przepis/szarlotka",
+      "expected": {
+        "titleContains": "Szarlotka",
+        "minIngredients": 5,
+        "minSteps": 3
+      }
+    },
+
+    {
+      "domain": "jadlonomia.com",
+      "url": "https://jadlonomia.com/przepisy/dyniowe-pancakes/",
+      "expected": {
+        "titleContains": "pancakes",
+        "minIngredients": 5,
+        "minSteps": 2
+      }
+    },
+    {
+      "domain": "jadlonomia.com",
+      "url": "https://jadlonomia.com/przepisy/pasta-z-bialej-fasoli-z-makiem/",
+      "expected": {
+        "titleContains": "Pasta",
+        "minIngredients": 4,
+        "minSteps": 2
+      }
+    },
+    {
+      "domain": "jadlonomia.com",
+      "url": "https://jadlonomia.com/przepisy/pasta-z-fasoli-i-pieczonego-czosnku/",
+      "expected": {
+        "titleContains": "Pasta",
+        "minIngredients": 4,
+        "minSteps": 2
+      }
+    },
+    {
+      "domain": "jadlonomia.com",
+      "url": "https://jadlonomia.com/przepisy/brzydula-z-czerwonej-cebuli/",
+      "expected": {
+        "titleContains": "Brzyduła",
+        "minIngredients": 4,
+        "minSteps": 2
+      }
+    },
+
+    {
+      "domain": "dietetykpowszechny.pl",
+      "url": "https://dietetykpowszechny.pl/pita-z-kurczakiem/",
+      "expected": {
+        "titleContains": "Pita",
+        "minIngredients": 5,
+        "minSteps": 2
+      }
+    },
+    {
+      "domain": "dietetykpowszechny.pl",
+      "url": "https://dietetykpowszechny.pl/zapiekanka-makaronowa-z-kurczakiem-i-brokulami/",
+      "expected": {
+        "titleContains": "Zapiekanka",
+        "minIngredients": 5,
+        "minSteps": 2
+      }
+    },
+    {
+      "domain": "dietetykpowszechny.pl",
+      "url": "https://dietetykpowszechny.pl/szybka-lasagne-z-patelni/",
+      "expected": {
+        "titleContains": "lasagne",
+        "minIngredients": 4,
+        "minSteps": 2
+      }
+    },
+    {
+      "domain": "dietetykpowszechny.pl",
+      "url": "https://dietetykpowszechny.pl/pinsa-z-kurczakiem-i-camembertem/",
+      "expected": {
+        "titleContains": "Pinsa",
+        "minIngredients": 5,
+        "minSteps": 2
+      }
+    }
+  ]
+}

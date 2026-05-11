@@ -1,0 +1,40 @@
+node_modules
+.env
+.env.local
+.env*.local
+dist
+build
+coverage
+.DS_Store
+.vscode
+.claude
+data/
+NIEISTOTNE
+
+# Production env (secrets)
+.env.prod
+
+# Temp debug/migration files
+n8n_*.json
+*_tmp.json
+food-names-*.json
+# Migration export files (large, not committed)
+scripts/data/recipes-export.json
+scripts/data/clean-products-export.json
+# BUG-3 repair-suggester output (review-then-apply workflow)
+apps/backend/scripts/data/ingredient-repairs.json
+apps/backend/scripts/data/compound-ingredients.csv
+.ts-scripts-out/
+
+# Next.js build cache
+.next/
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Local DB dumps (kept locally only)
+backups/
+
+# Solver baseline perf results (machine-specific timings, regenerable)
+apps/solver/tests/baseline_perf_results.json

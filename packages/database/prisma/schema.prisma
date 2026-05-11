@@ -1,0 +1,2306 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  DIETITIAN
+  PATIENT
+}
+
+enum DietPlanSource {
+  AI
+  MANUAL
+}
+
+enum DietPlanStatus {
+  AI_DRAFT
+  GENERATED
+  REVIEWED
+  SENT
+  PUBLISHED
+  MANUAL_REVIEW_REQUIRED
+  GENERATION_FAILED
+}
+
+enum DayRegenReason {
+  DONT_LIKE
+  TOO_COMPLEX
+  NO_INGREDIENTS
+}
+
+enum ProductType {
+  FREE_7
+  OPIEKA_MIESIECZNA
+  OPIEKA_ROCZNA
+  PLAN_2W
+  PLAN_4W
+  CONSULTATION
+  // Legacy values (kept for backward compatibility with existing orders)
+  PREMIUM
+  CONSULTATION_1W
+  AI_2W
+  AI_4W
+  SUBSCRIPTION_1M
+  CONSULTATION_2W
+  CONSULTATION_4W
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+// AddonType enum removed in 29.1.1 — no longer used
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  INCOMPLETE
+}
+
+enum SubscriptionPlan {
+  FREE
+  PRO_MONTHLY
+  PRO_YEARLY
+}
+
+enum ValidationStatus {
+  VALID
+  NEEDS_ADJUST
+  NEEDS_REPAIR_AI
+}
+
+enum MealType {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACK
+  SUPPER
+}
+
+enum DietType {
+  STANDARD
+  VEGE
+  VEGAN
+  GLUTEN_FREE
+  LACTOSE_FREE
+}
+
+// ─── Food Database Enums ──────────────────────────────────────────────────────
+
+enum FoodState {
+  RAW
+  COOKED
+  BAKED
+  FRIED
+  GRILLED
+  STEAMED
+  DRIED
+  FROZEN
+  CANNED
+  SMOKED
+  FERMENTED
+  PICKLED
+  PROCESSED
+  RECONSTITUTED
+}
+
+enum FodmapLevel {
+  LOW
+  MODERATE
+  HIGH
+  UNKNOWN
+}
+
+enum PriceCategory {
+  BUDGET
+  STANDARD
+  PREMIUM
+}
+
+enum ProcessingLevel {
+  UNPROCESSED // group 1 NOVA
+  MINIMALLY_PROCESSED // group 1 NOVA
+  PROCESSED_INGREDIENT // group 2 NOVA
+  PROCESSED // group 3 NOVA
+  ULTRA_PROCESSED // group 4 NOVA
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  AUTO_VERIFIED
+  MANUALLY_VERIFIED
+  REJECTED
+}
+
+enum AllergenPresence {
+  CONTAINS
+  MAY_CONTAIN
+  FREE
+  UNKNOWN
+}
+
+enum DietFlagSource {
+  AUTO_RULE
+  MANUAL
+  HEURISTIC
+  SOURCE_DATA
+}
+
+enum ImportJobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum DataQualitySeverity {
+  INFO
+  WARNING
+  ERROR
+  CRITICAL
+}
+
+enum ReviewItemType {
+  FOOD_PRODUCT
+  RECIPE
+}
+
+enum ReviewItemStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SKIPPED
+}
+
+enum RecipeDifficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum RecipeMealType {
+  BREAKFAST
+  SECOND_BREAKFAST
+  LUNCH
+  DINNER
+  SUPPER
+  SNACK
+  DESSERT
+  DRINK
+  SAUCE
+  SIDE_DISH
+}
+
+/// Faza C — czy przepis to samodzielny posiłek czy element składowy.
+/// Solver używa tego pola żeby wiedzieć czy może wybrać przepis solo,
+/// czy musi go uzupełnić o carb_side / veg_side (Faza D).
+enum DishCompleteness {
+  COMPLETE_MEAL  // pełen posiłek — pacjent może to zjeść samodzielnie
+  MAIN_DISH      // białko/mięso, wymaga dodatków (carb + veg dla obiadów)
+  CARB_SIDE      // ziemniaki, kasza, ryż, makaron — tylko jako side
+  VEG_SIDE       // sałatka, surówka, warzywa — tylko jako side
+  COMPONENT      // sos, marynata, polewa, farsz, spread — nigdy solo
+}
+
+/// Faza E — jednostka pola Recipe.servings + nutritionSnapshot.kcal.
+/// Solver używa tego pola żeby właściwie skalować przepis do target kcal.
+/// PER_PORTION (default) — kcal/serving = kcal jednej porcji na talerz
+/// PER_PIECE   — kcal/serving = kcal jednej sztuki (1 naleśnik, 1 placek)
+/// PER_100G    — kcal/serving = kcal 100g produktu (zupy, sosy, napoje)
+enum ServingType {
+  PER_PORTION
+  PER_PIECE
+  PER_100G
+}
+
+// ─── Nutrition Protocols (28.1) ───────────────────────────────────────────────
+
+enum ProtocolScope {
+  GLOBAL    // created by ADMIN, visible to all
+  DIETITIAN // created by ADMIN, assigned to specific dietitians
+}
+
+enum FoodRestrictionLevel {
+  HARD_BLOCK // treated like allergy — blocks AI, validates output
+  STRONG     // triggers MANUAL_REVIEW_REQUIRED if violated
+  SOFT       // stylistic guideline — only in systemPromptAdditions
+}
+
+enum RecipeComplexity {
+  SIMPLE
+  MODERATE
+  COMPLEX
+}
+
+enum BmrFormula {
+  MIFFLIN    // Mifflin-St Jeor (default)
+  HARRIS_BENEDICT
+}
+
+model Tenant {
+  id        String    @id @default(cuid())
+  slug      String    @unique
+  name      String
+  logoUrl   String?
+  ownerId   String?   @unique
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  owner    User?     @relation("TenantOwner", fields: [ownerId], references: [id])
+  patients Patient[]
+}
+
+model DietitianProfile {
+  id                      String   @id @default(cuid())
+  userId                  String   @unique
+  code                    String   @unique
+  firstName               String?
+  lastName                String?
+  scoringWeightsOverride  Json?    /// Per-dietitian scoring weight overrides (partial ScoringWeights JSON)
+  greyListWindow          Int      @default(1) /// How many previous plans contribute recipe IDs to the regeneration grey list (1-4). 0 disables grey list.
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @default(now()) @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String?
+  role          UserRole  @default(PATIENT)
+  emailVerified       DateTime?
+  lastLoginAt         DateTime?
+  grantedAccessUntil  DateTime?
+  deletedAt           DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  patient                 Patient?                 @relation("PatientUser")
+  patientsAsDietitian     Patient[]                @relation("PatientDietitian")
+  ownedTenant             Tenant?                  @relation("TenantOwner")
+  dietitianProfile        DietitianProfile?
+  subscription            Subscription?
+  auditLogs               AuditLog[]
+  passwordResetTokens     PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
+  testimonial             Testimonial?
+  notificationPreferences NotificationPreferences?
+  dietitianNotes          DietitianNote[]          @relation("NoteDietitian")
+  noteTemplates           NoteTemplate[]           @relation("TemplateDietitian")
+  referralCode            ReferralCode?
+  referralUsagesAsReferred ReferralUsage[]         @relation("ReferredUser")
+  consents                UserConsent[]
+  // Protocol relations (28.1)
+  ownedProtocols          NutritionProtocol[]      @relation("DietitianProtocols")
+  protocolAccesses        DietitianProtocolAccess[] @relation("DietitianProtocolAccesses")
+  trialFingerprints       TrialFingerprint[]
+  deviceFingerprints      DeviceFingerprint[]
+  protocolAssignments     DietitianProtocolAccess[] @relation("ProtocolAssignments")
+  // Chat (79.1)
+  conversationsAsPatient    Conversation[]   @relation("ConversationPatient")
+  conversationsAsDietitian  Conversation[]   @relation("ConversationDietitian")
+  sentMessages              Message[]        @relation("MessageSender")
+  // Supplements (79.6)
+  supplementPrescriptions   SupplementPrescription[] @relation("PrescribingDietitian")
+}
+
+model Patient {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  tenantId    String?
+  dietitianId String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  firstName String?
+  lastName  String?
+  sex       String?
+  birthYear Int?
+  birthDate DateTime?
+  heightCm  Int?
+  weightKg      Decimal?  @db.Decimal(6, 2)
+
+  user             User              @relation("PatientUser", fields: [userId], references: [id], onDelete: Cascade)
+  dietitian        User?             @relation("PatientDietitian", fields: [dietitianId], references: [id])
+  tenant           Tenant?           @relation(fields: [tenantId], references: [id])
+  interviews       Interview[]
+  dietPlans        DietPlan[]
+  orders           Order[]
+  labPanels        LabPanel[]
+  nutritionTargets NutritionTargets?
+  checkIns         CheckIn[]
+  aiUsageLogs      AiUsageLog[]
+  dietitianNotes   DietitianNote[]
+  recipeRatings    RecipeRating[]
+  favoriteMeals        FavoriteMeal[]
+  shoppingListChecks   ShoppingListCheck[]
+  bodyMeasurements     BodyMeasurement[]
+  supplements          SupplementPrescription[]
+
+  @@index([tenantId])
+  @@index([dietitianId])
+}
+
+model Interview {
+  id        String        @id @default(cuid())
+  patientId String
+  tenantId  String?
+  orderId   String?
+  createdAt DateTime      @default(now())
+
+  // Stored encrypted via encryptJson() — AES-256-GCM
+  answers         Json
+  medicalFlags    Json?
+  profileSnapshot Json?
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@index([patientId])
+  @@index([tenantId])
+}
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  userId       String?
+  action       String
+  resourceType String?
+  resourceId   String?
+  ip           String?
+  metadata     Json?
+  createdAt    DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+/// Audit trail for BUG-3 ingredient cleanup — every displayName change is logged here
+/// so the operation is reversible per-batch. One row = one mutation (update/split/delete/insert).
+model IngredientRepairLog {
+  id                  String   @id @default(cuid())
+  batchId             String   // groups all mutations applied in a single `apply` run
+  recipeIngredientId  String?  // null when a fresh row was inserted as a result of a split
+  recipeId            String
+  oldDisplayName      String?
+  newDisplayName      String?
+  oldGrams            Decimal? @db.Decimal(10, 2)
+  newGrams            Decimal? @db.Decimal(10, 2)
+  action              String   // 'update' | 'split-into' | 'delete' | 'insert'
+  reason              String   // pattern matched, e.g. 'colon-prefix-list', 'X-lub-Y', 'compound-dish'
+  confidence          String   // 'high' | 'medium' | 'low'
+  createdAt           DateTime @default(now())
+
+  @@index([batchId])
+  @@index([recipeId])
+  @@index([createdAt])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model EmailVerificationToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model DietPlan {
+  id        String   @id @default(cuid())
+  patientId String
+  tenantId  String?
+  orderId   String?
+  createdAt DateTime @default(now())
+
+  source DietPlanSource @default(AI)
+  status DietPlanStatus @default(GENERATED)
+
+  kcal     Int?
+  proteinG Int?
+  fatG     Int?
+  carbsG   Int?
+
+  // Stored encrypted via encryptJson() — AES-256-GCM
+  content Json
+
+  // AI audit — must NOT contain raw personal health data
+  aiProvider       String?
+  aiModel          String?
+  rawResponse      Json?
+  validated        Boolean           @default(false)
+  validationStatus ValidationStatus?
+  validationErrors Json?
+
+  /// Policy engine metadata: explanation, applied rules, red flags (not encrypted — no PHI)
+  policyMetadata Json?
+
+  // Protocol / template tracking (28.1.7)
+  templateId  String? // NutritionProtocol.id at time of generation
+  repairCount   Int     @default(0) // number of AI repair attempts
+  dayRegenLimit Int     @default(3) // patient day regeneration limit per plan
+
+  patient        Patient            @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  revisions      DietPlanRevision[]
+  swaps          MealSwap[]
+  dayRegens      DayRegeneration[]
+  dietitianNotes DietitianNote[]
+  protocol       NutritionProtocol? @relation("DietPlanProtocol", fields: [templateId], references: [id])
+  aiCostLogs         AiCostLog[]
+  shoppingListChecks ShoppingListCheck[]
+
+  @@index([patientId])
+  @@index([tenantId])
+  @@index([templateId])
+}
+
+model MealSwap {
+  id         String   @id @default(cuid())
+  dietPlanId String
+  dayIndex   Int      // 0-6 (Mon-Sun)
+  mealIndex  Int      // 0-4 (meal position within day)
+
+  originalMeal Json   // snapshot of the original meal (PlanMeal)
+  alternatives Json   // array of 3 alternative meals generated
+  chosenIndex  Int?   // which alternative was chosen (0-2), null = not yet confirmed
+  newMeal      Json?  // the confirmed replacement meal (copied from alternatives[chosenIndex])
+
+  confirmed Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  dietPlan DietPlan @relation(fields: [dietPlanId], references: [id], onDelete: Cascade)
+
+  @@index([dietPlanId])
+  @@index([dietPlanId, createdAt])
+}
+
+model Order {
+  id                String      @id @default(cuid())
+  patientId         String
+  productType       ProductType
+  status            OrderStatus @default(PENDING_PAYMENT)
+  consultationPhone  String?     @db.VarChar(20)
+  stripeInvoiceId    String?
+  createdAt          DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@index([patientId])
+}
+
+// @deprecated — artifact, scheduled for removal in a future migration (31.7)
+model LabPanel {
+  id        String   @id @default(cuid())
+  patientId String
+  orderId   String?
+  createdAt DateTime @default(now())
+
+  // Stored encrypted via encryptJson() — AES-256-GCM
+  data Json
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@index([patientId])
+}
+
+model Post {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  titleEn     String?
+  excerpt     String
+  excerptEn   String?
+  content     String // Markdown, always in Polish
+  contentEn   String? // Markdown, English translation
+  category    String
+  author      String
+  imageSrc    String?
+  imageAlt    String?
+  imageAltEn  String?
+  readTime    Int
+  publishedAt  DateTime
+  published    Boolean   @default(false)
+  scheduledAt  DateTime? // If set and > now(), post is hidden from public API
+  faq          Json? // Array of { question: string; answer: string }
+  viewCount    Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([slug])
+  @@index([category])
+  @@index([published])
+  @@index([scheduledAt])
+}
+
+model BlogCategoryConfig {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PROFESSIONAL FOOD DATABASE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ─── Food Categories (hierarchical) ──────────────────────────────────────────
+
+model FoodCategory {
+  id          String  @id @default(cuid())
+  name        String // e.g. "Nabiał", "Mięso", "Warzywa"
+  nameEn      String? // English name for mapping to external sources
+  slug        String  @unique
+  parentId    String?
+  sortOrder   Int     @default(0)
+  description String?
+  iconName    String? // for UI rendering
+
+  parent   FoodCategory?  @relation("FoodCategoryTree", fields: [parentId], references: [id])
+  children FoodCategory[] @relation("FoodCategoryTree")
+  products FoodProduct[]
+
+  @@index([parentId])
+  @@index([slug])
+}
+
+// ─── Food Products ───────────────────────────────────────────────────────────
+
+model FoodProduct {
+  id                   String             @id @default(cuid())
+  source               String             @default("manual") // usda | openfoodfacts | manual
+  sourceId             String? // external ID from source database
+  name                 String
+  nameEn               String? // for USDA/international mapping
+  slug                 String             @unique
+  brandId              String?
+  categoryId           String?
+  description          String?            @db.Text
+  state                FoodState          @default(RAW)
+  ediblePortionPercent Decimal?           @db.Decimal(5, 2) // e.g. 85.00 for bananas
+  density_g_per_ml     Decimal?           @db.Decimal(6, 3)
+  defaultServingGrams  Decimal?           @db.Decimal(7, 2)
+  searchableSynonyms   String[] // for search: ["pierś z kurczaka", "filet z kurczaka"]
+  languageCode         String             @default("pl") // ISO 639-1
+  isActive             Boolean            @default(true)
+  qualityScore         Int                @default(0) // 0–100, computed
+  verificationStatus   VerificationStatus @default(UNVERIFIED)
+  verifiedAt           DateTime?
+  verifiedBy           String? // userId of reviewer
+
+  // Professional clinical fields
+  glycemicIndex       Int? // 0–100+
+  glycemicLoadPer100g Decimal?         @db.Decimal(6, 2)
+  fodmapLevel         FodmapLevel?
+  processingLevel     ProcessingLevel?
+  isBabySafe          Boolean?
+  isPregnancySafe     Boolean?
+  isBreastfeedingSafe Boolean?
+  notesClinical       String?          @db.Text
+  notesDietitian      String?          @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  brand             FoodBrand?                   @relation(fields: [brandId], references: [id])
+  category          FoodCategory?                @relation(fields: [categoryId], references: [id])
+  nutrients         FoodProductNutrients?
+  allergens         FoodProductAllergen[]
+  dietFlags         FoodProductDietFlag[]
+  aliases           FoodProductAlias[]
+  sourceMeta        FoodProductSourceMeta[]
+  householdMeasures HouseholdMeasure[]
+  recipeIngredients RecipeIngredient[]
+  substitutesFrom   IngredientSubstitutionRule[] @relation("SubstituteFrom")
+  substitutesTo     IngredientSubstitutionRule[] @relation("SubstituteTo")
+
+  @@unique([source, sourceId])
+  @@index([name])
+  @@index([slug])
+  @@index([categoryId])
+  @@index([brandId])
+  @@index([languageCode])
+  @@index([isActive])
+  @@index([verificationStatus])
+  @@index([qualityScore])
+}
+
+// ─── Food Brand ──────────────────────────────────────────────────────────────
+
+model FoodBrand {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  country   String? // ISO 3166-1 alpha-2
+  logoUrl   String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  products FoodProduct[]
+
+  @@index([slug])
+}
+
+// ─── Nutrients (per 100g) ────────────────────────────────────────────────────
+
+model FoodProductNutrients {
+  id            String @id @default(cuid())
+  foodProductId String @unique
+
+  // Macronutrients
+  kcal                 Decimal  @db.Decimal(8, 2)
+  protein_g            Decimal  @db.Decimal(7, 3)
+  fat_g                Decimal  @db.Decimal(7, 3)
+  saturatedFat_g       Decimal? @db.Decimal(7, 3)
+  monounsaturatedFat_g Decimal? @db.Decimal(7, 3)
+  polyunsaturatedFat_g Decimal? @db.Decimal(7, 3)
+  transFat_g           Decimal? @db.Decimal(7, 3)
+  carbs_g              Decimal  @db.Decimal(7, 3)
+  sugars_g             Decimal? @db.Decimal(7, 3)
+  addedSugars_g        Decimal? @db.Decimal(7, 3)
+  fiber_g              Decimal? @db.Decimal(7, 3)
+  starch_g             Decimal? @db.Decimal(7, 3)
+  salt_g               Decimal? @db.Decimal(7, 3)
+
+  // Minerals
+  sodium_mg     Decimal? @db.Decimal(8, 3)
+  potassium_mg  Decimal? @db.Decimal(8, 3)
+  calcium_mg    Decimal? @db.Decimal(8, 3)
+  magnesium_mg  Decimal? @db.Decimal(8, 3)
+  phosphorus_mg Decimal? @db.Decimal(8, 3)
+  iron_mg       Decimal? @db.Decimal(7, 3)
+  zinc_mg       Decimal? @db.Decimal(7, 3)
+  copper_mg     Decimal? @db.Decimal(7, 4)
+  manganese_mg  Decimal? @db.Decimal(7, 4)
+  iodine_ug     Decimal? @db.Decimal(7, 3)
+  selenium_ug   Decimal? @db.Decimal(7, 3)
+  chromium_ug   Decimal? @db.Decimal(7, 3)
+  molybdenum_ug Decimal? @db.Decimal(7, 3)
+
+  // Fat-soluble vitamins
+  vitaminA_ug     Decimal? @db.Decimal(8, 3) // RAE
+  betaCarotene_ug Decimal? @db.Decimal(8, 3)
+  vitaminD_ug     Decimal? @db.Decimal(7, 3)
+  vitaminE_mg     Decimal? @db.Decimal(7, 3) // alpha-tocopherol
+  vitaminK_ug     Decimal? @db.Decimal(7, 3)
+
+  // Water-soluble vitamins
+  vitaminC_mg   Decimal? @db.Decimal(7, 3)
+  vitaminB1_mg  Decimal? @db.Decimal(7, 4) // thiamine
+  vitaminB2_mg  Decimal? @db.Decimal(7, 4) // riboflavin
+  vitaminB3_mg  Decimal? @db.Decimal(7, 3) // niacin NE
+  vitaminB5_mg  Decimal? @db.Decimal(7, 3) // pantothenic acid
+  vitaminB6_mg  Decimal? @db.Decimal(7, 4)
+  folate_ug     Decimal? @db.Decimal(7, 3) // DFE
+  vitaminB12_ug Decimal? @db.Decimal(7, 4)
+  biotin_ug     Decimal? @db.Decimal(7, 3)
+  choline_mg    Decimal? @db.Decimal(7, 3)
+
+  // Other
+  cholesterol_mg Decimal? @db.Decimal(7, 3)
+  water_g        Decimal? @db.Decimal(7, 3)
+  alcohol_g      Decimal? @db.Decimal(7, 3)
+  caffeine_mg    Decimal? @db.Decimal(7, 3)
+  ash_g          Decimal? @db.Decimal(7, 3)
+
+  // Amino acids (nullable, for clinical diets)
+  tryptophan_g    Decimal? @db.Decimal(6, 4)
+  threonine_g     Decimal? @db.Decimal(6, 4)
+  isoleucine_g    Decimal? @db.Decimal(6, 4)
+  leucine_g       Decimal? @db.Decimal(6, 4)
+  lysine_g        Decimal? @db.Decimal(6, 4)
+  methionine_g    Decimal? @db.Decimal(6, 4)
+  phenylalanine_g Decimal? @db.Decimal(6, 4)
+  valine_g        Decimal? @db.Decimal(6, 4)
+  histidine_g     Decimal? @db.Decimal(6, 4)
+
+  // Fatty acids detail
+  omega3_g Decimal? @db.Decimal(7, 4)
+  omega6_g Decimal? @db.Decimal(7, 4)
+  epa_g    Decimal? @db.Decimal(6, 4) // C20:5 n-3
+  dha_g    Decimal? @db.Decimal(6, 4) // C22:6 n-3
+  ala_g    Decimal? @db.Decimal(6, 4) // C18:3 n-3
+
+  // Purines (for gout diets)
+  purines_mg Decimal? @db.Decimal(7, 3)
+
+  // Oxalates (for renal diets)
+  oxalate_mg Decimal? @db.Decimal(7, 3)
+
+  foodProduct FoodProduct @relation(fields: [foodProductId], references: [id], onDelete: Cascade)
+}
+
+// ─── Allergens (EU 14) ───────────────────────────────────────────────────────
+
+model FoodProductAllergen {
+  id             String           @id @default(cuid())
+  foodProductId  String
+  allergenCode   String // gluten | crustaceans | eggs | fish | peanuts | soy | milk | nuts | celery | mustard | sesame | sulphites | lupin | molluscs
+  presence       AllergenPresence @default(UNKNOWN)
+  source         DietFlagSource   @default(AUTO_RULE) // how was this determined
+  confidence     Int              @default(50) // 0–100
+  manualOverride Boolean          @default(false)
+  notes          String?
+
+  foodProduct FoodProduct @relation(fields: [foodProductId], references: [id], onDelete: Cascade)
+
+  @@unique([foodProductId, allergenCode])
+  @@index([foodProductId])
+  @@index([allergenCode])
+}
+
+// ─── Diet Flags ──────────────────────────────────────────────────────────────
+
+model FoodProductDietFlag {
+  id             String         @id @default(cuid())
+  foodProductId  String
+  flagCode       String // vegetarian | vegan | pescatarian | lactoseFree | glutenFree | lowFodmap | lowSodium | lowSugar | lowFat | highProtein | highFiber | ketoCompatible | diabeticFriendly | renalFriendly | liverFriendly | ibsFriendly | pregnancyFriendly | goutFriendly | heartFriendly | pancreasFriendly
+  value          Boolean        @default(true)
+  source         DietFlagSource @default(AUTO_RULE)
+  confidence     Int            @default(50) // 0–100
+  manualOverride Boolean        @default(false)
+  notes          String?
+  computedAt     DateTime       @default(now())
+
+  foodProduct FoodProduct @relation(fields: [foodProductId], references: [id], onDelete: Cascade)
+
+  @@unique([foodProductId, flagCode])
+  @@index([foodProductId])
+  @@index([flagCode])
+  @@index([value])
+}
+
+// ─── Product Aliases (synonyms, translations) ────────────────────────────────
+
+model FoodProductAlias {
+  id            String  @id @default(cuid())
+  foodProductId String
+  alias         String
+  languageCode  String  @default("pl") // ISO 639-1
+  isPrimary     Boolean @default(false)
+
+  foodProduct FoodProduct @relation(fields: [foodProductId], references: [id], onDelete: Cascade)
+
+  @@index([foodProductId])
+  @@index([alias])
+  @@index([languageCode])
+}
+
+// ─── Source Metadata (traceability) ──────────────────────────────────────────
+
+model FoodProductSourceMeta {
+  id            String   @id @default(cuid())
+  foodProductId String
+  source        String // usda | openfoodfacts | manual | nzz | polish_tables
+  sourceId      String? // FDC ID, OFF barcode, etc.
+  sourceUrl     String?
+  sourceLicense String? // public_domain | odbl | cc_by_sa | proprietary
+  sourceVersion String? // e.g. "SR Legacy 2021-10"
+  importedAt    DateTime @default(now())
+  rawData       Json? // original source record for audit
+
+  foodProduct FoodProduct @relation(fields: [foodProductId], references: [id], onDelete: Cascade)
+
+  @@index([foodProductId])
+  @@index([source, sourceId])
+}
+
+// ─── Household Measures ──────────────────────────────────────────────────────
+
+model HouseholdMeasure {
+  id            String  @id @default(cuid())
+  foodProductId String
+  name          String // "łyżka stołowa", "szklanka", "plaster"
+  nameEn        String? // "tablespoon", "glass", "slice"
+  grams         Decimal @db.Decimal(7, 2)
+  source        String  @default("manual") // usda | manual
+  sortOrder     Int     @default(0)
+
+  foodProduct FoodProduct @relation(fields: [foodProductId], references: [id], onDelete: Cascade)
+
+  @@index([foodProductId])
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RECIPES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+model Recipe {
+  id                 String             @id @default(cuid())
+  source             String             @default("manual") // manual | imported | generated
+  sourceId           String?
+  title              String
+  slug               String             @unique
+  description        String?            @db.Text
+  category           String? // "zupy", "sałatki", "dania główne"
+  cuisineType        String? // "polska", "włoska", "azjatycka"
+  mealType           RecipeMealType     @default(LUNCH)
+  difficulty         RecipeDifficulty   @default(MEDIUM)
+  prepTimeMinutes    Int?
+  cookTimeMinutes    Int?
+  totalTimeMinutes   Int?
+  servings           Int                @default(1)
+  servingWeightG     Decimal?           @db.Decimal(7, 2) // final weight per serving
+  yieldWeightG       Decimal?           @db.Decimal(8, 2) // total yield after cooking
+  yieldFactor        Decimal?           @db.Decimal(4, 3) // weight after / weight before cooking
+  tips               String?            @db.Text
+  notesDietitian     String?            @db.Text
+  imageUrl           String?
+  videoUrl           String?
+  sourceUrl          String?            // original recipe URL (for imported recipes)
+  estimatedCost      PriceCategory      @default(STANDARD) // BUDGET | STANDARD | PREMIUM
+  isActive           Boolean            @default(true)
+  qualityScore       Int                @default(0) // 0–100
+  averageRating      Decimal?           @db.Decimal(3, 2) // cached avg 1.00-5.00
+  ratingCount        Int                @default(0) // cached count
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  mealPrepFriendly   Boolean            @default(false) // 37.7
+  cookingMethod      String?            // 84.3: BAKED, BOILED, FRIED, GRILLED, STEAMED, RAW, OTHER
+  seasons            Int[]              // months 1-12 (1=January, 12=December)
+  tags               String[]
+  languageCode       String             @default("pl")
+  // AI recipe management
+  origin             String             @default("manual") // manual | scraped | ai_generated
+  aiApproved         Boolean            @default(false)    // for ai_generated: true after admin review
+
+  // Faza C — Dish completeness (null = jeszcze nie przeklasyfikowane).
+  // Solver po backfillu filtruje pełne posiłki vs komponenty. Dopóki null,
+  // istniejący filtr po mealType (Faza A) trzyma starą logikę.
+  dishCompleteness         DishCompleteness?
+  // Czy przepis już zawiera ≥100 g warzyw (audit RecipeIngredient/CleanProduct).
+  // Faza D: jeśli main ma true, solver pomija dobieranie veg_side.
+  containsVegetableServing Boolean           @default(false)
+  // Suma gramów warzyw w przepisie (do tie-breakingu i raportu jakości).
+  vegetableWeightG         Int?
+
+  // Faza E — jednostka servings (PER_PORTION default, PER_PIECE dla naleśników/
+  // placek/kotlet jajeczny, PER_100G dla zup/sosów/napojów). Solver używa do
+  // odpowiedniego skalowania (np. 5 naleśników zamiast 17 servings).
+  servingType ServingType @default(PER_PORTION)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ingredients       RecipeIngredient[]
+  instructionSteps  RecipeInstructionStep[]
+  nutritionSnapshot RecipeNutritionSnapshot?
+  allergens         RecipeAllergen[]
+  dietFlags         RecipeDietFlag[]
+  ratings           RecipeRating[]
+  meals             Meal[]
+
+  @@unique([source, sourceId])
+  @@index([slug])
+  @@index([title])
+  @@index([category])
+  @@index([mealType])
+  @@index([isActive])
+  @@index([qualityScore])
+  @@index([averageRating])
+  @@index([dishCompleteness])
+  @@index([servingType])
+}
+
+// ─── Recipe Ingredients ──────────────────────────────────────────────────────
+
+model RecipeIngredient {
+  id              String  @id @default(cuid())
+  recipeId        String
+  foodProductId   String? // legacy FK — old recipes use this
+  cleanProductId  String? // new FK — new recipes use this
+  sortOrder       Int     @default(0)
+  quantity        Decimal @db.Decimal(8, 3) // numeric quantity (e.g. 2.5)
+  unit            String  @default("g") // g | ml | szt | łyżka | szklanka | etc.
+  grams           Decimal @db.Decimal(7, 2) // always resolved to grams
+  displayName     String? // optional override: "2 ząbki czosnku" instead of "czosnek 6g"
+  isOptional      Boolean @default(false)
+  groupName       String? // "Sos", "Ciasto", "Nadzienie" — for ingredient grouping
+  notes           String? // "drobno posiekany", "obrany"
+
+  // Retention factor for cooked weight (1.0 = no change, 0.7 = 30% weight loss)
+  retentionFactor Decimal? @db.Decimal(4, 3)
+
+  recipe       Recipe        @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  foodProduct  FoodProduct?  @relation(fields: [foodProductId], references: [id], onDelete: Cascade)
+  cleanProduct CleanProduct? @relation(fields: [cleanProductId], references: [id], onDelete: Cascade)
+
+  @@index([recipeId])
+  @@index([foodProductId])
+  @@index([cleanProductId])
+}
+
+// ─── Recipe Instruction Steps ────────────────────────────────────────────────
+
+model RecipeInstructionStep {
+  id              String  @id @default(cuid())
+  recipeId        String
+  stepNumber      Int
+  instruction     String  @db.Text
+  durationMinutes Int? // how long this step takes
+  phase           String  @default("prep") // "prep" or "cook"
+  imageUrl        String?
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@unique([recipeId, stepNumber])
+  @@index([recipeId])
+}
+
+// ─── Recipe Nutrition Snapshot ───────────────────────────────────────────────
+
+model RecipeNutritionSnapshot {
+  id         String   @id @default(cuid())
+  recipeId   String   @unique
+  computedAt DateTime @default(now())
+
+  // Per serving values
+  kcal           Decimal  @db.Decimal(8, 2)
+  protein_g      Decimal  @db.Decimal(7, 3)
+  fat_g          Decimal  @db.Decimal(7, 3)
+  saturatedFat_g Decimal? @db.Decimal(7, 3)
+  carbs_g        Decimal  @db.Decimal(7, 3)
+  sugars_g       Decimal? @db.Decimal(7, 3)
+  fiber_g        Decimal? @db.Decimal(7, 3)
+  salt_g         Decimal? @db.Decimal(7, 3)
+
+  // Fat fractions per serving
+  monounsaturatedFat_g Decimal? @db.Decimal(7, 3)
+  polyunsaturatedFat_g Decimal? @db.Decimal(7, 3)
+  transFat_g           Decimal? @db.Decimal(7, 3)
+  omega3_g             Decimal? @db.Decimal(7, 4)
+  omega6_g             Decimal? @db.Decimal(7, 4)
+  epa_g                Decimal? @db.Decimal(6, 4)
+  dha_g                Decimal? @db.Decimal(6, 4)
+  ala_g                Decimal? @db.Decimal(6, 4)
+
+  // Carb fractions per serving
+  starch_g      Decimal? @db.Decimal(7, 3)
+  addedSugars_g Decimal? @db.Decimal(7, 3)
+
+  // Minerals per serving
+  sodium_mg      Decimal? @db.Decimal(8, 3)
+  potassium_mg   Decimal? @db.Decimal(8, 3)
+  calcium_mg     Decimal? @db.Decimal(8, 3)
+  magnesium_mg   Decimal? @db.Decimal(8, 3)
+  phosphorus_mg  Decimal? @db.Decimal(8, 3)
+  iron_mg        Decimal? @db.Decimal(7, 3)
+  zinc_mg        Decimal? @db.Decimal(7, 3)
+  copper_mg      Decimal? @db.Decimal(7, 4)
+  manganese_mg   Decimal? @db.Decimal(7, 4)
+  iodine_ug      Decimal? @db.Decimal(7, 3)
+  selenium_ug    Decimal? @db.Decimal(7, 3)
+  chromium_ug    Decimal? @db.Decimal(7, 3)
+  molybdenum_ug  Decimal? @db.Decimal(7, 3)
+  fluoride_ug    Decimal? @db.Decimal(7, 3)
+  chloride_mg    Decimal? @db.Decimal(8, 3)
+
+  // Fat-soluble vitamins per serving
+  vitaminA_ug    Decimal? @db.Decimal(8, 3)
+  vitaminD_ug    Decimal? @db.Decimal(7, 3)
+  vitaminE_mg    Decimal? @db.Decimal(7, 3)
+  vitaminK_ug    Decimal? @db.Decimal(7, 3)
+
+  // Water-soluble vitamins per serving
+  vitaminC_mg    Decimal? @db.Decimal(7, 3)
+  vitaminB1_mg   Decimal? @db.Decimal(7, 4)
+  vitaminB2_mg   Decimal? @db.Decimal(7, 4)
+  vitaminB3_mg   Decimal? @db.Decimal(7, 3)
+  vitaminB5_mg   Decimal? @db.Decimal(7, 3)
+  vitaminB6_mg   Decimal? @db.Decimal(7, 4)
+  folate_ug      Decimal? @db.Decimal(7, 3)
+  vitaminB12_ug  Decimal? @db.Decimal(7, 4)
+  biotin_ug      Decimal? @db.Decimal(7, 3)
+  choline_mg     Decimal? @db.Decimal(7, 3)
+
+  // Other
+  cholesterol_mg Decimal? @db.Decimal(7, 3)
+
+  // Whole recipe totals
+  totalKcal      Decimal @db.Decimal(9, 2)
+  totalProtein_g Decimal @db.Decimal(8, 3)
+  totalFat_g     Decimal @db.Decimal(8, 3)
+  totalCarbs_g   Decimal @db.Decimal(8, 3)
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+}
+
+// ─── Recipe Allergens (computed from ingredients) ────────────────────────────
+
+model RecipeAllergen {
+  id           String           @id @default(cuid())
+  recipeId     String
+  allergenCode String // same codes as FoodProductAllergen
+  presence     AllergenPresence @default(UNKNOWN)
+  computedAt   DateTime         @default(now())
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@unique([recipeId, allergenCode])
+  @@index([recipeId])
+}
+
+// ─── Recipe Diet Flags (computed from ingredients) ───────────────────────────
+
+model RecipeDietFlag {
+  id         String         @id @default(cuid())
+  recipeId   String
+  flagCode   String // same codes as FoodProductDietFlag
+  value      Boolean        @default(true)
+  source     DietFlagSource @default(AUTO_RULE)
+  confidence Int            @default(50)
+  computedAt DateTime       @default(now())
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@unique([recipeId, flagCode])
+  @@index([recipeId])
+  @@index([flagCode])
+}
+
+// ─── Recipe Ratings (37.5) ──────────────────────────────────────────────────
+
+model RecipeRating {
+  id         String   @id @default(cuid())
+  recipeId   String
+  patientId  String
+  rating     Int      // 1-5
+  comment    String?  @db.Text
+  source     String   @default("inline") // "checkin" | "inline" | "manual"
+  dietPlanId String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  recipe  Recipe  @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@unique([recipeId, patientId])
+  @@index([recipeId])
+  @@index([patientId])
+}
+
+// ─── Shopping List Checks (63.3) ────────────────────────────────────────────
+
+model ShoppingListCheck {
+  id         String   @id @default(cuid())
+  patientId  String
+  dietPlanId String
+  itemName   String   @db.VarChar(300)
+  checked    Boolean  @default(false)
+  updatedAt  DateTime @updatedAt
+
+  patient  Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  dietPlan DietPlan @relation(fields: [dietPlanId], references: [id], onDelete: Cascade)
+
+  @@unique([patientId, dietPlanId, itemName])
+  @@index([patientId, dietPlanId])
+}
+
+// ─── Favorite Meals (64.2) ──────────────────────────────────────────────────
+
+model FavoriteMeal {
+  id         String   @id @default(cuid())
+  patientId  String
+  recipeName String   @db.VarChar(300)
+  recipeId   String?
+  dietPlanId String?
+  createdAt  DateTime @default(now())
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@unique([patientId, recipeName])
+  @@index([patientId])
+}
+
+// ─── Ingredient Substitution Rules ───────────────────────────────────────────
+
+model IngredientSubstitutionRule {
+  id               String  @id @default(cuid())
+  fromProductId    String
+  toProductId      String
+  conversionFactor Decimal @db.Decimal(5, 3) // grams ratio: 100g of A → X grams of B
+  notes            String?
+  dietContext      String? // "vegan" | "glutenFree" | "lactoseFree" — when this substitution is relevant
+  isActive         Boolean @default(true)
+
+  fromProduct FoodProduct @relation("SubstituteFrom", fields: [fromProductId], references: [id], onDelete: Cascade)
+  toProduct   FoodProduct @relation("SubstituteTo", fields: [toProductId], references: [id], onDelete: Cascade)
+
+  @@unique([fromProductId, toProductId, dietContext])
+  @@index([fromProductId])
+  @@index([toProductId])
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// DATA QUALITY & IMPORT INFRASTRUCTURE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+model ImportJob {
+  id             String          @id @default(cuid())
+  source         String // usda | openfoodfacts | csv | recipe_generator
+  status         ImportJobStatus @default(PENDING)
+  startedAt      DateTime?
+  completedAt    DateTime?
+  totalRecords   Int             @default(0)
+  importedCount  Int             @default(0)
+  skippedCount   Int             @default(0)
+  errorCount     Int             @default(0)
+  duplicateCount Int             @default(0)
+  config         Json? // import configuration / parameters
+  errorLog       Json? // array of { line, error, data }
+  summary        Json? // post-import report
+  createdBy      String? // userId
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@index([source])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model DataQualityIssue {
+  id           String              @id @default(cuid())
+  entityType   String // FoodProduct | Recipe
+  entityId     String
+  field        String? // which field has the issue
+  severity     DataQualitySeverity @default(WARNING)
+  issueCode    String // NEGATIVE_VALUE | KCAL_MISMATCH | MISSING_MICRONUTRIENT | SUSPICIOUS_VALUE | DUPLICATE_SUSPECT
+  description  String
+  suggestedFix String?
+  isResolved   Boolean             @default(false)
+  resolvedAt   DateTime?
+  resolvedBy   String? // userId
+  importJobId  String?
+  createdAt    DateTime            @default(now())
+
+  @@index([entityType, entityId])
+  @@index([severity])
+  @@index([isResolved])
+  @@index([issueCode])
+  @@index([importJobId])
+}
+
+model ManualReviewQueue {
+  id          String           @id @default(cuid())
+  itemType    ReviewItemType
+  itemId      String
+  status      ReviewItemStatus @default(PENDING)
+  priority    Int              @default(0) // higher = more urgent
+  reason      String // why this needs review
+  assignedTo  String? // userId
+  reviewNotes String?          @db.Text
+  resolvedAt  DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([itemType, status])
+  @@index([status])
+  @@index([priority])
+  @@index([assignedTo])
+}
+
+// ─── Nutrition targets ────────────────────────────────────────────────────────
+
+model NutritionTargets {
+  id             String   @id @default(cuid())
+  patientId      String   @unique
+  bmr            Int
+  tdee           Int
+  targetKcal     Int
+  targetProteinG Int
+  targetFatG     Int
+  targetCarbsG   Int
+  activityLevel  String
+  goal           String
+  ageYears       Int?
+  weightKg       Decimal? @db.Decimal(6, 2)
+  heightCm       Int?
+  breakdown      Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+}
+
+model FrequentInput {
+  id        String   @id @default(cuid())
+  field     String
+  value     String
+  count     Int      @default(1)
+  updatedAt DateTime @updatedAt
+
+  @@unique([field, value])
+  @@index([field, count])
+}
+
+// ─── Meal Library ─────────────────────────────────────────────────────────────
+
+model Meal {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  mealType    MealType
+  dietType    DietType @default(STANDARD)
+
+  // Total macros for one serving
+  kcal     Int
+  proteinG Decimal @db.Decimal(6, 2)
+  fatG     Decimal @db.Decimal(6, 2)
+  carbsG   Decimal @db.Decimal(6, 2)
+
+  // Allergen flags — denormalized for fast filtering
+  hasGluten  Boolean @default(false)
+  hasLactose Boolean @default(false)
+  hasNuts    Boolean @default(false)
+  hasSoy     Boolean @default(false)
+  hasEggs    Boolean @default(false)
+  hasFish    Boolean @default(false)
+
+  tags     String[]
+  isActive Boolean  @default(true)
+  source   String   @default("manual") // manual | seed | import
+
+  // Optional link to a Recipe for full ingredient breakdown
+  recipeId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  recipe        Recipe?        @relation(fields: [recipeId], references: [id])
+  templateMeals TemplateMeal[]
+
+  @@index([mealType])
+  @@index([dietType])
+  @@index([isActive])
+  @@index([kcal])
+}
+
+// ─── Template Plans (7.10.2) ──────────────────────────────────────────────────
+
+model TemplatePlan {
+  id             String   @id @default(cuid())
+  name           String
+  description    String?
+  targetKcal     Int
+  targetProteinG Int
+  targetFatG     Int
+  targetCarbsG   Int
+  goal           String // WEIGHT_LOSS | MAINTENANCE | MUSCLE_GAIN
+  dietType       DietType @default(STANDARD)
+  mealCount      Int      @default(5)
+  isActive       Boolean  @default(true)
+  source         String   @default("manual") // manual | seed
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  meals TemplateMeal[]
+
+  @@index([goal])
+  @@index([targetKcal])
+  @@index([dietType])
+  @@index([isActive])
+}
+
+model TemplateMeal {
+  id             String @id @default(cuid())
+  templatePlanId String
+  mealId         String
+  dayNumber      Int // 1–7
+  position       Int // order within day (1 = first meal)
+
+  templatePlan TemplatePlan @relation(fields: [templatePlanId], references: [id], onDelete: Cascade)
+  meal         Meal         @relation(fields: [mealId], references: [id])
+
+  @@unique([templatePlanId, mealId, dayNumber])
+  @@index([templatePlanId])
+}
+
+// ─── Diet plan versioning (7.11) ─────────────────────────────────────────────
+
+enum DietPlanRevisionReason {
+  AI_GENERATED
+  AUTO_ADJUST
+  DIETITIAN_EDIT
+  PUBLISHED
+  CHECKIN_ADJUSTMENT
+  SLOT_REPAIR
+}
+
+model DietPlanRevision {
+  id             String                 @id @default(cuid())
+  dietPlanId     String
+  revisionNumber Int
+  /// userId — null when system-generated (pipeline)
+  createdBy      String?
+  reason         DietPlanRevisionReason
+  /// Stored encrypted via encryptJson() — AES-256-GCM
+  contentJson    Json
+  createdAt      DateTime               @default(now())
+
+  dietPlan DietPlan @relation(fields: [dietPlanId], references: [id], onDelete: Cascade)
+
+  @@unique([dietPlanId, revisionNumber])
+  @@index([dietPlanId])
+}
+
+// ─── Weekly Check-ins (7.13) ─────────────────────────────────────────────────
+
+model CheckIn {
+  id        String   @id @default(cuid())
+  patientId String
+  createdAt DateTime @default(now())
+
+  weightKg   Decimal? @db.Decimal(6, 2)
+  compliance Int? // 0–100 (% diet adherence)
+  hunger     Int? // 1–10
+  energy     Int? // 1–10
+  sleep      Int? // 1–10
+  activity   Int? // 1–10 (optional)
+  mood       Int?     @db.SmallInt // 1–5 (62.3)
+  waistCm    Decimal? @db.Decimal(5, 1) // 62.4
+  hipsCm     Decimal? @db.Decimal(5, 1)
+  thighCm    Decimal? @db.Decimal(5, 1)
+  chestCm    Decimal? @db.Decimal(5, 1)
+  notes      String?  @db.Text
+  // 79.2: GI/digestion fields (shown only for IBS/reflux patients)
+  digestion     Int?     @db.SmallInt // 1–10 comfort scale
+  bloating      Boolean?             // yes/no
+  stoolBristol  Int?     @db.SmallInt // 1–7 Bristol Stool Scale
+  // 79.6: supplement compliance tracking
+  supplementsTaken Json? // [{ supplementId: string, taken: boolean }]
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@index([patientId])
+  @@index([createdAt])
+}
+
+// ─── Supplement Prescriptions (79.6) ─────────────────────────────────────────
+
+model SupplementPrescription {
+  id          String    @id @default(cuid())
+  patientId   String
+  dietitianId String?   // who prescribed (null = system recommendation)
+
+  nutrientKey String    @db.VarChar(50)  // e.g. "vitaminD", "iron", "omega3"
+  label       String    @db.VarChar(200) // e.g. "Wit. D 2000IU"
+  dose        String    @db.VarChar(50)  // e.g. "2000"
+  unit        String    @db.VarChar(20)  // e.g. "IU", "mg", "g"
+  frequency   String    @db.VarChar(50)  // e.g. "daily", "twice_daily", "weekly"
+  startDate   DateTime  @default(now())
+  endDate     DateTime?
+  active      Boolean   @default(true)
+  notes       String?   @db.Text
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  patient     Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  dietitian   User?     @relation("PrescribingDietitian", fields: [dietitianId], references: [id])
+
+  @@index([patientId])
+  @@index([patientId, active])
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String             @unique
+  stripeCustomerId     String?            @unique
+  stripeSubscriptionId String?            @unique
+  stripePriceId        String?
+  plan                 SubscriptionPlan   @default(FREE)
+  status               SubscriptionStatus @default(TRIALING)
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean            @default(false)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── Diet Template Cache (17.2) ─────────────────────────────────────────────
+
+model DietTemplate {
+  id          String @id @default(cuid())
+  segmentHash String @unique // SHA-256 of normalized segment
+
+  // Segment components (denormalized for similarity queries)
+  goal      String // WEIGHT_LOSS | MAINTENANCE | MUSCLE_GAIN
+  kcalBucket Int // rounded to nearest 100
+  dietType  String // STANDARD | VEGE | VEGAN | GLUTEN_FREE | LACTOSE_FREE
+  allergies String[] // sorted array of allergy codes
+  diseases  String[] // sorted array of chronic disease codes
+  mealCount Int // 3 | 4 | 5
+
+  // Plan content (encrypted — same format as DietPlan.content)
+  content Json
+
+  // Macros of the template
+  kcal     Int
+  proteinG Int
+  fatG     Int
+  carbsG   Int
+
+  // Metadata
+  sourceAiModel    String? // which AI model generated this
+  sourceDietPlanId String? // original DietPlan this was extracted from
+  usageCount       Int      @default(0)
+  lastUsedAt       DateTime?
+  qualityScore     Int      @default(0) // 0–100
+  isActive         Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([goal])
+  @@index([kcalBucket])
+  @@index([dietType])
+  @@index([isActive])
+  @@index([usageCount])
+}
+
+// ─── AI Usage Telemetry (7.14.1) ────────────────────────────────────────────
+
+model AiUsageLog {
+  id         String   @id @default(cuid())
+  patientId  String
+  dietPlanId String?
+  triggeredAt DateTime @default(now())
+  completedAt DateTime?
+
+  // Pipeline metrics
+  durationMs    Int?  // total pipeline execution time
+  source        String? // template | candidate_meals | fallback | n8n
+  cached        Boolean @default(false)
+  n8nTriggered  Boolean @default(false)
+  blocked       Boolean @default(false)
+
+  // Validation outcome
+  validationStatus String? // VALID | NEEDS_ADJUST | NEEDS_REPAIR_AI
+  autoAdjusted     Boolean @default(false)
+
+  // Policy engine stats
+  policyRulesCount Int @default(0)
+  redFlagsCount    Int @default(0)
+  redFlagSeverity  String? // CRITICAL | HIGH | MODERATE | null
+
+  // Step-level timing (JSON array of { step, durationMs })
+  stepTimings Json?
+
+  // Error tracking
+  error   String? @db.Text
+  success Boolean @default(true)
+
+  // Cost estimation (for future AI provider integration)
+  aiProvider       String? // pipeline | n8n | openai
+  aiModel          String?
+  promptTokens     Int?
+  completionTokens Int?
+  estimatedCostUsd Decimal? @db.Decimal(10, 6)
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@index([patientId])
+  @@index([triggeredAt])
+  @@index([source])
+  @@index([success])
+}
+
+// ─── Feature Flags (7.14.2) ─────────────────────────────────────────────────
+
+model FeatureFlag {
+  id          String   @id @default(cuid())
+  key         String   @unique // e.g. "n8n_generation", "stripe_payments", "checkin_adjustments"
+  name        String // human-readable name
+  description String?  @db.Text
+  enabled     Boolean  @default(false) // global on/off
+  /// JSON conditions: { roles?: string[], userIds?: string[], percentage?: number }
+  conditions  Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([key])
+  @@index([enabled])
+}
+
+enum TestimonialStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Testimonial {
+  id           String            @id @default(cuid())
+  userId       String            @unique
+  user         User              @relation(fields: [userId], references: [id])
+  content      String            @db.Text
+  rating       Int // 1-5
+  status       TestimonialStatus @default(PENDING)
+  adminReply   String?           @db.Text
+  adminReplyAt DateTime?
+  isPinned     Boolean           @default(false)
+  pinnedOrder  Int               @default(0)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  reviewedAt   DateTime?
+  reviewedBy   String?
+
+  @@index([status])
+  @@index([isPinned])
+}
+
+// ─── Notification Preferences (19.2) ──────────────────────────────────────────
+
+model NotificationPreferences {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  // Email reminders toggle
+  emailReminders Boolean @default(false)
+
+  // Meal times (HH:MM format, e.g. "08:00")
+  breakfastTime String? // default null = no reminder
+  lunchTime     String? // default null = no reminder
+  dinnerTime    String? // default null = no reminder
+  snackTime     String? // default null = no reminder
+
+  // Reminder lead time in minutes (how long before meal to send reminder)
+  reminderLeadMinutes Int @default(30)
+
+  // Weekly summary email
+  weeklySummary Boolean @default(true)
+
+  // Timezone (IANA, e.g. "Europe/Warsaw")
+  timezone String @default("Europe/Warsaw")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model DietitianNote {
+  id           String   @id @default(cuid())
+  patientId    String
+  dietitianId  String
+  dietPlanId   String?
+  content      String   @db.Text
+  createdAt    DateTime @default(now())
+
+  patient   Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  dietitian User      @relation("NoteDietitian", fields: [dietitianId], references: [id])
+  dietPlan  DietPlan? @relation(fields: [dietPlanId], references: [id])
+
+  @@index([patientId])
+  @@index([dietitianId])
+}
+
+model NoteTemplate {
+  id           String   @id @default(cuid())
+  dietitianId  String
+  title        String   @db.VarChar(200)
+  content      String   @db.Text
+  category     String?  @db.VarChar(100)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  dietitian User @relation("TemplateDietitian", fields: [dietitianId], references: [id], onDelete: Cascade)
+
+  @@index([dietitianId])
+}
+
+model ReferralCode {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  code            String   @unique @db.VarChar(20)
+  discountPercent Int      @default(20)
+  createdAt       DateTime @default(now())
+
+  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  usages ReferralUsage[]
+}
+
+model ReferralUsage {
+  id             String   @id @default(cuid())
+  referralCodeId String
+  referredUserId String
+  orderId        String?
+  createdAt      DateTime @default(now())
+
+  referralCode ReferralCode @relation(fields: [referralCodeId], references: [id], onDelete: Cascade)
+  referredUser User         @relation("ReferredUser", fields: [referredUserId], references: [id], onDelete: Cascade)
+
+  @@unique([referralCodeId, referredUserId])
+  @@index([referralCodeId])
+  @@index([referredUserId])
+}
+
+
+enum ClinicalRuleType {
+  POLICY
+  RED_FLAG
+}
+
+enum RuleSeverity {
+  CRITICAL
+  HIGH
+  MODERATE
+  LOW
+}
+
+model ClinicalRule {
+  id            String           @id @default(cuid())
+  name          String
+  description   String           @db.Text
+  type          ClinicalRuleType
+  severity      RuleSeverity     @default(LOW)
+  priority      Int              @default(50)
+  conditions    Json             // declarative condition tree
+  effects       Json             // PolicyEffect[] or RedFlag message
+  source        String?          @db.VarChar(200) // e.g. "PTD 2024, ch. 4.2"
+  version       String           @default("1.0") @db.VarChar(20)
+  sources       Json?            // [{ref, url?, year}] — detailed references
+  conflictsWith String[]         // names of conflicting rules
+  category      String?          @db.VarChar(50) // e.g. "metabolic", "cardio", "hepatic"
+  isActive      Boolean          @default(true)
+  isDefault        Boolean          @default(true)
+  createdBy        String?          // userId of admin who created/edited
+  triggerCount     Int              @default(0)
+  lastTriggeredAt  DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  history          ClinicalRuleHistory[]
+
+  @@index([type, isActive])
+  @@index([isActive])
+  @@index([category])
+}
+
+model ClinicalRuleHistory {
+  id        String   @id @default(cuid())
+  ruleId    String
+  changedBy String?  // userId
+  changeSummary String @db.Text
+  previousData  Json // snapshot of rule before change
+  createdAt DateTime @default(now())
+
+  rule ClinicalRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  @@index([ruleId])
+  @@index([createdAt])
+}
+
+enum ConsentType {
+  HEALTH_DATA_PROCESSING
+  AI_DISCLAIMER
+  EMAIL_NOTIFICATIONS
+  TERMS_ACCEPTANCE
+  PRIVACY_POLICY
+  COOKIE_FUNCTIONAL
+  COOKIE_ANALYTICS
+  COOKIE_MARKETING
+}
+
+model UserConsent {
+  id              String      @id @default(cuid())
+  userId          String
+  consentType     ConsentType
+  granted         Boolean     @default(true)
+  documentVersion String      @default("1.0") @db.VarChar(20)
+  acceptedAt      DateTime    @default(now())
+  revokedAt       DateTime?
+  ipAddress       String?     @db.VarChar(45)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, consentType])
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CLEAN PRODUCT DATABASE (FAZA 25)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+enum CleanProductType {
+  BASE // from ilewazy + USDA merge
+  RETAIL // from Open Food Facts
+  MANUAL // added by dietitian
+}
+
+enum CleanProductSource {
+  ILEWAZY
+  USDA
+  OPENFOODFACTS
+  MANUAL
+}
+
+enum CleanVerificationStatus {
+  VERIFIED
+  UNVERIFIED
+  FLAGGED
+}
+
+// ─── Clean Product ──────────────────────────────────────────────────────────
+
+model CleanProduct {
+  id            String                  @id @default(cuid())
+  name          String
+  nameEn        String?
+  slug          String                  @unique
+  type          CleanProductType
+  brand         String?
+  barcode       String?
+  category      String // one of 12 Polish categories from ilewazy
+  subcategory   String?
+  description   String?                 @db.Text
+  imageUrl      String?
+
+  // Source traceability
+  sourcePrimary   CleanProductSource
+  sourceSecondary CleanProductSource?
+  sourceUrl       String?
+  sourceId        String? // external ID (USDA FDC ID, OFF barcode, ilewazy ID)
+
+  // Quality
+  qualityScore       Int                     @default(0) // 0–100
+  verificationStatus CleanVerificationStatus @default(UNVERIFIED)
+  hasMicronutrients  Boolean                 @default(false)
+
+  // Clinical (26.C + 26.F)
+  glycemicIndex       Int?
+  glycemicLoadPer100g Decimal?     @db.Decimal(6, 2)
+  fodmapLevel         FodmapLevel?
+
+  // Budget heuristic (37.6)
+  priceCategory        PriceCategory @default(STANDARD)
+  estimatedPricePer100g Decimal?     @db.Decimal(6, 2) // PLN per 100g, null = unknown
+
+  // Retail-specific
+  packageWeightG  Int?
+  servingWeightG  Int?
+
+  // Audit
+  createdByUserId String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  nutrients         CleanProductNutrients?
+  aminoAcids        CleanProductAminoAcids?
+  bioactives        CleanProductBioactives?
+  portions          CleanProductPortion[]
+  allergens         CleanProductAllergen[]
+  dietFlags         CleanProductDietFlag[]
+  recipeIngredients RecipeIngredient[]
+
+  @@index([name])
+  @@index([category])
+  @@index([type])
+  @@index([verificationStatus])
+  @@index([qualityScore])
+}
+
+// ─── Clean Product Nutrients (per 100g, 1:1) ────────────────────────────────
+
+model CleanProductNutrients {
+  id             String @id @default(cuid())
+  cleanProductId String @unique
+
+  // Macronutrients per 100g
+  kcalPer100g         Decimal  @db.Decimal(8, 2)
+  proteinPer100g      Decimal  @db.Decimal(7, 3)
+  fatPer100g          Decimal  @db.Decimal(7, 3)
+  carbsPer100g        Decimal  @db.Decimal(7, 3)
+  fiberPer100g        Decimal? @db.Decimal(7, 3)
+  sugarsPer100g       Decimal? @db.Decimal(7, 3)
+  saltPer100g         Decimal? @db.Decimal(7, 3)
+  saturatedFatPer100g Decimal? @db.Decimal(7, 3)
+
+  // Fat fractions (26.B)
+  monounsaturatedFatPer100g Decimal? @db.Decimal(7, 3)
+  polyunsaturatedFatPer100g Decimal? @db.Decimal(7, 3)
+  transFatPer100g           Decimal? @db.Decimal(7, 3)
+  omega3Per100g             Decimal? @db.Decimal(7, 4)
+  omega6Per100g             Decimal? @db.Decimal(7, 4)
+  epaPer100g                Decimal? @db.Decimal(6, 4) // C20:5 n-3
+  dhaPer100g                Decimal? @db.Decimal(6, 4) // C22:6 n-3
+  alaPer100g                Decimal? @db.Decimal(6, 4) // C18:3 n-3
+
+  // Carb fractions (26.C)
+  starchPer100g      Decimal? @db.Decimal(7, 3)
+  addedSugarsPer100g Decimal? @db.Decimal(7, 3)
+
+  // Minerals per 100g (nullable — empty for RETAIL products)
+  sodiumMg      Decimal? @db.Decimal(8, 3)
+  potassiumMg   Decimal? @db.Decimal(8, 3)
+  calciumMg     Decimal? @db.Decimal(8, 3)
+  magnesiumMg   Decimal? @db.Decimal(8, 3)
+  phosphorusMg  Decimal? @db.Decimal(8, 3)
+  ironMg        Decimal? @db.Decimal(7, 3)
+  zincMg        Decimal? @db.Decimal(7, 3)
+  copperMg      Decimal? @db.Decimal(7, 4)
+  manganeseMg   Decimal? @db.Decimal(7, 4)
+  iodineUg      Decimal? @db.Decimal(7, 3)
+  seleniumUg    Decimal? @db.Decimal(7, 3)
+  chromiumUg    Decimal? @db.Decimal(7, 3)
+  molybdenumUg  Decimal? @db.Decimal(7, 3)
+  fluorideUg    Decimal? @db.Decimal(7, 3)
+  chlorideMg    Decimal? @db.Decimal(8, 3)
+
+  // Fat-soluble vitamins per 100g
+  vitaminAUg    Decimal? @db.Decimal(8, 3) // RAE
+  vitaminDUg    Decimal? @db.Decimal(7, 3)
+  vitaminEMg    Decimal? @db.Decimal(7, 3) // alpha-tocopherol
+  vitaminKUg    Decimal? @db.Decimal(7, 3)
+
+  // Water-soluble vitamins per 100g
+  vitaminCMg    Decimal? @db.Decimal(7, 3)
+  vitaminB1Mg   Decimal? @db.Decimal(7, 4) // thiamine
+  vitaminB2Mg   Decimal? @db.Decimal(7, 4) // riboflavin
+  vitaminB3Mg   Decimal? @db.Decimal(7, 3) // niacin NE
+  vitaminB5Mg   Decimal? @db.Decimal(7, 3) // pantothenic acid
+  vitaminB6Mg   Decimal? @db.Decimal(7, 4)
+  folateUg      Decimal? @db.Decimal(7, 3) // DFE
+  vitaminB12Ug  Decimal? @db.Decimal(7, 4)
+  biotinUg      Decimal? @db.Decimal(7, 3)
+  cholineMg     Decimal? @db.Decimal(7, 3)
+
+  // Other
+  cholesterolMg Decimal? @db.Decimal(7, 3)
+
+  cleanProduct CleanProduct @relation(fields: [cleanProductId], references: [id], onDelete: Cascade)
+}
+
+// ─── Clean Product Portions (1:N) ───────────────────────────────────────────
+
+model CleanProductPortion {
+  id             String @id @default(cuid())
+  cleanProductId String
+  portionName    String // łyżka, szklanka, szt, plaster, garść, kromka, porcja, opakowanie
+  weightG        Decimal @db.Decimal(7, 2)
+  source         CleanProductSource
+
+  cleanProduct CleanProduct @relation(fields: [cleanProductId], references: [id], onDelete: Cascade)
+
+  @@unique([cleanProductId, portionName])
+  @@index([cleanProductId])
+}
+
+// ─── Clean Product Allergens (1:N) ──────────────────────────────────────────
+
+model CleanProductAllergen {
+  id             String           @id @default(cuid())
+  cleanProductId String
+  allergenCode   String // gluten | crustaceans | eggs | fish | peanuts | soy | milk | nuts | celery | mustard | sesame | sulphites | lupin | molluscs
+  presence       AllergenPresence @default(UNKNOWN)
+  source         DietFlagSource   @default(AUTO_RULE)
+  confidence     Int              @default(50) // 0–100
+
+  cleanProduct CleanProduct @relation(fields: [cleanProductId], references: [id], onDelete: Cascade)
+
+  @@unique([cleanProductId, allergenCode])
+  @@index([cleanProductId])
+  @@index([allergenCode])
+}
+
+// ─── Clean Product Diet Flags (1:N) ─────────────────────────────────────────
+
+model CleanProductDietFlag {
+  id             String         @id @default(cuid())
+  cleanProductId String
+  flagCode       String // vegetarian | vegan | glutenFree | lactoseFree | etc.
+  value          Boolean        @default(true)
+  source         DietFlagSource @default(AUTO_RULE)
+  confidence     Int            @default(50) // 0–100
+  computedAt     DateTime       @default(now())
+
+  cleanProduct CleanProduct @relation(fields: [cleanProductId], references: [id], onDelete: Cascade)
+
+  @@unique([cleanProductId, flagCode])
+  @@index([cleanProductId])
+  @@index([flagCode])
+}
+
+// ─── Clean Product Amino Acids (1:1, 26.D) ──────────────────────────────────
+
+model CleanProductAminoAcids {
+  id             String @id @default(cuid())
+  cleanProductId String @unique
+
+  tryptophanPer100g    Decimal? @db.Decimal(6, 4)
+  threoninePer100g     Decimal? @db.Decimal(6, 4)
+  isoleucinePer100g    Decimal? @db.Decimal(6, 4)
+  leucinePer100g       Decimal? @db.Decimal(6, 4)
+  lysinePer100g        Decimal? @db.Decimal(6, 4)
+  methioninePer100g    Decimal? @db.Decimal(6, 4)
+  phenylalaninePer100g Decimal? @db.Decimal(6, 4)
+  valinePer100g        Decimal? @db.Decimal(6, 4)
+  histidinePer100g     Decimal? @db.Decimal(6, 4)
+
+  cleanProduct CleanProduct @relation(fields: [cleanProductId], references: [id], onDelete: Cascade)
+}
+
+// ─── Clean Product Bioactives (1:1, 26.E) ───────────────────────────────────
+
+model CleanProductBioactives {
+  id             String @id @default(cuid())
+  cleanProductId String @unique
+
+  purinesMg          Decimal? @db.Decimal(7, 3)
+  oxalateMg          Decimal? @db.Decimal(7, 3)
+  caffeineMg         Decimal? @db.Decimal(7, 3)
+  polyphenolsMg      Decimal? @db.Decimal(7, 3)
+  betaCaroteneUg     Decimal? @db.Decimal(8, 3)
+  lycopeneUg         Decimal? @db.Decimal(8, 3)
+  luteinZeaxanthinUg Decimal? @db.Decimal(8, 3)
+
+  cleanProduct CleanProduct @relation(fields: [cleanProductId], references: [id], onDelete: Cascade)
+}
+
+// ─── Nutrition Protocols (28.1) ───────────────────────────────────────────────
+
+model NutritionProtocol {
+  id          String        @id @default(cuid())
+  name        String
+  description String?       @db.Text
+  version     Int           @default(1)
+  isActive    Boolean       @default(true)
+  isDefault   Boolean       @default(false)
+  scope       ProtocolScope @default(GLOBAL)
+  dietitianId String? // null = GLOBAL scope
+
+  // Macro ratios per goal (Json: { REDUCE: {proteinPct, fatPct, carbsPct}, GAIN: {...}, MAINTAIN: {...} })
+  macroRatios Json
+
+  // BMR calculation formula
+  bmrFormula BmrFormula @default(MIFFLIN)
+
+  // Caloric adjustments per goal (Json: { REDUCE: -15, GAIN: 12, MAINTAIN: 0 } — percent)
+  caloricAdjustments Json
+
+  // Protein constraints (g/kg body weight)
+  minProteinPerKg Decimal @default(0.8) @db.Decimal(4, 2)
+  maxProteinPerKg Decimal @default(2.5) @db.Decimal(4, 2)
+
+  // Meal structure
+  defaultMealCount Int  @default(5)
+  // Json: [{ mealName, pct }] — must sum to 100
+  mealDistribution Json
+
+  // Food restrictions per disease/category
+  // Json[]: [{ category, keywords: String[], level: FoodRestrictionLevel, reason }]
+  foodRestrictions Json @default("[]")
+
+  // AI generation hints
+  systemPromptAdditions String?    @db.Text
+  preferredCuisines     String[]   @default([])
+  recipeComplexity      RecipeComplexity @default(MODERATE)
+  // Json[]: [{ category, reason }]
+  avoidFoodCategories   Json       @default("[]")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  dietitian      User?                    @relation("DietitianProtocols", fields: [dietitianId], references: [id])
+  accessGrants   DietitianProtocolAccess[]
+  dietPlans      DietPlan[]               @relation("DietPlanProtocol")
+  triggers       ProtocolTrigger[]
+
+  @@index([scope])
+  @@index([dietitianId])
+  @@index([isDefault])
+  @@index([isActive])
+}
+
+model DietitianProtocolAccess {
+  id         String   @id @default(cuid())
+  dietitianId String
+  protocolId  String
+  isActive    Boolean  @default(false) // only one active per dietitian
+  assignedAt  DateTime @default(now())
+  assignedBy  String   // userId of ADMIN who assigned
+
+  dietitian User               @relation("DietitianProtocolAccesses", fields: [dietitianId], references: [id], onDelete: Cascade)
+  protocol  NutritionProtocol  @relation(fields: [protocolId], references: [id], onDelete: Cascade)
+  assignedByUser User          @relation("ProtocolAssignments", fields: [assignedBy], references: [id])
+
+  @@unique([dietitianId, protocolId])
+  @@index([dietitianId])
+  @@index([protocolId])
+}
+
+// ─── App Settings (29.0) ─────────────────────────────────────────────────────
+
+model AppSettings {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Protocol Auto-Matching (30.1) ──────────────────────────────────────────
+
+model ProtocolTrigger {
+  id             String   @id @default(cuid())
+  interviewField String   // e.g. "mainGoal", "chronicDiseases", "allergies", "dietType"
+  interviewValue String   // e.g. "BUILD_MUSCLE", "DIABETES_T2", "LACTOSE"
+  protocolId     String
+  priority       Int      @default(3) // 1=CRITICAL(diseases), 2=HIGH(allergies), 3=NORMAL(preferences)
+  score          Float    @default(1.0) // 0.0-1.0, reserved for future weighted matching
+  matchCount     Int      @default(0)   // 44.2 — how many times this trigger matched
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  protocol NutritionProtocol @relation(fields: [protocolId], references: [id], onDelete: Cascade)
+
+  @@unique([interviewField, interviewValue, protocolId])
+  @@index([interviewField, interviewValue])
+  @@index([protocolId])
+}
+
+model ProtocolConflict {
+  id            String   @id @default(cuid())
+  triggerAField String   // e.g. "mainGoal"
+  triggerAValue String   // e.g. "BUILD_MUSCLE"
+  triggerBField String   // e.g. "chronicDiseases"
+  triggerBValue String   // e.g. "CKD_4_5"
+  severity      String   // "BLOCK" = no AI generation, "WARN" = warning only
+  messageKey    String   // i18n key e.g. "conflicts.renal_mass"
+  description   String?  @db.Text // 43.2 — Polish description
+  winnerSide    String   @default("B") // "B" = disease wins (safety first)
+  triggerCount  Int      @default(0)   // 43.3 — how many times detected
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([triggerAField, triggerAValue, triggerBField, triggerBValue])
+}
+
+// ─── AI Cost Tracking (33.9) ─────────────────────────────────────────────────
+
+model AiCostLog {
+  id               String   @id @default(cuid())
+  dietPlanId       String
+  model            String
+  promptTokens     Int
+  completionTokens Int
+  totalTokens      Int
+  estimatedCostUsd Float
+  jobType          String // 'generate' | 'repair' | 'partial'
+  jobId            String?
+  createdAt        DateTime @default(now())
+
+  dietPlan DietPlan @relation(fields: [dietPlanId], references: [id], onDelete: Cascade)
+
+  @@index([dietPlanId])
+  @@index([createdAt])
+}
+
+/// Stores Stripe card fingerprints used for trial subscriptions.
+/// Prevents the same card from being used for multiple free trials.
+model TrialFingerprint {
+  id              String   @id @default(cuid())
+  cardFingerprint String   @unique
+  userId          String
+  stripeSessionId String?
+  createdAt       DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+/// 39.2: Device fingerprints for anti-abuse (browser fingerprinting).
+/// Links a browser fingerprint hash to a user. Tracks multiple accounts per device.
+model DeviceFingerprint {
+  id           String   @id @default(cuid())
+  fingerprint  String   // FingerprintJS visitorId hash
+  userId       String
+  userAgent    String?
+  ip           String?
+  lastSeenAt   DateTime @default(now())
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([fingerprint, userId])
+  @@index([fingerprint])
+  @@index([userId])
+}
+
+// ─── Security Bans (40.3) ────────────────────────────────────────────────────
+
+model SecurityBan {
+  id          String    @id @default(cuid())
+  type        String    // IP, SUBNET, FINGERPRINT
+  value       String    // IP address or fingerprint hash
+  reason      String    @db.Text
+  createdById String?
+  expiresAt   DateTime? // null = permanent
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([type, value, active])
+  @@index([active])
+}
+
+// ─── Patient Day Regeneration ─────────────────────────────────────────────────
+
+model DayRegeneration {
+  id           String          @id @default(cuid())
+  dietPlanId   String
+  dayName      String          // e.g. "Poniedziałek"
+  reason       DayRegenReason
+  keepSimilar  Boolean         @default(false)
+
+  originalDay  Json            // snapshot of original PlanDay (for undo)
+  newDay       Json?           // AI-generated replacement day (null while PENDING)
+  status       DayRegenStatus  @default(PENDING)
+
+  createdAt    DateTime        @default(now())
+
+  dietPlan DietPlan @relation(fields: [dietPlanId], references: [id], onDelete: Cascade)
+
+  @@index([dietPlanId])
+  @@index([dietPlanId, status])
+}
+
+enum DayRegenStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+// ─── Body Measurements (79.3) ────────────────────────────────────────────────
+
+model BodyMeasurement {
+  id          String   @id @default(cuid())
+  patientId   String
+  date        DateTime @default(now())
+  waistCm     Decimal? @db.Decimal(5, 1) // 40-200
+  hipCm       Decimal? @db.Decimal(5, 1) // 50-200
+  chestCm     Decimal? @db.Decimal(5, 1) // 50-200
+  thighCm     Decimal? @db.Decimal(5, 1) // 20-100
+  armCm       Decimal? @db.Decimal(5, 1) // 15-60
+  bodyFatPct  Decimal? @db.Decimal(4, 1) // 3-60%
+  notes       String?  @db.Text
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@index([patientId, date])
+}
+
+// ─── Patient ↔ Dietitian Chat (79.1) ────────────────────────────────────────
+
+model Conversation {
+  id                    String    @id @default(cuid())
+  patientId             String
+  dietitianId           String
+  lastMessageAt         DateTime?
+  unreadCountPatient    Int       @default(0)
+  unreadCountDietitian  Int       @default(0)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  patient   User      @relation("ConversationPatient", fields: [patientId], references: [id], onDelete: Cascade)
+  dietitian User      @relation("ConversationDietitian", fields: [dietitianId], references: [id], onDelete: Cascade)
+  messages  Message[]
+
+  @@unique([patientId, dietitianId])
+  @@index([patientId])
+  @@index([dietitianId])
+  @@index([lastMessageAt])
+}
+
+model Message {
+  id              String    @id @default(cuid())
+  conversationId  String
+  senderId        String
+  senderRole      String    // PATIENT or DIETITIAN
+  content         String    @db.Text  /// Encrypted with AES-256-GCM
+  readAt          DateTime?
+  createdAt       DateTime  @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@index([senderId])
+}
+
+// ─── 84.4: Email Campaign System ────────────────────────────────────────────
+
+model EmailCampaign {
+  id             String   @id @default(cuid())
+  type           String   // WEEKLY_SUMMARY, DIETITIAN_SUMMARY, TRIGGER_PLATEAU, TRIGGER_MILESTONE, TRIGGER_INACTIVE, TRIGGER_PLAN_EXPIRY, MOTIVATION, CUSTOM
+  name           String   // admin-facing name
+  subject        String   // email subject (supports {{name}} vars)
+  subjectVariantB String? // A/B test: variant B subject
+  bodyTemplate   String?  @db.Text // custom body HTML (for CUSTOM type)
+  schedule       String?  // cron expression: "0 8 * * 1" = Monday 8am
+  segmentation   String?  // goal filter: lose_weight, maintenance, muscle_gain, all
+  enabled        Boolean  @default(true)
+  lastSentAt     DateTime?
+  // A/B test tracking
+  variantASent   Int      @default(0)
+  variantAOpened Int      @default(0)
+  variantBSent   Int      @default(0)
+  variantBOpened Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  sends EmailSend[]
+}
+
+model EmailSend {
+  id           String    @id @default(cuid())
+  campaignId   String
+  recipientId  String    // userId
+  recipientEmail String
+  variant      String    @default("A") // A or B
+  sentAt       DateTime  @default(now())
+  openedAt     DateTime?
+  clickedAt    DateTime?
+  // Personalization snapshot (for debugging/analytics)
+  personalData Json?     // {weightTrend, compliance, topMeal, ...}
+
+  campaign EmailCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId, sentAt])
+  @@index([recipientId])
+}

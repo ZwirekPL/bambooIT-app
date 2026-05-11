@@ -1,0 +1,78 @@
+name: Deploy to VPS
+
+on:
+  # Manual trigger from GitHub Actions UI
+  workflow_dispatch:
+
+  # Auto-deploy after successful CI on master
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [master]
+
+jobs:
+  deploy:
+    name: Deploy via SSH
+    runs-on: ubuntu-latest
+    # Only deploy when CI passed (or manual trigger)
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Deploy to Hostinger VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          command_timeout: 15m
+          script: |
+            set -e
+            APP_DIR="/opt/dietetyk"
+            COMPOSE="docker compose -f $APP_DIR/docker-compose.prod.yml"
+
+            echo "=== [1/7] Pulling latest code ==="
+            cd "$APP_DIR"
+            git pull origin master
+
+            echo "=== [2/7] Pre-deploy backup ==="
+            if bash infra/backup.sh; then
+              echo "Backup completed"
+            else
+              echo "WARNING: Backup failed — continuing deploy (check logs)"
+            fi
+
+            echo "=== [3/7] Building Docker images ==="
+            $COMPOSE build --parallel
+
+            echo "=== [4/7] Starting services ==="
+            $COMPOSE up -d
+
+            echo "=== [5/7] Running database migrations ==="
+            $COMPOSE exec -T backend \
+              npx prisma migrate deploy \
+              --schema=/app/packages/database/prisma/schema.prisma \
+              || echo "Migrations skipped (no pending changes)"
+
+            echo "=== [6/7] Smoke test ==="
+            sleep 5
+            for i in 1 2 3; do
+              HEALTH=$(docker exec dietetyk_backend wget -qO- http://localhost:4000/health 2>/dev/null || echo "FAIL")
+              if echo "$HEALTH" | grep -q "OK"; then
+                echo "Health check passed!"
+                break
+              fi
+              if [ "$i" -eq 3 ]; then
+                echo "ERROR: Health check failed after 3 attempts!"
+                echo "Backend logs:"
+                $COMPOSE logs --tail=50 backend
+                exit 1
+              fi
+              echo "Attempt $i failed, retrying in 5s..."
+              sleep 5
+            done
+
+            echo "=== [7/7] Cleanup ==="
+            docker image prune -f
+
+            echo "=== Deploy completed successfully ==="

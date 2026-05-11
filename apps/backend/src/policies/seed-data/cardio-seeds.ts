@@ -1,0 +1,123 @@
+import type { RuleSeed } from './types';
+
+export const CARDIO_SEEDS: RuleSeed[] = [
+  // ─── Cardiovascular rules (27.3) ─────────────────────────────────────────
+  // 27.3.1 Nadciśnienie tętnicze (ULEPSZENIE)
+  {
+    name: 'Nadciśnienie tętnicze',
+    description: 'Nadciśnienie — dieta DASH, sód <2000mg, potas 4700mg/d, suplementacja Mg i CoQ10',
+    type: 'POLICY', severity: 'LOW', priority: 75,
+    version: '2.0', category: 'cardio',
+    sources: [{ ref: 'ESC/ESH Guidelines on Arterial Hypertension', year: 2023 }, { ref: 'DASH Trial', year: 1997 }],
+    conditions: { type: 'HAS_CONDITION', terms: ['hypertension', 'nadciśnienie', 'nadcisnienie', 'nadciśnienie tętnicze'] },
+    effects: [
+      { type: 'NUTRIENT_LIMIT', nutrient: 'sodium', scope: 'DAILY_TOTAL', max: 2000 },
+      { type: 'NUTRIENT_LIMIT', nutrient: 'potassium', scope: 'DAILY_TOTAL', min: 4700 },
+      { type: 'NUTRIENT_LIMIT', nutrient: 'fiber', scope: 'DAILY_TOTAL', min: 25, max: 35 },
+      { type: 'NUTRIENT_LIMIT', nutrient: 'saturatedFat', scope: 'DAILY_TOTAL', max: 20 },
+      { type: 'PREFER_PRODUCTS', flagKey: 'lowSodium', flagValue: true },
+      { type: 'PREFER_PRODUCTS', flagKey: 'heartFriendly', flagValue: true },
+      { type: 'EXCLUDE_KEYWORDS', keywords: ['solony', 'marynowany', 'konserwowy', 'salted', 'pickled', 'canned', 'zupa instant', 'kostka rosołowa', 'sos sojowy', 'soy sauce'] },
+      { type: 'CLINICAL_NOTE', note: 'Nadciśnienie tętnicze: dieta DASH — sód <2000mg/d, potas 4700mg/d (banany, awokado, ziemniaki, szpinak), błonnik 25-35g/d, ograniczenie alkoholu. Źródło: ESC/ESH 2023, DASH trial', category: 'RESTRICTION' },
+      { type: 'CLINICAL_NOTE', note: 'Zalecane: owoce i warzywa 8-10 porcji/d, nabiał niskotłuszczowy 2-3 porcje/d, ryby 2-3x/tyg, orzechy/nasiona', category: 'RECOMMENDATION' },
+      { type: 'SUGGEST_SUPPLEMENT', name: 'Magnez', dose: '300-400 mg/d', reason: 'Wsparcie kontroli ciśnienia tętniczego (ESC/ESH 2023)' },
+      { type: 'SUGGEST_SUPPLEMENT', name: 'Koenzym Q10', dose: '100-200 mg/d', reason: 'Wsparcie funkcji śródbłonka naczyniowego' },
+    ],
+  },
+  // 27.3.2 Miażdżyca (NOWA)
+  {
+    name: 'Miażdżyca',
+    description: 'Miażdżyca — dieta śródziemnomorska, omega-3, antyoksydanty, eliminacja tłuszczów trans',
+    type: 'POLICY', severity: 'LOW', priority: 78,
+    version: '1.0', category: 'cardio',
+    sources: [{ ref: 'ESC 2021 Prevention Guidelines', year: 2021 }],
+    conditions: { type: 'HAS_CONDITION', terms: ['atherosclerosis', 'miażdżyca', 'miazdzyca', 'arterosclerosis'] },
+    effects: [
+      { type: 'NUTRIENT_LIMIT', nutrient: 'saturatedFat', scope: 'DAILY_TOTAL', max: 16 },
+      { type: 'NUTRIENT_LIMIT', nutrient: 'fiber', scope: 'DAILY_TOTAL', min: 25, max: 40 },
+      { type: 'PREFER_PRODUCTS', flagKey: 'heartFriendly', flagValue: true },
+      { type: 'PREFER_PRODUCTS', flagKey: 'highFiber', flagValue: true },
+      { type: 'EXCLUDE_KEYWORDS', keywords: ['tłuszcz trans', 'trans fat', 'margaryna twarda', 'hard margarine', 'fast food', 'boczek', 'smalec', 'bacon', 'lard', 'palmowy', 'palm oil', 'chipsy', 'chips'] },
+      { type: 'CLINICAL_NOTE', note: 'Miażdżyca: dieta śródziemnomorska, tłuszcze nasycone <7% energii, tłuszcze trans 0%, preferencja oliwy, orzechów, ryb, warzyw. Omega-3 (EPA+DHA) 1g/d. Źródło: ESC 2021 Prevention Guidelines', category: 'RESTRICTION' },
+      { type: 'CLINICAL_NOTE', note: 'Zalecane: ryby tłuste 2-3x/tyg, orzechy 30g/d, oliwa z oliwek extra virgin, warzywa bogate w antyoksydanty (jagody, szpinak, brokuły)', category: 'RECOMMENDATION' },
+      { type: 'SUGGEST_SUPPLEMENT', name: 'Omega-3 (EPA+DHA)', dose: '1 g/d', reason: 'Działanie przeciwmiażdżycowe i przeciwzapalne (ESC 2021)' },
+    ],
+  },
+  // 27.3.3 Choroba niedokrwienna serca — CHD (ULEPSZENIE)
+  {
+    name: 'Choroba niedokrwienna serca',
+    description: 'CHD — ścisłe ograniczenie tłuszczów nasyconych, omega-3, błonnik rozpuszczalny 10-25g/d',
+    type: 'POLICY', severity: 'LOW', priority: 80,
+    version: '2.0', category: 'cardio',
+    sources: [{ ref: 'ESC 2019 CCS Guidelines', year: 2019 }],
+    conditions: { type: 'HAS_CONDITION', terms: ['chd', 'choroba wieńcowa', 'wieńcowa', 'choroba niedokrwienna serca', 'niedokrwienna serca', 'coronary heart disease'] },
+    effects: [
+      { type: 'NUTRIENT_LIMIT', nutrient: 'saturatedFat', scope: 'DAILY_TOTAL', max: 15 },
+      { type: 'NUTRIENT_LIMIT', nutrient: 'sodium', scope: 'DAILY_TOTAL', max: 2000 },
+      { type: 'NUTRIENT_LIMIT', nutrient: 'cholesterol', scope: 'DAILY_TOTAL', max: 200 },
+      { type: 'NUTRIENT_LIMIT', nutrient: 'fiber', scope: 'DAILY_TOTAL', min: 25, max: 40 },
+      { type: 'PREFER_PRODUCTS', flagKey: 'heartFriendly', flagValue: true },
+      { type: 'PREFER_PRODUCTS', flagKey: 'highFiber', flagValue: true },
+      { type: 'EXCLUDE_KEYWORDS', keywords: ['boczek', 'smalec', 'bacon', 'lard', 'palmowy', 'palm oil', 'tłuszcz trans', 'trans fat', 'fast food'] },
+      { type: 'CLINICAL_NOTE', note: 'Choroba niedokrwienna serca: tłuszcze nasycone <15g/d, cholesterol <200mg/d, błonnik rozpuszczalny 10-25g/d (owies, jęczmień, psyllium), omega-3 z ryb 2-3x/tyg. Źródło: ESC 2019 CCS Guidelines', category: 'RESTRICTION' },
+      { type: 'SUGGEST_SUPPLEMENT', name: 'Koenzym Q10', dose: '100-200 mg/d', reason: 'Wsparcie funkcji mięśnia sercowego (ESC 2019)' },
+      { type: 'SUGGEST_SUPPLEMENT', name: 'Omega-3 (EPA+DHA)', dose: '1 g/d', reason: 'Redukcja ryzyka zdarzeń sercowo-naczyniowych' },
+    ],
+  },
+  // 27.3.4 Dyslipidemia ogólna (NOWA)
+  {
+    name: 'Dyslipidemia',
+    description: 'Dyslipidemia — tłuszcze nasycone <10% energii, trans 0%, błonnik 25-40g/d, sterole roślinne',
+    type: 'POLICY', severity: 'LOW', priority: 73,
+    version: '1.0', category: 'cardio',
+    sources: [{ ref: 'ESC/EAS 2019 Dyslipidemia Guidelines', year: 2019 }],
+    conditions: { type: 'HAS_CONDITION', terms: ['dyslipidemia', 'zaburzenia lipidowe', 'zaburzenia gospodarki lipidowej'] },
+    effects: [
+      { type: 'NUTRIENT_LIMIT', nutrient: 'saturatedFat', scope: 'DAILY_TOTAL', max: 22 },
+      { type: 'NUTRIENT_LIMIT', nutrient: 'fiber', scope: 'DAILY_TOTAL', min: 25, max: 40 },
+      { type: 'PREFER_PRODUCTS', flagKey: 'heartFriendly', flagValue: true },
+      { type: 'PREFER_PRODUCTS', flagKey: 'highFiber', flagValue: true },
+      { type: 'EXCLUDE_KEYWORDS', keywords: ['tłuszcz trans', 'trans fat', 'margaryna twarda', 'fast food', 'smalec', 'lard', 'palmowy', 'palm oil'] },
+      { type: 'CLINICAL_NOTE', note: 'Dyslipidemia: tłuszcze nasycone <10% energii, tłuszcze trans 0%, błonnik 25-40g/d, sterole/stanole roślinne 2g/d (margaryny wzbogacane). Źródło: ESC/EAS 2019 Dyslipidemia Guidelines', category: 'RESTRICTION' },
+      { type: 'CLINICAL_NOTE', note: 'Zalecane: oliwa z oliwek, orzechy, ryby tłuste, rośliny strączkowe, produkty pełnoziarniste. Rozważyć margaryny z fitosterolami.', category: 'RECOMMENDATION' },
+    ],
+  },
+  // 27.3.5 Hipercholesterolemia (ULEPSZENIE — Portfolio diet)
+  {
+    name: 'Hipercholesterolemia',
+    description: 'Hipercholesterolemia — Portfolio diet approach, sterole roślinne, błonnik rozpuszczalny',
+    type: 'POLICY', severity: 'LOW', priority: 75,
+    version: '2.0', category: 'cardio',
+    sources: [{ ref: 'ESC/EAS 2019 Dyslipidemia Guidelines', year: 2019 }],
+    conditions: { type: 'HAS_CONDITION', terms: ['hypercholesterol', 'cholesterol', 'hipercholesterol', 'hipercholesterolemia', 'podwyższony cholesterol', 'wysoki cholesterol'] },
+    effects: [
+      { type: 'NUTRIENT_LIMIT', nutrient: 'saturatedFat', scope: 'DAILY_TOTAL', max: 18 },
+      { type: 'NUTRIENT_LIMIT', nutrient: 'cholesterol', scope: 'DAILY_TOTAL', max: 200 },
+      { type: 'NUTRIENT_LIMIT', nutrient: 'fiber', scope: 'DAILY_TOTAL', min: 25, max: 40 },
+      { type: 'PREFER_PRODUCTS', flagKey: 'heartFriendly', flagValue: true },
+      { type: 'PREFER_PRODUCTS', flagKey: 'highFiber', flagValue: true },
+      { type: 'EXCLUDE_KEYWORDS', keywords: ['boczek', 'smalec', 'bacon', 'lard', 'palmowy', 'palm oil', 'tłuszcz trans', 'trans fat', 'fast food'] },
+      { type: 'CLINICAL_NOTE', note: 'Hipercholesterolemia: Portfolio diet — sterole roślinne 2g/d, białko sojowe 25g/d, orzechy 30g/d, błonnik rozpuszczalny 10-25g/d (owies, psyllium, jęczmień). Tłuszcze nasycone <10% energii, cholesterol <200mg/d. Źródło: ESC/EAS 2019', category: 'RESTRICTION' },
+      { type: 'CLINICAL_NOTE', note: 'Zalecane: owies/otręby owsiane codziennie, orzechy włoskie/migdały 30g/d, rośliny strączkowe 3-4x/tyg, margaryny z fitosterolami', category: 'RECOMMENDATION' },
+    ],
+  },
+  // 27.3.6 Hipertriglicerydemia (NOWA)
+  {
+    name: 'Hipertriglicerydemia',
+    description: 'Hipertriglicerydemia — ograniczenie cukrów prostych, eliminacja alkoholu, omega-3 2-4g/d',
+    type: 'POLICY', severity: 'LOW', priority: 74,
+    version: '1.0', category: 'cardio',
+    sources: [{ ref: 'ESC/EAS 2019 Dyslipidemia Guidelines', year: 2019 }, { ref: 'Endocrine Society Hypertriglyceridemia Guidelines', year: 2020 }],
+    conditions: { type: 'HAS_CONDITION', terms: ['hypertriglyceridemia', 'hipertriglicerydemia', 'triglicerydy', 'wysokie triglicerydy', 'podwyższone triglicerydy', 'trójglicerydy'] },
+    effects: [
+      { type: 'NUTRIENT_LIMIT', nutrient: 'sugar', scope: 'PER_100G', max: 5 },
+      { type: 'NUTRIENT_LIMIT', nutrient: 'saturatedFat', scope: 'DAILY_TOTAL', max: 20 },
+      { type: 'PREFER_PRODUCTS', flagKey: 'lowSugar', flagValue: true },
+      { type: 'PREFER_PRODUCTS', flagKey: 'heartFriendly', flagValue: true },
+      { type: 'EXCLUDE_KEYWORDS', keywords: ['cukier', 'dżem', 'syrop', 'miód', 'słodycze', 'sok owocowy', 'napój gazowany', 'alkohol', 'piwo', 'wino', 'wódka', 'sugar', 'candy', 'soda', 'juice', 'honey', 'alcohol', 'beer', 'wine'] },
+      { type: 'CLINICAL_NOTE', note: 'Hipertriglicerydemia: cukry proste <10% energii, eliminacja alkoholu, omega-3 (EPA+DHA) 2-4g/d, ograniczenie fruktozy (sok owocowy max 150ml/d). Redukcja masy ciała jeśli nadwaga. Źródło: ESC/EAS 2019, Endocrine Society 2020', category: 'RESTRICTION' },
+      { type: 'CLINICAL_NOTE', note: 'Zalecane: ryby tłuste 3-4x/tyg (łosoś, makrela, sardynki), produkty pełnoziarniste, warzywa, unikanie fast foodu i przetworzonej żywności', category: 'RECOMMENDATION' },
+      { type: 'SUGGEST_SUPPLEMENT', name: 'Omega-3 (EPA+DHA)', dose: '2-4 g/d', reason: 'Redukcja triglicerydów o 15-30% (ESC/EAS 2019, Endocrine Society 2020)' },
+    ],
+  },
+];
