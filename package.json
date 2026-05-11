@@ -13,6 +13,8 @@
     "dev:api": "npm run dev --workspace=backend",
     "dev:web": "npm run dev --workspace=web",
     "dev": "concurrently -n api,web -c green,blue \"npm run dev:api\" \"npm run dev:web\"",
+    "typecheck": "npm run generate --workspace=database && npm run build --workspace=database && npm run build --workspace=backend && npm run type-check --workspace=web",
+    "build": "npm run generate --workspace=database && npm run build --workspace=database && npm run build --workspace=backend && npm run build --workspace=web",
     "test:smoke": "npx vitest run --reporter=verbose --testPathPattern=smoke --workspace=apps/backend && npx playwright test --config=apps/web/playwright.config.ts e2e/responsive.spec.ts",
     "test:smoke:api": "npx vitest run --reporter=verbose --testPathPattern=smoke --workspace=apps/backend",
     "test:smoke:e2e": "npx playwright test --config=apps/web/playwright.config.ts",
