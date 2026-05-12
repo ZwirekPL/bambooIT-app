@@ -56,12 +56,13 @@ export function Footer() {
             <ul className="space-y-2.5">
               {[
                 { href: '/', label: t('nav.home') },
-                { href: '/o-nas', label: t('nav.about') },
+                // TODO(4-cleanup): diet routes removed in K4. Rebuild as bambooIT links in K11.
+                // { href: '/o-nas', label: t('nav.about') },
                 { href: '/blog', label: t('nav.blog') },
-                { href: '/oferta', label: t('nav.pricing') },
-                { href: '/jak-to-dziala', label: t('nav.howAiWorks') },
-                { href: '/faq', label: t('nav.faq') },
-                { href: '/slownik', label: t('nav.glossary') },
+                // { href: '/oferta', label: t('nav.pricing') },
+                // { href: '/jak-to-dziala', label: t('nav.howAiWorks') },
+                // { href: '/faq', label: t('nav.faq') },
+                // { href: '/slownik', label: t('nav.glossary') },
               ].map(({ href, label }) => (
                 <li key={href}>
                   <Link

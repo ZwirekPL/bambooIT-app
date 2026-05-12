@@ -13,16 +13,19 @@ import { cn } from '@/lib/utils';
 import { useSession } from 'next-auth/react';
 import { performFullLogout } from '@/lib/logout';
 
+// TODO(4-cleanup): diet routes (/dietetyk, /dashboard) removed in K4.
+// DIETITIAN role removed in K7. Client panel rebuilt as /panel in K11.
 function getDashboardHref(role?: string): string {
   if (role === 'ADMIN') return '/admin';
-  if (role === 'DIETITIAN') return '/dietetyk';
-  return '/dashboard';
+  return '/';
 }
 
+// TODO(4-cleanup): /o-nas, /oferta, /faq removed in K4 (diet pages).
+// Rebuild as /o-nas (bambooIT) + /pakiety + /audyt in K11.
 const navLinks = [
-  { href: '/o-nas',            label: 'about'   },
-  { href: '/oferta',           label: 'pricing' },
-  { href: '/faq',              label: 'faq'     },
+  // { href: '/o-nas',            label: 'about'   },
+  // { href: '/oferta',           label: 'pricing' },
+  // { href: '/faq',              label: 'faq'     },
   { href: '/blog',             label: 'blog'    },
   { href: '/dokumenty-prawne', label: 'legal'   },
 ] as const;

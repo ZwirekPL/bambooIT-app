@@ -45,14 +45,5 @@ for (const viewport of VIEWPORTS) {
   });
 }
 
-// Protected pages — just verify redirect doesn't break layout
-test.describe('Responsiveness @ mobile-375 — protected redirect', () => {
-  test.use({ viewport: { width: 375, height: 812 } });
-
-  test('dashboard redirect renders login without overflow', async ({ page }) => {
-    await page.goto('/pl/dashboard');
-    await expect(page).toHaveURL(/zaloguj/, { timeout: 5000 });
-    const overflow = await page.evaluate(() => document.body.scrollWidth > window.innerWidth);
-    expect(overflow).toBe(false);
-  });
-});
+// TODO(4-cleanup): /pl/dashboard removed in K4. Re-add similar test for
+// /pl/panel (bambooIT client panel) after K11 rebuild.

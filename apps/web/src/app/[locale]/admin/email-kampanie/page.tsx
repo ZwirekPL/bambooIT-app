@@ -1,5 +1,11 @@
 'use client';
 
+// TODO(4-cleanup): backend route /email-campaigns removed in K2c.
+// This admin page will show fetch error until rebuilt in phase 4.
+// Generic email campaign infrastructure (newsletter, satisfaction
+// surveys) needs new design — current diet workflow (TRIGGER_PLATEAU,
+// PLAN_EXPIRY etc.) was 100% diet-specific.
+
 import { useState, useEffect, useRef } from 'react';
 import {
   Mail, Plus, Play, FlaskConical, Trash2, ToggleLeft, ToggleRight,
