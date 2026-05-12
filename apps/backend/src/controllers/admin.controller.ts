@@ -35,21 +35,14 @@ const paginationSchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
-const tenantIdSchema = z.object({ id: z.string().cuid() });
+// TODO(5c-cleanup): Tenant model dropped per D-025 (bambooIT is B2B, not SaaS multi-tenant).
+// const tenantIdSchema = z.object({ id: z.string().cuid() });
+// const listTenantsQuerySchema = paginationSchema.extend({
+//   search: z.string().min(1).max(100).optional(),
+// });
 
-const listTenantsQuerySchema = paginationSchema.extend({
-  search: z.string().min(1).max(100).optional(),
-});
-
-const updateTenantBodySchema = z.object({
-  name: z.string().min(1).max(200).optional(),
-  slug: z
-    .string()
-    .min(1)
-    .max(100)
-    .regex(/^[a-z0-9-]+$/)
-    .optional(),
-});
+// TODO(5c-cleanup): Tenant dropped per D-025
+// const updateTenantBodySchema = z.object({ name?, slug? });
 
 const listUsersQuerySchema = paginationSchema.extend({
   search: z.string().min(1).max(100).optional(),
@@ -108,94 +101,10 @@ export async function listUsers(req: Request, res: Response, next: NextFunction)
   }
 }
 
-export async function listTenants(req: Request, res: Response, next: NextFunction) {
-  const parsed = listTenantsQuerySchema.safeParse(req.query);
-  if (!parsed.success) {
-    return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid query parameters'));
-  }
-
-  try {
-    const result = await adminService.listTenants(parsed.data);
-    return res.json({ ok: true, ...result });
-  } catch (err) {
-    next(err);
-  }
-}
-
-export async function getTenantById(req: Request, res: Response, next: NextFunction) {
-  const parsed = tenantIdSchema.safeParse(req.params);
-  if (!parsed.success) {
-    return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid tenant id'));
-  }
-
-  try {
-    const tenant = await adminService.getTenantById(parsed.data.id);
-    return res.json({ ok: true, tenant });
-  } catch (err) {
-    next(err);
-  }
-}
-
-export async function softDeleteTenant(req: Request, res: Response, next: NextFunction) {
-  const parsed = tenantIdSchema.safeParse(req.params);
-  if (!parsed.success) {
-    return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid tenant id'));
-  }
-
-  try {
-    const tenant = await adminService.softDeleteTenant(parsed.data.id);
-    logAudit({
-      userId: req.user?.sub,
-      action: 'DELETE_TENANT',
-      resourceType: 'TENANT',
-      resourceId: parsed.data.id,
-      ip: req.ip,
-    });
-    return res.json({ ok: true, tenant });
-  } catch (err) {
-    next(err);
-  }
-}
-
-export async function restoreTenant(req: Request, res: Response, next: NextFunction) {
-  const parsed = tenantIdSchema.safeParse(req.params);
-  if (!parsed.success) {
-    return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid tenant id'));
-  }
-
-  try {
-    const tenant = await adminService.restoreTenant(parsed.data.id);
-    logAudit({
-      userId: req.user?.sub,
-      action: 'RESTORE_TENANT',
-      resourceType: 'TENANT',
-      resourceId: parsed.data.id,
-      ip: req.ip,
-    });
-    return res.json({ ok: true, tenant });
-  } catch (err) {
-    next(err);
-  }
-}
-
-export async function updateTenant(req: Request, res: Response, next: NextFunction) {
-  const idParsed = tenantIdSchema.safeParse(req.params);
-  if (!idParsed.success) {
-    return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid tenant id'));
-  }
-
-  const bodyParsed = updateTenantBodySchema.safeParse(req.body);
-  if (!bodyParsed.success) {
-    return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid request body'));
-  }
-
-  try {
-    const tenant = await adminService.updateTenantById(idParsed.data.id, bodyParsed.data);
-    return res.json({ ok: true, tenant });
-  } catch (err) {
-    next(err);
-  }
-}
+// TODO(5c-cleanup): Tenant model dropped per D-025 — all 5 handlers below commented.
+// listTenants, getTenantById, softDeleteTenant, restoreTenant, updateTenant
+// (used adminService.{listTenants, getTenantById, softDeleteTenant, restoreTenant, updateTenantById})
+// (audit log actions 'DELETE_TENANT'/'RESTORE_TENANT' commented in audit-labels.ts in K4)
 
 export async function getStats(req: Request, res: Response, next: NextFunction) {
   try {

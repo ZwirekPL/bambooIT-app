@@ -14,19 +14,13 @@ export interface User {
   updatedAt: string;
 }
 
-export interface Tenant {
-  id: string;
-  slug: string;
-  name: string;
-  ownerId: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
+// TODO(5c-cleanup): Tenant interface dropped per D-025 (bambooIT is B2B, not SaaS multi-tenant).
 
 export interface Patient {
   id: string;
   userId: string;
-  tenantId: string | null;
+  // TODO(5c-cleanup): tenantId dropped per D-025
+  // tenantId: string | null;
   firstName?: string;
   lastName?: string;
   sex?: string;
@@ -151,17 +145,7 @@ export interface SubscriptionItem {
   stripeSubscriptionId: string | null;
 }
 
-export interface AdminTenant {
-  id: string;
-  slug: string;
-  name: string;
-  ownerId: string | null;
-  deletedAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-  owner: { id: string; email: string; role: UserRole } | null;
-  _count: { patients: number };
-}
+// TODO(5c-cleanup): AdminTenant dropped per D-025
 
 export interface AdminUser {
   id: string;

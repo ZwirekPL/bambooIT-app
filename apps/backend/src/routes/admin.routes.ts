@@ -32,11 +32,12 @@ adminRouter.get('/users', adminController.listUsers);
 adminRouter.get('/users/:id', adminController.getUserById);
 adminRouter.delete('/users/:id', adminController.softDeleteUser);
 adminRouter.patch('/users/:id/restore', adminController.restoreUser);
-adminRouter.get('/tenants', adminController.listTenants);
-adminRouter.get('/tenants/:id', adminController.getTenantById);
-adminRouter.patch('/tenants/:id', adminController.updateTenant);
-adminRouter.delete('/tenants/:id', adminController.softDeleteTenant);
-adminRouter.patch('/tenants/:id/restore', adminController.restoreTenant);
+// TODO(5c-cleanup): Tenant dropped per D-025 — 5 admin tenant CRUD mounts commented
+// adminRouter.get('/tenants', adminController.listTenants);
+// adminRouter.get('/tenants/:id', adminController.getTenantById);
+// adminRouter.patch('/tenants/:id', adminController.updateTenant);
+// adminRouter.delete('/tenants/:id', adminController.softDeleteTenant);
+// adminRouter.patch('/tenants/:id/restore', adminController.restoreTenant);
 adminRouter.get('/stats', adminController.getStats);
 adminRouter.get('/dashboard/action-items', adminController.getActionItems);
 adminRouter.patch('/users/:id/role', adminController.changeUserRole);

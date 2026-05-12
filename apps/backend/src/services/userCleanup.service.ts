@@ -54,11 +54,13 @@ export async function findExpiredSoftDeletedUsers(now: Date = new Date()) {
 export async function hardDeleteUser(userId: string): Promise<void> {
   await prisma.$transaction(async (tx) => {
     await tx.auditLog.updateMany({ where: { userId }, data: { userId: null } });
-    await tx.tenant.updateMany({ where: { ownerId: userId }, data: { ownerId: null } });
+    // TODO(5c-cleanup): Tenant model dropped per D-025 (bambooIT is B2B, not SaaS)
+    // await tx.tenant.updateMany({ where: { ownerId: userId }, data: { ownerId: null } });
     await tx.patient.updateMany({ where: { dietitianId: userId }, data: { dietitianId: null } });
     // TODO(5b-cleanup): SupplementPrescription model dropped in K5b
     // await tx.supplementPrescription.updateMany({ where: { dietitianId: userId }, data: { dietitianId: null } });
-    await tx.nutritionProtocol.updateMany({ where: { dietitianId: userId }, data: { dietitianId: null } });
+    // TODO(5c-cleanup): NutritionProtocol model dropped in K5c
+    // await tx.nutritionProtocol.updateMany({ where: { dietitianId: userId }, data: { dietitianId: null } });
     await tx.user.delete({ where: { id: userId } });
   });
 }

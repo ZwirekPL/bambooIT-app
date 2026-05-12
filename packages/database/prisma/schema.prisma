@@ -58,36 +58,6 @@ enum SubscriptionPlan {
 
 // ─── Nutrition Protocols (28.1) ───────────────────────────────────────────────
 
-enum ProtocolScope {
-  GLOBAL    // created by ADMIN, visible to all
-  DIETITIAN // created by ADMIN, assigned to specific dietitians
-}
-
-enum RecipeComplexity {
-  SIMPLE
-  MODERATE
-  COMPLEX
-}
-
-enum BmrFormula {
-  MIFFLIN    // Mifflin-St Jeor (default)
-  HARRIS_BENEDICT
-}
-
-model Tenant {
-  id        String    @id @default(cuid())
-  slug      String    @unique
-  name      String
-  logoUrl   String?
-  ownerId   String?   @unique
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  owner    User?     @relation("TenantOwner", fields: [ownerId], references: [id])
-  patients Patient[]
-}
-
 model DietitianProfile {
   id                      String   @id @default(cuid())
   userId                  String   @unique
@@ -116,7 +86,6 @@ model User {
 
   patient                 Patient?                 @relation("PatientUser")
   patientsAsDietitian     Patient[]                @relation("PatientDietitian")
-  ownedTenant             Tenant?                  @relation("TenantOwner")
   dietitianProfile        DietitianProfile?
   subscription            Subscription?
   auditLogs               AuditLog[]
@@ -128,11 +97,8 @@ model User {
   referralUsagesAsReferred ReferralUsage[]         @relation("ReferredUser")
   consents                UserConsent[]
   // Protocol relations (28.1)
-  ownedProtocols          NutritionProtocol[]      @relation("DietitianProtocols")
-  protocolAccesses        DietitianProtocolAccess[] @relation("DietitianProtocolAccesses")
   trialFingerprints       TrialFingerprint[]
   deviceFingerprints      DeviceFingerprint[]
-  protocolAssignments     DietitianProtocolAccess[] @relation("ProtocolAssignments")
   // Chat (79.1)
   // Supplements (79.6)
 }
@@ -140,7 +106,6 @@ model User {
 model Patient {
   id          String   @id @default(cuid())
   userId      String   @unique
-  tenantId    String?
   dietitianId String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -155,10 +120,8 @@ model Patient {
 
   user             User              @relation("PatientUser", fields: [userId], references: [id], onDelete: Cascade)
   dietitian        User?             @relation("PatientDietitian", fields: [dietitianId], references: [id])
-  tenant           Tenant?           @relation(fields: [tenantId], references: [id])
   orders           Order[]
 
-  @@index([tenantId])
   @@index([dietitianId])
 }
 
@@ -442,60 +405,6 @@ model ReferralUsage {
 }
 
 
-enum ClinicalRuleType {
-  POLICY
-  RED_FLAG
-}
-
-enum RuleSeverity {
-  CRITICAL
-  HIGH
-  MODERATE
-  LOW
-}
-
-model ClinicalRule {
-  id            String           @id @default(cuid())
-  name          String
-  description   String           @db.Text
-  type          ClinicalRuleType
-  severity      RuleSeverity     @default(LOW)
-  priority      Int              @default(50)
-  conditions    Json             // declarative condition tree
-  effects       Json             // PolicyEffect[] or RedFlag message
-  source        String?          @db.VarChar(200) // e.g. "PTD 2024, ch. 4.2"
-  version       String           @default("1.0") @db.VarChar(20)
-  sources       Json?            // [{ref, url?, year}] — detailed references
-  conflictsWith String[]         // names of conflicting rules
-  category      String?          @db.VarChar(50) // e.g. "metabolic", "cardio", "hepatic"
-  isActive      Boolean          @default(true)
-  isDefault        Boolean          @default(true)
-  createdBy        String?          // userId of admin who created/edited
-  triggerCount     Int              @default(0)
-  lastTriggeredAt  DateTime?
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-  history          ClinicalRuleHistory[]
-
-  @@index([type, isActive])
-  @@index([isActive])
-  @@index([category])
-}
-
-model ClinicalRuleHistory {
-  id        String   @id @default(cuid())
-  ruleId    String
-  changedBy String?  // userId
-  changeSummary String @db.Text
-  previousData  Json // snapshot of rule before change
-  createdAt DateTime @default(now())
-
-  rule ClinicalRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
-
-  @@index([ruleId])
-  @@index([createdAt])
-}
-
 enum ConsentType {
   HEALTH_DATA_PROCESSING
   AI_DISCLAIMER
@@ -543,75 +452,6 @@ model UserConsent {
 
 // ─── Nutrition Protocols (28.1) ───────────────────────────────────────────────
 
-model NutritionProtocol {
-  id          String        @id @default(cuid())
-  name        String
-  description String?       @db.Text
-  version     Int           @default(1)
-  isActive    Boolean       @default(true)
-  isDefault   Boolean       @default(false)
-  scope       ProtocolScope @default(GLOBAL)
-  dietitianId String? // null = GLOBAL scope
-
-  // Macro ratios per goal (Json: { REDUCE: {proteinPct, fatPct, carbsPct}, GAIN: {...}, MAINTAIN: {...} })
-  macroRatios Json
-
-  // BMR calculation formula
-  bmrFormula BmrFormula @default(MIFFLIN)
-
-  // Caloric adjustments per goal (Json: { REDUCE: -15, GAIN: 12, MAINTAIN: 0 } — percent)
-  caloricAdjustments Json
-
-  // Protein constraints (g/kg body weight)
-  minProteinPerKg Decimal @default(0.8) @db.Decimal(4, 2)
-  maxProteinPerKg Decimal @default(2.5) @db.Decimal(4, 2)
-
-  // Meal structure
-  defaultMealCount Int  @default(5)
-  // Json: [{ mealName, pct }] — must sum to 100
-  mealDistribution Json
-
-  // Food restrictions per disease/category
-  // Json[]: [{ category, keywords: String[], level: FoodRestrictionLevel, reason }]
-  foodRestrictions Json @default("[]")
-
-  // AI generation hints
-  systemPromptAdditions String?    @db.Text
-  preferredCuisines     String[]   @default([])
-  recipeComplexity      RecipeComplexity @default(MODERATE)
-  // Json[]: [{ category, reason }]
-  avoidFoodCategories   Json       @default("[]")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  dietitian      User?                    @relation("DietitianProtocols", fields: [dietitianId], references: [id])
-  accessGrants   DietitianProtocolAccess[]
-  triggers       ProtocolTrigger[]
-
-  @@index([scope])
-  @@index([dietitianId])
-  @@index([isDefault])
-  @@index([isActive])
-}
-
-model DietitianProtocolAccess {
-  id         String   @id @default(cuid())
-  dietitianId String
-  protocolId  String
-  isActive    Boolean  @default(false) // only one active per dietitian
-  assignedAt  DateTime @default(now())
-  assignedBy  String   // userId of ADMIN who assigned
-
-  dietitian User               @relation("DietitianProtocolAccesses", fields: [dietitianId], references: [id], onDelete: Cascade)
-  protocol  NutritionProtocol  @relation(fields: [protocolId], references: [id], onDelete: Cascade)
-  assignedByUser User          @relation("ProtocolAssignments", fields: [assignedBy], references: [id])
-
-  @@unique([dietitianId, protocolId])
-  @@index([dietitianId])
-  @@index([protocolId])
-}
-
 // ─── App Settings (29.0) ─────────────────────────────────────────────────────
 
 model AppSettings {
@@ -621,43 +461,6 @@ model AppSettings {
 }
 
 // ─── Protocol Auto-Matching (30.1) ──────────────────────────────────────────
-
-model ProtocolTrigger {
-  id             String   @id @default(cuid())
-  interviewField String   // e.g. "mainGoal", "chronicDiseases", "allergies", "dietType"
-  interviewValue String   // e.g. "BUILD_MUSCLE", "DIABETES_T2", "LACTOSE"
-  protocolId     String
-  priority       Int      @default(3) // 1=CRITICAL(diseases), 2=HIGH(allergies), 3=NORMAL(preferences)
-  score          Float    @default(1.0) // 0.0-1.0, reserved for future weighted matching
-  matchCount     Int      @default(0)   // 44.2 — how many times this trigger matched
-  isActive       Boolean  @default(true)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  protocol NutritionProtocol @relation(fields: [protocolId], references: [id], onDelete: Cascade)
-
-  @@unique([interviewField, interviewValue, protocolId])
-  @@index([interviewField, interviewValue])
-  @@index([protocolId])
-}
-
-model ProtocolConflict {
-  id            String   @id @default(cuid())
-  triggerAField String   // e.g. "mainGoal"
-  triggerAValue String   // e.g. "BUILD_MUSCLE"
-  triggerBField String   // e.g. "chronicDiseases"
-  triggerBValue String   // e.g. "CKD_4_5"
-  severity      String   // "BLOCK" = no AI generation, "WARN" = warning only
-  messageKey    String   // i18n key e.g. "conflicts.renal_mass"
-  description   String?  @db.Text // 43.2 — Polish description
-  winnerSide    String   @default("B") // "B" = disease wins (safety first)
-  triggerCount  Int      @default(0)   // 43.3 — how many times detected
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  @@unique([triggerAField, triggerAValue, triggerBField, triggerBValue])
-}
 
 // ─── AI Cost Tracking (33.9) ─────────────────────────────────────────────────
 
@@ -717,43 +520,4 @@ model SecurityBan {
 // ─── Patient ↔ Dietitian Chat (79.1) ────────────────────────────────────────
 
 // ─── 84.4: Email Campaign System ────────────────────────────────────────────
-
-model EmailCampaign {
-  id             String   @id @default(cuid())
-  type           String   // WEEKLY_SUMMARY, DIETITIAN_SUMMARY, TRIGGER_PLATEAU, TRIGGER_MILESTONE, TRIGGER_INACTIVE, TRIGGER_PLAN_EXPIRY, MOTIVATION, CUSTOM
-  name           String   // admin-facing name
-  subject        String   // email subject (supports {{name}} vars)
-  subjectVariantB String? // A/B test: variant B subject
-  bodyTemplate   String?  @db.Text // custom body HTML (for CUSTOM type)
-  schedule       String?  // cron expression: "0 8 * * 1" = Monday 8am
-  segmentation   String?  // goal filter: lose_weight, maintenance, muscle_gain, all
-  enabled        Boolean  @default(true)
-  lastSentAt     DateTime?
-  // A/B test tracking
-  variantASent   Int      @default(0)
-  variantAOpened Int      @default(0)
-  variantBSent   Int      @default(0)
-  variantBOpened Int      @default(0)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  sends EmailSend[]
-}
-
-model EmailSend {
-  id           String    @id @default(cuid())
-  campaignId   String
-  recipientId  String    // userId
-  recipientEmail String
-  variant      String    @default("A") // A or B
-  sentAt       DateTime  @default(now())
-  openedAt     DateTime?
-  clickedAt    DateTime?
-  // Personalization snapshot (for debugging/analytics)
-  personalData Json?     // {weightTrend, compliance, topMeal, ...}
-
-  campaign EmailCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-
-  @@index([campaignId, sentAt])
-  @@index([recipientId])
-}
+

@@ -3,7 +3,7 @@
  * Uses NEXT_PUBLIC_API_URL (client + server) for all requests.
  * Server-only auth requests use API_URL env variable.
  */
-import type { Patient, Order, ProductType, CheckoutProductType, Subscription, AdminStats, UserRole, User, AdminUser, AdminTenant, AuditLog, BlogPost, BlogListItem, BlogCategoryConfig, AccessStatus, Testimonial, TestimonialWithUser, PublicTestimonial, NotificationPreferences, MonthlyReport, ClinicalRule, ClinicalRuleHistory, ClinicalRuleType, RuleSeverity, NutritionProtocol, NutritionProtocolCreateData, DietitianProtocolWithAccess, ProtocolAssignedDietitian, ProtocolTrigger, ProtocolTriggerCreateData, ProtocolConflict, ProtocolConflictCreateData, MatchedProtocolsResponse, SubscriptionStats, SubscriptionItem, PatientInvoice } from '@/types/api';
+import type { Patient, Order, ProductType, CheckoutProductType, Subscription, AdminStats, UserRole, User, AdminUser, AuditLog, BlogPost, BlogListItem, BlogCategoryConfig, AccessStatus, Testimonial, TestimonialWithUser, PublicTestimonial, NotificationPreferences, MonthlyReport, ClinicalRule, ClinicalRuleHistory, ClinicalRuleType, RuleSeverity, NutritionProtocol, NutritionProtocolCreateData, DietitianProtocolWithAccess, ProtocolAssignedDietitian, ProtocolTrigger, ProtocolTriggerCreateData, ProtocolConflict, ProtocolConflictCreateData, MatchedProtocolsResponse, SubscriptionStats, SubscriptionItem, PatientInvoice } from '@/types/api';
 import { getApiBaseUrl } from './api-url';
 
 /** Tracks whether a 401 auto-logout is already in progress to prevent multiple redirects */
@@ -422,34 +422,8 @@ export const api = {
         method: 'POST',
         token,
       }),
-    listTenants: (params: { page?: number; limit?: number; search?: string }, token: string) => {
-      const query = new URLSearchParams();
-      if (params.page) query.set('page', String(params.page));
-      if (params.limit) query.set('limit', String(params.limit));
-      if (params.search) query.set('search', params.search);
-      return apiFetch<{ ok: boolean; tenants: AdminTenant[]; total: number; page: number; limit: number }>(
-        `/admin/tenants?${query.toString()}`,
-        { token }
-      );
-    },
-    getTenantById: (id: string, token: string) =>
-      apiFetch<{ ok: boolean; tenant: AdminTenant }>(`/admin/tenants/${id}`, { token }),
-    updateTenant: (id: string, data: { name?: string; slug?: string }, token: string) =>
-      apiFetch<{ ok: boolean; tenant: AdminTenant }>(`/admin/tenants/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(data),
-        token,
-      }),
-    deleteTenant: (id: string, token: string) =>
-      apiFetch<{ ok: boolean; tenant: { id: string; slug: string; name: string; deletedAt: string } }>(`/admin/tenants/${id}`, {
-        method: 'DELETE',
-        token,
-      }),
-    restoreTenant: (id: string, token: string) =>
-      apiFetch<{ ok: boolean; tenant: { id: string; slug: string; name: string; deletedAt: null } }>(`/admin/tenants/${id}/restore`, {
-        method: 'PATCH',
-        token,
-      }),
+    // TODO(5c-cleanup): Tenant dropped per D-025 — 5 admin tenant methods commented
+    // listTenants, getTenantById, updateTenant, deleteTenant, restoreTenant
     listAuditLogs: (
       params: {
         page?: number;

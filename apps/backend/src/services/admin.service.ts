@@ -143,100 +143,19 @@ export async function listUsers({ page, limit, search, role, excludeRole, hideDe
   return { users, total, page, limit };
 }
 
-export interface ListTenantsOptions {
-  page: number;
-  limit: number;
-  search?: string;
-}
-
-export async function listTenants({ page, limit, search }: ListTenantsOptions) {
-  const skip = (page - 1) * limit;
-
-  const where: Prisma.TenantWhereInput = search
-    ? {
-        OR: [
-          { name: { contains: search, mode: 'insensitive' } },
-          { slug: { contains: search, mode: 'insensitive' } },
-        ],
-      }
-    : {};
-
-  const [tenants, total] = await prisma.$transaction([
-    prisma.tenant.findMany({
-      where,
-      skip,
-      take: limit,
-      orderBy: { createdAt: 'desc' },
-      include: {
-        owner: { select: { id: true, email: true, role: true } },
-        _count: { select: { patients: true } },
-      },
-    }),
-    prisma.tenant.count({ where }),
-  ]);
-
-  return { tenants, total, page, limit };
-}
-
-export async function getTenantById(id: string) {
-  const tenant = await prisma.tenant.findUnique({
-    where: { id },
-    include: {
-      owner: { select: { id: true, email: true, role: true } },
-      _count: { select: { patients: true } },
-    },
-  });
-  if (!tenant) {
-    throw new AppError(404, 'NOT_FOUND', 'Tenant not found');
-  }
-  return tenant;
-}
-
-export async function softDeleteTenant(id: string) {
-  const tenant = await prisma.tenant.findFirst({ where: { id, deletedAt: null } });
-  if (!tenant) {
-    throw new AppError(404, 'NOT_FOUND', 'Tenant not found or already deleted');
-  }
-  return prisma.tenant.update({
-    where: { id },
-    data: { deletedAt: new Date() },
-    select: { id: true, slug: true, name: true, deletedAt: true },
-  });
-}
-
-export async function restoreTenant(id: string) {
-  const tenant = await prisma.tenant.findFirst({ where: { id } });
-  if (!tenant) {
-    throw new AppError(404, 'NOT_FOUND', 'Tenant not found');
-  }
-  if (!tenant.deletedAt) {
-    throw new AppError(409, 'NOT_DELETED', 'Tenant is not deleted');
-  }
-  return prisma.tenant.update({
-    where: { id },
-    data: { deletedAt: null },
-    select: { id: true, slug: true, name: true, deletedAt: true },
-  });
-}
-
-export async function updateTenantById(id: string, data: { name?: string; slug?: string }) {
-  const tenant = await prisma.tenant.findFirst({ where: { id, deletedAt: null } });
-  if (!tenant) {
-    throw new AppError(404, 'NOT_FOUND', 'Tenant not found');
-  }
-  if (data.slug && data.slug !== tenant.slug) {
-    const existing = await prisma.tenant.findUnique({ where: { slug: data.slug } });
-    if (existing) throw new AppError(409, 'SLUG_TAKEN', 'Slug is already in use');
-  }
-  return prisma.tenant.update({
-    where: { id },
-    data,
-    include: {
-      owner: { select: { id: true, email: true, role: true } },
-      _count: { select: { patients: true } },
-    },
-  });
-}
+// TODO(5c-cleanup): Tenant model dropped per D-025 (bambooIT is B2B, not SaaS multi-tenant).
+// All 5 service functions commented:
+// - listTenants({ page, limit, search }): paginated list with owner + patients count
+// - getTenantById(id): findUnique with owner + patients count
+// - softDeleteTenant(id): set deletedAt
+// - restoreTenant(id): clear deletedAt
+// - updateTenantById(id, { name?, slug? }): update with slug uniqueness check
+//
+// export interface ListTenantsOptions {
+//   page: number;
+//   limit: number;
+//   search?: string;
+// }
 
 export async function getStats() {
   const [
