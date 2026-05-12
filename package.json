@@ -15,18 +15,9 @@
     "dev": "concurrently -n api,web -c green,blue \"npm run dev:api\" \"npm run dev:web\"",
     "typecheck": "npm run generate --workspace=database && npm run build --workspace=database && npm run build --workspace=backend && npm run type-check --workspace=web",
     "build": "npm run generate --workspace=database && npm run build --workspace=database && npm run build --workspace=backend && npm run build --workspace=web",
-    "test:smoke": "npx vitest run --reporter=verbose --testPathPattern=smoke --workspace=apps/backend && npx playwright test --config=apps/web/playwright.config.ts e2e/responsive.spec.ts",
-    "test:smoke:api": "npx vitest run --reporter=verbose --testPathPattern=smoke --workspace=apps/backend",
     "test:smoke:e2e": "npx playwright test --config=apps/web/playwright.config.ts",
-    "test:smoke:seed": "node scripts/seed-smoke-fixtures.js",
     "test:env:up": "docker compose -f docker-compose.test.yml up -d",
     "test:env:down": "docker compose -f docker-compose.test.yml down -v",
-    "db:export:recipes": "npx ts-node --esm scripts/export-recipes.ts",
-    "db:export:products": "npx ts-node --esm scripts/export-clean-products.ts",
-    "db:import:products": "npx ts-node --esm scripts/import-clean-products.ts",
-    "db:import:recipes": "npx ts-node --esm scripts/import-recipes.ts",
-    "db:export:all": "npm run db:export:products && npm run db:export:recipes",
-    "db:import:all": "npm run db:import:products && npm run db:import:recipes",
     "db:backup": "npx ts-node --esm scripts/backup-database.ts",
     "db:restore": "npx ts-node --esm scripts/restore-database.ts"
   }
