@@ -48,16 +48,6 @@ adminRouter.post('/users/:id/force-password-reset', adminController.forcePasswor
 adminRouter.patch('/users/bulk', adminController.bulkUserAction);
 adminRouter.post('/users/:id/revoke-sessions', adminController.revokeUserSessions);
 
-adminRouter.post('/dietitians', adminController.createDietitian);
-adminRouter.get('/dietitians', adminController.listDietitians);
-adminRouter.get('/dietitians/:id/patients', adminController.getDietitianCompanies);
-adminRouter.patch('/dietitians/:id', adminController.updateDietitian);
-adminRouter.post('/dietitians/:id/rotate-code', adminController.rotateDietitianCode);
-adminRouter.patch('/dietitians/:id/toggle-active', adminController.toggleDietitianActive);
-
-// TODO(2b-cleanup): patient.service dropped in 2c → handler unlockPatientProfile commented in admin.controller
-// // 39.1.2: Unlock patient profile
-// adminRouter.post('/patients/:id/unlock-profile', adminController.unlockPatientProfile);
 // 39.6.3: Unlock locked account
 adminRouter.post('/users/:id/unlock', adminController.unlockAccount);
 

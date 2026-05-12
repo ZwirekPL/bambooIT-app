@@ -51,40 +51,6 @@ export async function changePassword(req: Request, res: Response, next: NextFunc
   }
 }
 
-const updateDietitianSchema = z.object({
-  firstName: z.string().min(1).max(100).optional(),
-  lastName: z.string().min(1).max(100).optional(),
-}).refine(data => data.firstName !== undefined || data.lastName !== undefined, {
-  message: 'At least one field must be provided',
-});
-
-export async function getDietitianProfile(req: Request, res: Response, next: NextFunction) {
-  try {
-    const profile = await profileService.getDietitianProfile(req.user!.sub);
-    return res.json({ ok: true, profile });
-  } catch (err) {
-    next(err);
-  }
-}
-
-export async function updateDietitianProfile(req: Request, res: Response, next: NextFunction) {
-  const parsed = updateDietitianSchema.safeParse(req.body);
-  if (!parsed.success) {
-    return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid request body'));
-  }
-
-  try {
-    const profile = await profileService.updateDietitianProfile(
-      req.user!.sub,
-      parsed.data,
-      req.ip,
-    );
-    return res.json({ ok: true, profile });
-  } catch (err) {
-    next(err);
-  }
-}
-
 const changeEmailSchema = z.object({
   newEmail: z.string().email('Invalid email address'),
   password: z.string().min(1),

@@ -74,8 +74,6 @@ export function LoginForm() {
     const role = (session?.user as { role?: string } | undefined)?.role;
     if (role === 'ADMIN') {
       window.location.href = `/${locale}/admin`;
-    } else if (role === 'DIETITIAN') {
-      window.location.href = `/${locale}/dietetyk`;
     } else {
       window.location.href = `/${locale}/dashboard`;
     }

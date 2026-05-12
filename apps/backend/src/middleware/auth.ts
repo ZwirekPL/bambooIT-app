@@ -5,7 +5,7 @@ import { apiError } from '../utils/errors';
 import { redis } from '../utils/redis';
 import { logAudit } from '../services/audit.service';
 
-export type UserRole = 'ADMIN' | 'DIETITIAN' | 'PATIENT';
+export type UserRole = 'ADMIN' | 'CLIENT';
 
 // TODO(K6a-deploy): JWT claim renamed `patientId` → `companyId` in K6a.
 // Tokens issued before K6a contain `patientId` and will pass cryptographic
@@ -13,6 +13,36 @@ export type UserRole = 'ADMIN' | 'DIETITIAN' | 'PATIENT';
 // 404/500 errors. In dev this is a non-issue (no real users). In prod K6a
 // deploy: run `redis-cli FLUSHDB` (or equivalent blacklist:user:* mass set)
 // before deploy to force re-login on all clients.
+//
+// TODO(K7-deploy): Production deployment notes.
+//
+// The K7 migration (drop_dietitian_role_and_rename_patient_to_client)
+// includes a manual SQL edit prepending ALTER TYPE RENAME VALUE
+// 'PATIENT' TO 'CLIENT' before Prisma's auto-generated enum recreate
+// workaround. This preserves PATIENT data by renaming it in-place
+// before the workaround tries to cast values into the new enum.
+//
+// However, the migration still cannot auto-convert DIETITIAN users —
+// those rows must be handled before migration deploys to production:
+//
+// 1. DELETE FROM "User" WHERE role = 'DIETITIAN'   (if dietitians
+//    should lose access)
+//    OR
+// 1. UPDATE "User" SET role = 'CLIENT' WHERE role = 'DIETITIAN'
+//    (if they should retain access as regular clients — manual
+//    review per user)
+//
+// 2. Run npx prisma migrate deploy (auto-handles PATIENT → CLIENT
+//    rename + DIETITIAN drop)
+//
+// 3. Frontend logout-on-401 handling clears stale cookies for any
+//    users whose tokens contain old role claims
+//
+// 4. Notify users about re-login requirement
+//
+// Currently dev DB has 0 users — zero impact for K7 commit.
+// bambooIT not deployed to prod yet — these steps become relevant
+// when prod first launches with real users.
 export interface AuthPayload {
   sub: string;
   email: string;

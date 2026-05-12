@@ -1,0 +1,81 @@
+═════════════════════════════════════════════════════════
+K7 Drop DIETITIAN + Rename PATIENT→CLIENT — DRY-RUN
+═════════════════════════════════════════════════════════
+
+Files scanned: 228
+Files modified: 15
+Files with FLAGS (manual review): 21
+Total patterns replaced: 51
+Total flags found: 89
+
+--- Modified files ---
+    13 changes  apps/backend/src/routes/order.routes.ts
+     8 changes  apps/backend/src/__tests__/services/auth.service.test.ts
+     6 changes  apps/backend/src/controllers/admin.controller.ts
+     4 changes  apps/backend/src/__tests__/services/userCleanup.service.test.ts
+     3 changes  apps/backend/src/server.ts
+     3 changes  apps/web/src/components/admin/UsersTable.tsx
+     3 changes  apps/web/src/__tests__/components/auth/RegisterForm.test.tsx
+     2 changes  apps/backend/src/services/admin.service.ts
+     2 changes  apps/web/src/__tests__/lib/api.test.ts
+     2 changes  apps/web/src/__tests__/lib/sentry-scrub.test.ts
+     1 changes  apps/backend/src/controllers/order.controller.ts
+     1 changes  apps/backend/src/middleware/auth.ts
+     1 changes  apps/backend/src/services/audit.service.ts
+     1 changes  apps/backend/src/services/auth.service.ts
+     1 changes  apps/web/src/types/api.ts
+
+--- Pattern counts ---
+    41  A. 'PATIENT' → 'CLIENT' (string literal)
+     5  B. requireAuth dual 'ADMIN', 'DIETITIAN' → 'ADMIN'
+     4  B. requireAuth/enum triple ['ADMIN','DIETITIAN','CLIENT'] → ['ADMIN','CLIENT']
+     1  A. "PATIENT" → "CLIENT" (double-quoted)
+
+--- FLAGGED files (manual review) ---
+  apps/backend/src/controllers/admin.controller.ts
+    L49: Standalone 'DIETITIAN' literal — manual review (auth function? audit action? array elem?)
+    L65: dietitianCode — drop param/block (auth.service signup)
+    L71: Standalone 'DIETITIAN' literal — manual review (auth function? audit action? array elem?)
+    L288: companiesAsDietitian relation — drop from include/select (manual)
+    L306: companiesAsDietitian relation — drop from include/select (manual)
+    L557: patientRating — drop field (K7 cleanup)
+  apps/backend/src/controllers/auth.controller.ts
+    L26: dietitianCode — drop param/block (auth.service signup)
+    L103: dietitianCode — drop param/block (auth.service signup)
+  apps/backend/src/middleware/auth.ts
+    L8: Standalone 'DIETITIAN' literal — manual review (auth function? audit action? array elem?)
+  apps/backend/src/routes/order.routes.ts
+    L21: Standalone 'DIETITIAN' literal — manual review (auth function? audit action? array elem?)
+    L23: Standalone 'DIETITIAN' literal — manual review (auth function? audit action? array elem?)
+  apps/backend/src/server.ts
+    L144: Standalone 'DIETITIAN' literal — manual review (auth function? audit action? array elem?)
+  apps/backend/src/services/admin.service.ts
+    L11: Standalone 'DIETITIAN' literal — manual review (auth function? audit action? array elem?)
+    L171: Standalone 'DIETITIAN' literal — manual review (auth function? audit action? array elem?)
+    L245: Standalone 'DIETITIAN' literal — manual review (auth function? audit action? array elem?)
+    L252: prisma.dietitianProfile.* — drop entire call (manual)
+    L260: prisma.dietitianProfile.* — drop entire call (manual)
+    L278: dietitianCode — drop param/block (auth.service signup)
+    L281: dietitianCode — drop param/block (auth.service signup)
+    L287: dietitianId field — drop (Company column dropped in K7)
+    L288: dietitianCode — drop param/block (auth.service signup)
+    L289: prisma.dietitianProfile.* — drop entire call (manual)
+    L290: dietitianCode — drop param/block (auth.service signup)
+    L295: dietitianId field — drop (Company column dropped in K7)
+    L304: dietitianId field — drop (Company column dropped in K7)
+    L345: companiesAsDietitian relation — drop from include/select (manual)
+    L348: prisma.dietitianProfile.* — drop entire call (manual)
+    L362: companiesAsDietitian relation — drop from include/select (manual)
+    L367: prisma.dietitianProfile.* — drop entire call (manual)
+    L380: companiesAsDietitian relation — drop from include/select (manual)
+    L387: prisma.dietitianProfile.* — drop entire call (manual)
+    L393: dietitianId field — drop (Company column dropped in K7)
+    L421: prisma.dietitianProfile.* — drop entire call (manual)
+    L443: prisma.dietitianProfile.* — drop entire call (manual)
+    L457: companiesAsDietitian relation — drop from include/select (manual)
+    L472: companiesAsDietitian relation — drop from include/select (manual)
+    L477: prisma.dietitianProfile.* — drop entire call (manual)
+    L485: prisma.dietitianProfile.* — drop entire call (manual)
+    L493: prisma.dietitianProfile.* — drop entire call (manual)
+    L513: DietitianProfile type/model — manual review
+    L514: Standalone 'DIETITIAN' literal — manual review (au

@@ -12,10 +12,9 @@ import { api, ApiError } from '@/lib/api';
 
 interface RegisterFormProps {
   initialReferralCode?: string;
-  initialDietitianCode?: string;
 }
 
-export function RegisterForm({ initialReferralCode, initialDietitianCode }: RegisterFormProps) {
+export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
   const t = useTranslations('auth');
   const deviceFingerprint = useDeviceFingerprint();
 
@@ -39,7 +38,6 @@ export function RegisterForm({ initialReferralCode, initialDietitianCode }: Regi
     const email = (form.elements.namedItem('email') as HTMLInputElement).value.trim();
     const password = (form.elements.namedItem('password') as HTMLInputElement).value;
     const confirmPassword = (form.elements.namedItem('confirmPassword') as HTMLInputElement).value;
-    const dietitianCode = (form.elements.namedItem('dietitianCode') as HTMLInputElement).value.trim() || undefined;
     const referralCode = (form.elements.namedItem('referralCode') as HTMLInputElement).value.trim() || undefined;
 
     const hasLetter = /[a-zA-Z]/.test(password);
@@ -71,7 +69,6 @@ export function RegisterForm({ initialReferralCode, initialDietitianCode }: Regi
         password,
         firstName,
         lastName,
-        dietitianCode,
         referralCode,
         consents: {
           healthDataProcessing: consentHealth,
@@ -210,22 +207,6 @@ export function RegisterForm({ initialReferralCode, initialDietitianCode }: Regi
             {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
-      </div>
-
-      {/* Dietitian code */}
-      <div className="space-y-2">
-        <Label htmlFor="dietitianCode">{t('dietitianCodeLabel')}</Label>
-        <Input
-          id="dietitianCode"
-          name="dietitianCode"
-          type="text"
-          placeholder={t('dietitianCodePlaceholder')}
-          defaultValue={initialDietitianCode}
-          autoComplete="off"
-          className="h-11 uppercase"
-          maxLength={12}
-        />
-        <p className="text-xs text-muted-foreground">{t('dietitianCodeHint')}</p>
       </div>
 
       {/* Referral code */}

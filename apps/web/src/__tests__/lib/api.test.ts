@@ -102,7 +102,7 @@ describe('api.auth.register', () => {
   afterEach(() => vi.unstubAllGlobals());
 
   it('POSTs to /auth/register with correct body', async () => {
-    const fetchMock = mockFetch(201, { ok: true, user: { id: '1', email: 'a@b.com', role: 'PATIENT' } });
+    const fetchMock = mockFetch(201, { ok: true, user: { id: '1', email: 'a@b.com', role: 'CLIENT' } });
     await api.auth.register({ email: 'a@b.com', password: 'secret123', consents: { healthDataProcessing: true, aiDisclaimer: true, emailNotifications: false } });
 
     const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit];
@@ -112,7 +112,7 @@ describe('api.auth.register', () => {
   });
 
   it('includes optional fields when provided', async () => {
-    const fetchMock = mockFetch(201, { ok: true, user: { id: '1', email: 'a@b.com', role: 'PATIENT' } });
+    const fetchMock = mockFetch(201, { ok: true, user: { id: '1', email: 'a@b.com', role: 'CLIENT' } });
     await api.auth.register({
       email: 'a@b.com',
       password: 'secret123',

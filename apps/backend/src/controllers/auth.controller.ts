@@ -23,7 +23,6 @@ const registerSchema = z.object({
   password: passwordSchema,
   firstName: z.string().max(50).optional().transform(v => v?.trim() || undefined),
   lastName: z.string().max(50).optional().transform(v => v?.trim() || undefined),
-  dietitianCode: z.string().optional().transform(v => v?.trim() || undefined),
   referralCode: z.string().optional().transform(v => v?.trim() || undefined),
   consents: consentSchema,
   deviceFingerprint: z.string().optional(),
@@ -100,7 +99,6 @@ export async function register(req: Request, res: Response, next: NextFunction) 
     const result = await authService.register(
       parsed.data.email,
       parsed.data.password,
-      parsed.data.dietitianCode,
       parsed.data.firstName,
       parsed.data.lastName,
       parsed.data.referralCode,

@@ -17,12 +17,11 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RegisterPage({
   searchParams,
 }: {
-  searchParams: Promise<{ ref?: string; code?: string }>;
+  searchParams: Promise<{ ref?: string }>;
 }) {
   const t = await getTranslations('auth');
   const params = await searchParams;
   const initialReferralCode = params.ref ?? '';
-  const initialDietitianCode = params.code ?? '';
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-gradient-to-br from-cream-50 to-sage-50/40 py-12 px-4">
@@ -44,7 +43,7 @@ export default async function RegisterPage({
               <p className="mt-1 text-sm text-muted-foreground">{t('registerSubtitle')}</p>
             </div>
           </div>
-          <RegisterForm initialReferralCode={initialReferralCode} initialDietitianCode={initialDietitianCode} />
+          <RegisterForm initialReferralCode={initialReferralCode} />
         </div>
       </div>
     </div>

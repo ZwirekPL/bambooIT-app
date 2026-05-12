@@ -60,13 +60,12 @@ import { actionLabel, resourceLabel, getActionSeverity, formatActivityDate } fro
 const ROLE_FILTERS: Array<{ key: string; value: UserRole | '' }> = [
   { key: 'filterAll', value: '' },
   { key: 'filterAdmin', value: 'ADMIN' },
-  { key: 'filterPatient', value: 'PATIENT' },
+  { key: 'filterClient', value: 'CLIENT' },
 ];
 
 const ROLE_BADGE_CLASS: Record<UserRole, string> = {
   ADMIN: 'bg-red-100 text-red-700 border-red-200',
-  DIETITIAN: 'bg-teal-100 text-teal-700 border-teal-200',
-  PATIENT: 'bg-blue-100 text-blue-700 border-blue-200',
+  CLIENT: 'bg-blue-100 text-blue-700 border-blue-200',
 };
 
 interface UsersTableProps {
@@ -159,7 +158,7 @@ function ChangeRoleDialog({
   token: string;
   t: ReturnType<typeof useTranslations<string>>;
 }) {
-  const [role, setRole] = useState<UserRole>('PATIENT');
+  const [role, setRole] = useState<UserRole>('CLIENT');
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -193,8 +192,7 @@ function ChangeRoleDialog({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="ADMIN">{t('roleAdmin')}</SelectItem>
-            <SelectItem value="DIETITIAN">{t('roleDietitian')}</SelectItem>
-            <SelectItem value="PATIENT">{t('rolePatient')}</SelectItem>
+            <SelectItem value="CLIENT">{t('roleClient')}</SelectItem>
           </SelectContent>
         </Select>
         <DialogFooter>

@@ -5,7 +5,6 @@ const m = vi.hoisted(() => ({
   // prisma tables
   user: { findFirst: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
   company: { findUnique: vi.fn(), create: vi.fn() },
-  dietitianProfile: { findUnique: vi.fn(), findFirst: vi.fn().mockResolvedValue(null) },
   passwordResetToken: { findFirst: vi.fn(), create: vi.fn(), updateMany: vi.fn() },
   emailVerificationToken: { findFirst: vi.fn(), create: vi.fn(), updateMany: vi.fn() },
   // utilities
@@ -30,7 +29,6 @@ vi.mock('@db', () => {
     prisma: {
       user: m.user,
       company: m.company,
-      dietitianProfile: m.dietitianProfile,
       passwordResetToken: m.passwordResetToken,
       emailVerificationToken: m.emailVerificationToken,
       appSettings: { findUnique: vi.fn().mockResolvedValue(null) },
@@ -39,7 +37,7 @@ vi.mock('@db', () => {
       subscription,
       userConsent,
       $transaction: vi.fn((fn: (tx: unknown) => unknown) => fn({
-        user: m.user, company: m.company, dietitianProfile: m.dietitianProfile,
+        user: m.user, company: m.company,
         passwordResetToken: m.passwordResetToken, emailVerificationToken: m.emailVerificationToken,
         referralCode, subscription, userConsent, deviceFingerprint,
       })),
@@ -76,7 +74,7 @@ const makeUser = (overrides = {}) => ({
   id: 'user-1',
   email: 'test@example.com',
   passwordHash: 'hashed',
-  role: 'PATIENT',
+  role: 'CLIENT',
   emailVerified: new Date(),
   deletedAt: null,
   ...overrides,
@@ -123,7 +121,7 @@ describe('auth.service', () => {
       expect(result.user).toMatchObject({
         id: 'user-1',
         email: 'test@example.com',
-        role: 'PATIENT',
+        role: 'CLIENT',
         companyId: 'company-1',
       });
     });
@@ -146,50 +144,27 @@ describe('auth.service', () => {
         .rejects.toMatchObject({ code: 'EMAIL_TAKEN', statusCode: 409 });
     });
 
-    it('throws INVALID_DIETITIAN_CODE when code not found', async () => {
-      m.user.findFirst.mockResolvedValue(null);
-      m.dietitianProfile.findUnique.mockResolvedValue(null);
-      await expect(register('new@example.com', 'pass', 'BADCODE'))
-        .rejects.toMatchObject({ code: 'INVALID_DIETITIAN_CODE', statusCode: 400 });
-    });
-
     it('creates user and company on success', async () => {
       m.user.findFirst.mockResolvedValue(null);
       m.bcryptHash.mockResolvedValue('hashed-pw');
-      m.user.create.mockResolvedValue({ id: 'user-new', email: 'new@example.com', role: 'PATIENT' });
+      m.user.create.mockResolvedValue({ id: 'user-new', email: 'new@example.com', role: 'CLIENT' });
       m.company.create.mockResolvedValue({ id: 'company-new' });
       m.emailVerificationToken.updateMany.mockResolvedValue({ count: 0 });
       m.emailVerificationToken.create.mockResolvedValue({ id: 'tok-1' });
 
-      const result = await register('new@example.com', 'pass', undefined, 'Jan', 'Kowalski');
+      const result = await register('new@example.com', 'pass', 'Jan', 'Kowalski');
 
-      expect(result.user).toMatchObject({ id: 'user-new', email: 'new@example.com', role: 'PATIENT' });
+      expect(result.user).toMatchObject({ id: 'user-new', email: 'new@example.com', role: 'CLIENT' });
       expect(m.company.create).toHaveBeenCalledWith({
-        data: { userId: 'user-new', dietitianId: null, contactFirstName: 'Jan', contactLastName: 'Kowalski' },
+        data: { userId: 'user-new', contactFirstName: 'Jan', contactLastName: 'Kowalski' },
       });
       expect(m.sendEmailVerificationEmail).toHaveBeenCalledOnce();
-    });
-
-    it('links dietitian when valid code provided', async () => {
-      m.user.findFirst.mockResolvedValue(null);
-      m.dietitianProfile.findFirst.mockResolvedValueOnce({ userId: 'dietitian-1' });
-      m.bcryptHash.mockResolvedValue('hashed-pw');
-      m.user.create.mockResolvedValue({ id: 'user-new', email: 'new@example.com', role: 'PATIENT' });
-      m.company.create.mockResolvedValue({ id: 'company-new' });
-      m.emailVerificationToken.updateMany.mockResolvedValue({ count: 0 });
-      m.emailVerificationToken.create.mockResolvedValue({ id: 'tok-1' });
-
-      await register('new@example.com', 'pass', 'DIETCODE');
-
-      expect(m.company.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({ dietitianId: 'dietitian-1' }),
-      });
     });
 
     it('invalidates old verification tokens before creating new one', async () => {
       m.user.findFirst.mockResolvedValue(null);
       m.bcryptHash.mockResolvedValue('hashed-pw');
-      m.user.create.mockResolvedValue({ id: 'user-new', email: 'new@example.com', role: 'PATIENT' });
+      m.user.create.mockResolvedValue({ id: 'user-new', email: 'new@example.com', role: 'CLIENT' });
       m.company.create.mockResolvedValue({ id: 'company-new' });
       m.emailVerificationToken.updateMany.mockResolvedValue({ count: 1 });
       m.emailVerificationToken.create.mockResolvedValue({ id: 'tok-new' });
@@ -338,7 +313,7 @@ describe('auth.service', () => {
       const future = Math.floor(Date.now() / 1000) + 3600;
       const jwt = require('jsonwebtoken');
       const token = jwt.sign(
-        { sub: 'user-1', email: 'x@x.com', role: 'PATIENT', exp: future },
+        { sub: 'user-1', email: 'x@x.com', role: 'CLIENT', exp: future },
         process.env.JWT_SECRET!,
       );
       m.redisSet.mockResolvedValue('OK');
@@ -356,7 +331,7 @@ describe('auth.service', () => {
     it('logs LOGOUT audit event', async () => {
       m.redisSet.mockResolvedValue('OK');
       const jwt = require('jsonwebtoken');
-      const token = jwt.sign({ sub: 'user-1', email: 'x@x.com', role: 'PATIENT' }, process.env.JWT_SECRET!);
+      const token = jwt.sign({ sub: 'user-1', email: 'x@x.com', role: 'CLIENT' }, process.env.JWT_SECRET!);
 
       await logout(token, 'user-1');
 

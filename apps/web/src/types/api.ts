@@ -4,7 +4,7 @@ export interface ApiResponse<T = unknown> {
   error?: string;
 }
 
-export type UserRole = 'ADMIN' | 'DIETITIAN' | 'PATIENT';
+export type UserRole = 'ADMIN' | 'CLIENT';
 
 export interface User {
   id: string;
@@ -115,11 +115,7 @@ export interface PatientInvoice {
 
 export interface AdminStats {
   users: { total: number; active: number; deleted: number };
-  dietitians: number;
-  patients: number;
-  interviews: number;
-  dietPlans: { total: number; byStatus: { GENERATED: number; REVIEWED: number; SENT: number } };
-  recipes?: { total: number; needingWork: number };
+  clients: number;
 }
 
 export interface SubscriptionStats {
@@ -232,33 +228,6 @@ export type BlogListItem = Omit<BlogPost, 'content'>;
 // ── Body Measurements (79.3) ─────────────────────────────────────────────────
 
 // ─── Dietitian Alerts (20.1) ──────────────────────────────────────────────────
-
-export type AlertSeverity = 'critical' | 'high' | 'moderate' | 'info';
-export type AlertType = 'plans_awaiting_review' | 'red_flag_plans' | 'dropout_risk' | 'rapid_weight_loss' | 'micronutrient_deficiency';
-
-export interface DietitianAlertPatient {
-  companyId: string;
-  firstName: string | null;
-  lastName: string | null;
-  detail?: string;
-}
-
-// ─── Dietitian Notes (20.2) ───────────────────────────────────────────────────
-
-// ─── Monthly Report (20.4) ──────────────────────────────────────────────────
-
-export interface PatientReportSummary {
-  companyId: string;
-  firstName: string | null;
-  lastName: string | null;
-  currentWeightKg: number | null;
-  goalWeightKg: number | null;
-  weightChangeKg: number | null;
-  avgCompliance: number | null;
-  checkInsCount: number;
-  planCount: number;
-  latestPlanStatus: string | null;
-}
 
 // ─── Note Templates (20.3) ──────────────────────────────────────────────────
 

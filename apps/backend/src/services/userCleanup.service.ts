@@ -7,24 +7,11 @@ import { logAudit } from './audit.service';
  *
  * Runs as a BullMQ repeatable job — see src/jobs/cleanupSoftDeleted.job.ts.
  *
- * FK handling — User has several referencing relations without onDelete
- * Cascade/SetNull:
- *   - AuditLog.userId       (must stay nullable for accountability)
- *   - Tenant.ownerId
- *   - Company.dietitianId
- *   - SupplementPrescription.dietitianId
- *   - NutritionProtocol.dietitianId
- *
- * We null these explicitly in a transaction so the User.delete() succeeds
- * without requiring a schema migration.
- *
- * Cascaded by schema (dropped automatically):
- *   Company (user), Subscription, UserConsent, DietitianProfile,
- *   PasswordResetToken, EmailVerificationToken, NotificationPreferences,
- *   DietitianNote (as dietitian — NoteDietitian relation), NoteTemplate,
- *   Testimonial, ReferralCode, ReferralUsage (ReferredUser),
- *   DietitianProtocolAccess, TrialFingerprint, DeviceFingerprint,
- *   Conversation (company & dietitian), Message (sender) — see schema.
+/**
+ * FK handling — only AuditLog.userId needs explicit nullification
+ * (must stay nullable for accountability after user hard-delete).
+ * All other User-referencing relations are handled by schema-level
+ * onDelete: Cascade or SetNull.
  */
 
 const DEFAULT_RETENTION_DAYS = 30;
@@ -54,13 +41,6 @@ export async function findExpiredSoftDeletedUsers(now: Date = new Date()) {
 export async function hardDeleteUser(userId: string): Promise<void> {
   await prisma.$transaction(async (tx) => {
     await tx.auditLog.updateMany({ where: { userId }, data: { userId: null } });
-    // TODO(5c-cleanup): Tenant model dropped per D-025 (bambooIT is B2B, not SaaS)
-    // await tx.tenant.updateMany({ where: { ownerId: userId }, data: { ownerId: null } });
-    await tx.company.updateMany({ where: { dietitianId: userId }, data: { dietitianId: null } });
-    // TODO(5b-cleanup): SupplementPrescription model dropped in K5b
-    // await tx.supplementPrescription.updateMany({ where: { dietitianId: userId }, data: { dietitianId: null } });
-    // TODO(5c-cleanup): NutritionProtocol model dropped in K5c
-    // await tx.nutritionProtocol.updateMany({ where: { dietitianId: userId }, data: { dietitianId: null } });
     await tx.user.delete({ where: { id: userId } });
   });
 }

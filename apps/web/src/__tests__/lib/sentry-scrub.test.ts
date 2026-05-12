@@ -27,12 +27,12 @@ describe('scrubEvent', () => {
 
   it('removes email from user', () => {
     const event = makeEvent({
-      user: { id: 'u-1', email: 'pacjent@test.pl', username: 'PATIENT' },
+      user: { id: 'u-1', email: 'pacjent@test.pl', username: 'CLIENT' },
     });
     const scrubbed = scrubEvent(event);
     expect(scrubbed?.user?.email).toBeUndefined();
     expect(scrubbed?.user?.id).toBe('u-1');
-    expect(scrubbed?.user?.username).toBe('PATIENT');
+    expect(scrubbed?.user?.username).toBe('CLIENT');
   });
 
   it('redacts password in request.data', () => {

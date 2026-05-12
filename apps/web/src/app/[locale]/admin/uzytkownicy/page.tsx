@@ -41,7 +41,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
   let total = 0;
 
   try {
-    const res = await api.admin.listUsers({ page, limit: LIMIT, search, role, excludeRole: 'DIETITIAN', hideDeleted, inactiveMonths, sortBy, sortOrder, createdFrom, createdTo, subscriptionStatus }, token);
+    const res = await api.admin.listUsers({ page, limit: LIMIT, search, role, hideDeleted, inactiveMonths, sortBy, sortOrder, createdFrom, createdTo, subscriptionStatus }, token);
     users = res.users;
     total = res.total;
   } catch {

@@ -28,7 +28,7 @@ interface CreateOrderInput {
 }
 
 /**
- * Verify that a DIETITIAN owns the given company (company.dietitianId === userId).
+ * Verify that a CLIENT owns the given company (company.userId === userId).
  * ADMIN always passes. Throws 403 on mismatch.
  */
 export async function assertCompanyOwnership(
@@ -40,12 +40,12 @@ export async function assertCompanyOwnership(
 
   const company = await prisma.company.findUnique({
     where: { id: companyId },
-    select: { dietitianId: true },
+    select: { userId: true },
   });
   if (!company) {
     throw new AppError(404, 'NOT_FOUND', 'Company not found');
   }
-  if (company.dietitianId !== userId) {
+  if (company.userId !== userId) {
     throw new AppError(403, 'FORBIDDEN', 'You do not have access to this company');
   }
 }

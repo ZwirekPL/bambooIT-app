@@ -117,7 +117,7 @@ export async function getOrder(req: Request, res: Response, next: NextFunction) 
   try {
     const order = await orderService.getOrder(parsed.data.id);
 
-    // DIETITIAN can only see orders of their own patients
+    // ADMIN can see any order; CLIENT only their own (via assertCompanyOwnership)
     const userId = req.user!.sub;
     const role = req.user!.role;
     await orderService.assertCompanyOwnership(order.companyId, userId, role);
@@ -303,7 +303,7 @@ export async function getInvoice(req: Request, res: Response, next: NextFunction
     const order = await orderService.getOrder(parsed.data.id);
 
     // Ownership check: PATIENT can only see own orders
-    if (req.user?.role === 'PATIENT') {
+    if (req.user?.role === 'CLIENT') {
       const company = await prisma.company.findUnique({ where: { userId }, select: { id: true } });
       if (!company || order.companyId !== company.id) {
         return res.status(403).json(apiError('FORBIDDEN', 'Not your order'));

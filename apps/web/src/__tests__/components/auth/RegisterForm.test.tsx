@@ -105,7 +105,7 @@ describe('RegisterForm', () => {
   });
 
   it('shows success state with email after successful registration', async () => {
-    mockRegister.mockResolvedValue({ ok: true, user: { id: '1', email: 'jan@example.com', role: 'PATIENT' } });
+    mockRegister.mockResolvedValue({ ok: true, user: { id: '1', email: 'jan@example.com', role: 'CLIENT' } });
     const user = userEvent.setup();
     render(React.createElement(RegisterForm));
 
@@ -159,7 +159,7 @@ describe('RegisterForm', () => {
   });
 
   it('calls api.auth.register with correct payload', async () => {
-    mockRegister.mockResolvedValue({ ok: true, user: { id: '1', email: 'jan@example.com', role: 'PATIENT' } });
+    mockRegister.mockResolvedValue({ ok: true, user: { id: '1', email: 'jan@example.com', role: 'CLIENT' } });
     const user = userEvent.setup();
     render(React.createElement(RegisterForm));
 
@@ -177,7 +177,7 @@ describe('RegisterForm', () => {
   });
 
   it('does not include dietitianCode when field is empty', async () => {
-    mockRegister.mockResolvedValue({ ok: true, user: { id: '1', email: 'jan@example.com', role: 'PATIENT' } });
+    mockRegister.mockResolvedValue({ ok: true, user: { id: '1', email: 'jan@example.com', role: 'CLIENT' } });
     const user = userEvent.setup();
     render(React.createElement(RegisterForm));
 

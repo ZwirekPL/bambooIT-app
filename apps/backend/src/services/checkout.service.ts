@@ -157,12 +157,9 @@ async function sendConsultationEmails(orderId: string, companyId: string): Promi
     where: { id: companyId },
     include: {
       user: { select: { email: true } },
-      dietitian: { select: { id: true, email: true } },
     },
   });
   if (!company) return;
-
-  const contactName = [company.contactFirstName, company.contactLastName].filter(Boolean).join(' ') || 'Klient';
 
   // Email to company — simplified: "we'll contact you by email to schedule"
   await sendConsultationPatientEmail(
@@ -171,15 +168,6 @@ async function sendConsultationEmails(orderId: string, companyId: string): Promi
     { orderId },
   );
 
-  // Email to dietitian with company data (if company has an assigned dietitian)
-  if (company.dietitian) {
-    await sendConsultationDietitianEmail(
-      company.dietitian.email,
-      {
-        orderId,
-        contactName,
-        contactEmail: company.user.email,
-      },
-    );
-  }
+  // K7: dietitian-targeted internal notification removed (DietitianProfile
+  // dropped). Admin notifications for new consultations rebuild w fazie 4.
 }

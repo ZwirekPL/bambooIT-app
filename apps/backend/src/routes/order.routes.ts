@@ -5,20 +5,20 @@ import * as orderController from '../controllers/order.controller';
 export const orderRouter = Router();
 
 // PATIENT endpoints
-orderRouter.get('/my', requireAuth('PATIENT'), orderController.listMyOrders);
-orderRouter.get('/my/portal', requireAuth('PATIENT'), orderController.getMyPortal);
-orderRouter.get('/my/invoices', requireAuth('PATIENT'), orderController.listMyInvoices);
-orderRouter.post('/my', requireAuth('PATIENT'), orderController.createMyOrder);
-orderRouter.post('/my/cancel-subscription', requireAuth('PATIENT'), orderController.cancelMySubscription);
-orderRouter.post('/my/resume-subscription', requireAuth('PATIENT'), orderController.resumeMySubscription);
-orderRouter.get('/my/can-withdraw', requireAuth('PATIENT'), orderController.canWithdraw);
-orderRouter.post('/my/withdraw', requireAuth('PATIENT'), orderController.withdrawFromContract);
+orderRouter.get('/my', requireAuth('CLIENT'), orderController.listMyOrders);
+orderRouter.get('/my/portal', requireAuth('CLIENT'), orderController.getMyPortal);
+orderRouter.get('/my/invoices', requireAuth('CLIENT'), orderController.listMyInvoices);
+orderRouter.post('/my', requireAuth('CLIENT'), orderController.createMyOrder);
+orderRouter.post('/my/cancel-subscription', requireAuth('CLIENT'), orderController.cancelMySubscription);
+orderRouter.post('/my/resume-subscription', requireAuth('CLIENT'), orderController.resumeMySubscription);
+orderRouter.get('/my/can-withdraw', requireAuth('CLIENT'), orderController.canWithdraw);
+orderRouter.post('/my/withdraw', requireAuth('CLIENT'), orderController.withdrawFromContract);
 
-orderRouter.patch('/:id/consultation-phone', requireAuth('PATIENT'), orderController.setConsultationPhone);
+orderRouter.patch('/:id/consultation-phone', requireAuth('CLIENT'), orderController.setConsultationPhone);
 orderRouter.get('/:id/invoice', requireAuth(), orderController.getInvoice);
 
-// ADMIN/DIETITIAN manage orders
-orderRouter.post('/:companyId', requireAuth('ADMIN', 'DIETITIAN'), orderController.createOrder);
-orderRouter.patch('/:id/confirm', requireAuth('ADMIN', 'DIETITIAN'), orderController.confirmOrder);
-orderRouter.get('/:companyId', requireAuth('ADMIN', 'DIETITIAN'), orderController.listOrders);
-orderRouter.get('/detail/:id', requireAuth('ADMIN', 'DIETITIAN'), orderController.getOrder);
+// ADMIN manage orders
+orderRouter.post('/:companyId', requireAuth('ADMIN'), orderController.createOrder);
+orderRouter.patch('/:id/confirm', requireAuth('ADMIN'), orderController.confirmOrder);
+orderRouter.get('/:companyId', requireAuth('ADMIN'), orderController.listOrders);
+orderRouter.get('/detail/:id', requireAuth('ADMIN'), orderController.getOrder);

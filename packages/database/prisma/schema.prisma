@@ -9,8 +9,7 @@ datasource db {
 
 enum UserRole {
   ADMIN
-  DIETITIAN
-  PATIENT
+  CLIENT
 }
 
 enum ProductType {
@@ -58,25 +57,11 @@ enum SubscriptionPlan {
 
 // ─── Nutrition Protocols (28.1) ───────────────────────────────────────────────
 
-model DietitianProfile {
-  id                      String   @id @default(cuid())
-  userId                  String   @unique
-  code                    String   @unique
-  firstName               String?
-  lastName                String?
-  scoringWeightsOverride  Json?    /// Per-dietitian scoring weight overrides (partial ScoringWeights JSON)
-  greyListWindow          Int      @default(1) /// How many previous plans contribute recipe IDs to the regeneration grey list (1-4). 0 disables grey list.
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @default(now()) @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
   passwordHash  String?
-  role          UserRole  @default(PATIENT)
+  role          UserRole  @default(CLIENT)
   emailVerified       DateTime?
   lastLoginAt         DateTime?
   grantedAccessUntil  DateTime?
@@ -85,8 +70,6 @@ model User {
   updatedAt     DateTime  @updatedAt
 
   company                 Company?                 @relation("CompanyUser")
-  companiesAsDietitian    Company[]                @relation("CompanyDietitian")
-  dietitianProfile        DietitianProfile?
   subscription            Subscription?
   auditLogs               AuditLog[]
   passwordResetTokens     PasswordResetToken[]
@@ -106,7 +89,6 @@ model User {
 model Company {
   id          String   @id @default(cuid())
   userId      String   @unique
-  dietitianId String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -114,10 +96,7 @@ model Company {
   contactLastName  String?
 
   user             User              @relation("CompanyUser", fields: [userId], references: [id], onDelete: Cascade)
-  dietitian        User?             @relation("CompanyDietitian", fields: [dietitianId], references: [id])
   orders           Order[]
-
-  @@index([dietitianId])
 }
 
 model AuditLog {

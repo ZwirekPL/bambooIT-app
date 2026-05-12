@@ -62,12 +62,7 @@ export async function login(email: string, password: string) {
 
   const company = await prisma.company.findUnique({ where: { userId: user.id } });
 
-  // Resolve firstName: from Company (for patients) or DietitianProfile (for dietitians)
-  let firstName: string | null = company?.contactFirstName ?? null;
-  if (!firstName && user.role === 'DIETITIAN') {
-    const dietitianProfile = await prisma.dietitianProfile.findUnique({ where: { userId: user.id } });
-    firstName = dietitianProfile?.firstName ?? null;
-  }
+  const firstName: string | null = company?.contactFirstName ?? null;
 
   const token = jwt.sign(
     { sub: user.id, email: user.email, role: user.role, companyId: company?.id },
@@ -109,7 +104,6 @@ interface RegisterConsents {
 export async function register(
   email: string,
   password: string,
-  dietitianCode?: string,
   firstName?: string,
   lastName?: string,
   referralCode?: string,
@@ -131,24 +125,13 @@ export async function register(
     throw new AppError(409, 'EMAIL_TAKEN', 'Email is already registered');
   }
 
-  let dietitianId: string | null = null;
-  if (dietitianCode) {
-    const profile = await prisma.dietitianProfile.findFirst({
-      where: { code: { equals: dietitianCode, mode: 'insensitive' } },
-    });
-    if (!profile) {
-      throw new AppError(400, 'INVALID_DIETITIAN_CODE', 'Invalid dietitian code');
-    }
-    dietitianId = profile.userId;
-  }
-
   const passwordHash = await bcrypt.hash(password, 12);
   const user = await prisma.user.create({
-    data: { email, passwordHash, role: 'PATIENT' },
+    data: { email, passwordHash, role: 'CLIENT' },
   });
 
   await prisma.company.create({
-    data: { userId: user.id, dietitianId, contactFirstName: firstName, contactLastName: lastName },
+    data: { userId: user.id, contactFirstName: firstName, contactLastName: lastName },
   });
 
   // Save user consents with version tracking

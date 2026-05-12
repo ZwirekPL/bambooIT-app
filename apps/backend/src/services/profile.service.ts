@@ -94,53 +94,6 @@ export async function changeEmail(
   logAudit({ userId, action: 'EMAIL_CHANGE', resourceType: 'USER', resourceId: userId, ip });
 }
 
-export async function getDietitianProfile(userId: string) {
-  const profile = await prisma.dietitianProfile.findUnique({
-    where: { userId },
-    include: { user: { select: { email: true } } },
-  });
-  if (!profile) {
-    throw new AppError(404, 'PROFILE_NOT_FOUND', 'Dietitian profile not found');
-  }
-  return {
-    code: profile.code,
-    firstName: profile.firstName,
-    lastName: profile.lastName,
-    email: profile.user.email,
-  };
-}
-
-export async function updateDietitianProfile(
-  userId: string,
-  data: { firstName?: string; lastName?: string },
-  ip?: string,
-) {
-  const profile = await prisma.dietitianProfile.findUnique({ where: { userId } });
-  if (!profile) {
-    throw new AppError(404, 'PROFILE_NOT_FOUND', 'Dietitian profile not found');
-  }
-
-  const updated = await prisma.dietitianProfile.update({
-    where: { userId },
-    data: {
-      firstName: data.firstName,
-      lastName: data.lastName,
-    },
-    include: { user: { select: { email: true } } },
-  });
-
-  await cacheDel(`cache:profile:${userId}`);
-
-  logAudit({ userId, action: 'UPDATE_PATIENT', resourceType: 'USER', resourceId: profile.id, ip });
-
-  return {
-    code: updated.code,
-    firstName: updated.firstName,
-    lastName: updated.lastName,
-    email: updated.user.email,
-  };
-}
-
 /**
  * RODO Art. 17 — delete own account (66.2).
  * Soft delete + PII anonymization + Stripe subscription cancel.

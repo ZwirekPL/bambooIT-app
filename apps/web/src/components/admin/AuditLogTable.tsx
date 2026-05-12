@@ -35,16 +35,10 @@ const ACTION_LABELS: Record<string, string> = {
   EDIT_PLAN: 'Edycja planu',
   EXPORT_PLAN: 'Eksport planu',
   CREATE_MANUAL_PLAN: 'Ręczne tworzenie planu',
-  VIEW_PATIENT: 'Podgląd pacjenta',
-  UPDATE_PATIENT: 'Aktualizacja pacjenta',
-  DELETE_PATIENT: 'Usunięcie pacjenta',
   DELETE_USER: 'Usunięcie użytkownika',
   RESTORE_USER: 'Przywrócenie użytkownika',
   CHANGE_USER_ROLE: 'Zmiana roli',
   CREATE_USER: 'Utworzenie użytkownika',
-  CREATE_DIETITIAN: 'Utworzenie dietetyka',
-  UPDATE_DIETITIAN: 'Aktualizacja dietetyka',
-  ROTATE_DIETITIAN_CODE: 'Rotacja kodu dietetyka',
   PASSWORD_RESET: 'Reset hasła',
   PASSWORD_CHANGE: 'Zmiana hasła',
   EMAIL_VERIFIED: 'Weryfikacja email',
@@ -108,7 +102,6 @@ const ACTION_LABELS: Record<string, string> = {
   REFERRAL_USED: 'Użycie kodu polecającego',
   REFERRAL_DISCOUNT_APPLIED: 'Zastosowanie rabatu',
   UNLOCK_ACCOUNT: 'Odblokowanie konta',
-  UNLOCK_PATIENT_PROFILE: 'Odblokowanie profilu pacjenta',
   DELETE_OWN_ACCOUNT: 'Usunięcie własnego konta',
   LOGIN_FAILED: 'Nieudane logowanie',
   ACCOUNT_LOCKED: 'Zablokowanie konta',
@@ -116,7 +109,7 @@ const ACTION_LABELS: Record<string, string> = {
 
 const RESOURCE_LABELS: Record<string, string> = {
   USER: 'Użytkownik',
-  PATIENT: 'Klient',
+  CLIENT: 'Klient',
   INTERVIEW: 'Wywiad',
   DIET_PLAN: 'Plan diety',
   TENANT: 'Tenant',
@@ -129,7 +122,6 @@ const RESOURCE_LABELS: Record<string, string> = {
   CHECKIN: 'Check-in',
   TESTIMONIAL: 'Opinia',
   MEAL_SWAP: 'Zamiana posiłku',
-  DIETITIAN_NOTE: 'Notatka',
   REFERRAL: 'Polecenie',
   NUTRITION_PROTOCOL: 'Protokół żywieniowy',
   PROTOCOL_TRIGGER: 'Mapowanie protokołu',
@@ -162,14 +154,13 @@ const SEVERITY_CLASSES: Record<Severity, string> = {
 const ACTION_GROUPS: Array<{ label: string; actions: string[] }> = [
   { label: 'Auth', actions: ['LOGIN', 'LOGOUT', 'LOGIN_FAILED', 'ACCOUNT_LOCKED', 'PASSWORD_RESET', 'PASSWORD_CHANGE', 'EMAIL_VERIFIED', 'EMAIL_CHANGE'] },
   { label: 'Plany diety', actions: ['GENERATE_PLAN', 'VIEW_PLAN', 'APPROVE_PLAN', 'SEND_PLAN', 'PUBLISH_PLAN', 'EDIT_PLAN', 'EXPORT_PLAN', 'CREATE_MANUAL_PLAN', 'AI_GENERATION_ENQUEUED', 'AI_REPAIR_ENQUEUED', 'AI_PARTIAL_REGEN_ENQUEUED', 'REGENERATE_PARTIAL', 'RED_FLAG_TRIGGERED', 'GENERATION_BLOCKED'] },
-  { label: 'Klienci', actions: ['VIEW_PATIENT', 'UPDATE_PATIENT', 'DELETE_PATIENT', 'CREATE_INTERVIEW', 'VIEW_INTERVIEW', 'CREATE_CHECKIN', 'CHECKIN_ADAPTATION', 'REQUEST_MEAL_SWAP', 'CONFIRM_MEAL_SWAP'] },
+  { label: 'Klienci', actions: ['CREATE_INTERVIEW', 'VIEW_INTERVIEW', 'CREATE_CHECKIN', 'CHECKIN_ADAPTATION', 'REQUEST_MEAL_SWAP', 'CONFIRM_MEAL_SWAP'] },
   { label: 'Użytkownicy', actions: ['CREATE_USER', 'DELETE_USER', 'RESTORE_USER', 'CHANGE_USER_ROLE', 'ADMIN_VERIFY_EMAIL', 'ADMIN_RESEND_VERIFICATION', 'ADMIN_FORCE_PASSWORD_RESET', 'BULK_USER_ACTION', 'REVOKE_USER_SESSIONS', 'DELETE_OWN_ACCOUNT', 'UNLOCK_ACCOUNT'] },
-  { label: 'Dietetycy', actions: ['CREATE_DIETITIAN', 'UPDATE_DIETITIAN', 'ROTATE_DIETITIAN_CODE'] },
   { label: 'Stripe', actions: ['CHECKOUT_STARTED', 'CHECKOUT_COMPLETED', 'SUBSCRIPTION_CHECKOUT_STARTED', 'SUBSCRIPTION_PORTAL_ACCESSED', 'STRIPE_CHECKOUT_COMPLETED', 'STRIPE_INVOICE_PAID', 'STRIPE_SUBSCRIPTION_DELETED', 'STRIPE_SUBSCRIPTION_UPDATED', 'STRIPE_INVOICE_PAYMENT_FAILED', 'STRIPE_REFUND'] },
   { label: 'Przepisy & Produkty', actions: ['CREATE_RECIPE', 'UPDATE_RECIPE', 'DELETE_RECIPE', 'BULK_UPDATE_RECIPES', 'MERGE_RECIPES', 'CREATE_CLEAN_PRODUCT', 'UPDATE_CLEAN_PRODUCT', 'DELETE_CLEAN_PRODUCT', 'BULK_UPDATE_CLEAN_PRODUCTS'] },
   { label: 'Protokoły', actions: ['CREATE_PROTOCOL', 'UPDATE_PROTOCOL', 'TOGGLE_PROTOCOL', 'ASSIGN_PROTOCOL', 'UNASSIGN_PROTOCOL', 'PROTOCOL_AUTO_MATCHED', 'PROTOCOL_CONFLICT_DETECTED', 'CREATE_PROTOCOL_TRIGGER', 'UPDATE_PROTOCOL_TRIGGER', 'DELETE_PROTOCOL_TRIGGER', 'CREATE_PROTOCOL_CONFLICT', 'UPDATE_PROTOCOL_CONFLICT', 'DELETE_PROTOCOL_CONFLICT'] },
   { label: 'Blog & Opinie', actions: ['CREATE_POST', 'EDIT_POST', 'DELETE_POST', 'CREATE_TESTIMONIAL', 'DELETE_TESTIMONIAL', 'APPROVE_TESTIMONIAL', 'REJECT_TESTIMONIAL'] },
-  { label: 'Inne', actions: ['CREATE_NOTE', 'REFERRAL_CODE_GENERATED', 'REFERRAL_USED', 'REFERRAL_DISCOUNT_APPLIED', 'UNLOCK_PATIENT_PROFILE'] },
+  { label: 'Inne', actions: ['CREATE_NOTE', 'REFERRAL_CODE_GENERATED', 'REFERRAL_USED', 'REFERRAL_DISCOUNT_APPLIED'] },
 ];
 
 const ALL_RESOURCE_TYPES = Object.keys(RESOURCE_LABELS);

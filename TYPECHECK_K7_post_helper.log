@@ -1,0 +1,45 @@
+
+> bambooit@1.0.0 typecheck
+> npm run generate --workspace=database && npm run build --workspace=database && npm run build --workspace=backend && npm run type-check --workspace=web
+
+
+> database@1.0.0 generate
+> prisma generate
+
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+✔ Generated Prisma Client (v6.19.2) to .\..\..\node_modules\@prisma\client in 125ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+
+
+> database@1.0.0 build
+> tsc -p tsconfig.json
+
+
+> backend@1.0.0 build
+> tsc
+
+src/controllers/profile.controller.ts(63,42): error TS2339: Property 'getDietitianProfile' does not exist on type 'typeof import("C:/Users/wirig/Desktop/bambooIT/apps/backend/src/services/profile.service")'.
+src/controllers/profile.controller.ts(77,42): error TS2339: Property 'updateDietitianProfile' does not exist on type 'typeof import("C:/Users/wirig/Desktop/bambooIT/apps/backend/src/services/profile.service")'.
+src/services/admin.service.ts(34,9): error TS2322: Type '{ OR?: ({ lastLoginAt: null; } | { lastLoginAt: { lt: Date; }; })[] | undefined; deletedAt?: null | undefined; email?: { contains: string; mode: "insensitive"; } | undefined; role?: UserRole | { ...; } | undefined; }' is not assignable to type 'UserWhereInput'.
+  Types of property 'role' are incompatible.
+    Type 'UserRole | { not: UserRole; } | undefined' is not assignable to type 'UserRole | EnumUserRoleFilter<"User"> | undefined'.
+      Type '"CLIENT"' is not assignable to type 'UserRole | EnumUserRoleFilter<"User"> | undefined'.
+src/services/admin.service.ts(217,34): error TS2322: Type '"CLIENT"' is not assignable to type 'UserRole | undefined'.
+src/services/admin.service.ts(241,13): error TS2322: Type 'UserRole' is not assignable to type 'UserRole | EnumUserRoleFieldUpdateOperationsInput | undefined'.
+  Type '"CLIENT"' is not assignable to type 'UserRole | EnumUserRoleFieldUpdateOperationsInput | undefined'.
+src/services/auth.service.ts(130,34): error TS2322: Type '"CLIENT"' is not assignable to type 'UserRole | undefined'.
+npm error Lifecycle script `build` failed with error:
+npm error code 2
+npm error path C:\Users\wirig\Desktop\bambooIT\apps\backend
+npm error workspace backend@1.0.0
+npm error location C:\Users\wirig\Desktop\bambooIT\apps\backend
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c tsc

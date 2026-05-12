@@ -21,15 +21,6 @@ import { redis } from '../utils/redis';
 import * as adminSubscription from '../services/adminSubscription.service';
 import { forgotPassword } from '../services/auth.service';
 
-const dietitianIdSchema = z.object({ id: z.string().cuid() });
-
-const createDietitianSchema = z.object({
-  email: z.string().email(),
-  password: passwordSchema.optional(),
-  firstName: z.string().min(1).max(100).optional(),
-  lastName: z.string().min(1).max(100).optional(),
-});
-
 const paginationSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
@@ -46,8 +37,8 @@ const paginationSchema = z.object({
 
 const listUsersQuerySchema = paginationSchema.extend({
   search: z.string().min(1).max(100).optional(),
-  role: z.enum(['ADMIN', 'DIETITIAN', 'PATIENT']).optional(),
-  excludeRole: z.enum(['ADMIN', 'DIETITIAN', 'PATIENT']).optional(),
+  role: z.enum(['ADMIN', 'CLIENT']).optional(),
+  excludeRole: z.enum(['ADMIN', 'CLIENT']).optional(),
   hideDeleted: z.coerce.boolean().optional(),
   inactiveMonths: z.coerce.number().int().min(1).max(24).optional(),
   sortBy: z.enum(['email', 'createdAt', 'lastLoginAt', 'role']).optional(),
@@ -62,13 +53,12 @@ const createUserSchema = z.object({
   password: passwordSchema.optional(),
   firstName: z.string().min(1).max(100).optional(),
   lastName: z.string().min(1).max(100).optional(),
-  dietitianCode: z.string().min(1).max(20).optional(),
 });
 
 const userIdSchema = z.object({ id: z.string().cuid() });
 
 const changeRoleSchema = z.object({
-  role: z.enum(['ADMIN', 'DIETITIAN', 'PATIENT']),
+  role: z.enum(['ADMIN', 'CLIENT']),
 });
 
 const listAuditLogsQuerySchema = paginationSchema.extend({
@@ -147,163 +137,6 @@ export async function createUser(req: Request, res: Response, next: NextFunction
       ip: req.ip,
     });
     return res.status(201).json({ ok: true, ...result });
-  } catch (err) {
-    next(err);
-  }
-}
-
-export async function createDietitian(req: Request, res: Response, next: NextFunction) {
-  const parsed = createDietitianSchema.safeParse(req.body);
-  if (!parsed.success) {
-    const fields = parsed.error.issues.map(i => ({
-      field: i.path.join('.'),
-      code: i.code,
-      minimum: 'minimum' in i ? (i as unknown as { minimum: number }).minimum : undefined,
-    }));
-    return res.status(400).json({
-      error: { code: 'VALIDATION_ERROR', message: 'Validation failed', fields },
-    });
-  }
-
-  try {
-    const result = await adminService.createDietitian(parsed.data);
-    logAudit({
-      userId: req.user?.sub,
-      action: 'CREATE_DIETITIAN',
-      resourceType: 'USER',
-      resourceId: result.dietitianUserId,
-      ip: req.ip,
-    });
-    return res.status(201).json({ ok: true, ...result });
-  } catch (err) {
-    next(err);
-  }
-}
-
-const listDietitiansQuerySchema = z.object({
-  page: z.coerce.number().int().min(1).default(1),
-  limit: z.coerce.number().int().min(1).max(500).default(20),
-  search: z.string().min(1).max(100).optional(),
-  sortBy: z.enum(['email', 'createdAt', 'lastLoginAt', 'companiesCount']).optional(),
-  sortOrder: z.enum(['asc', 'desc']).optional(),
-  hideDeleted: z.coerce.boolean().optional(),
-});
-
-export async function listDietitians(req: Request, res: Response, next: NextFunction) {
-  const parsed = listDietitiansQuerySchema.safeParse(req.query);
-  if (!parsed.success) {
-    return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid query parameters'));
-  }
-
-  try {
-    const result = await adminService.listDietitians(parsed.data);
-    return res.json({ ok: true, ...result });
-  } catch (err) {
-    next(err);
-  }
-}
-
-const updateDietitianSchema = z.object({
-  firstName: z.string().max(100).optional(),
-  lastName: z.string().max(100).optional(),
-  email: z.string().email().optional(),
-});
-
-export async function getDietitianCompanies(req: Request, res: Response, next: NextFunction) {
-  const parsed = dietitianIdSchema.safeParse(req.params);
-  if (!parsed.success) {
-    return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid user id'));
-  }
-
-  try {
-    const result = await adminService.getDietitianCompanies(parsed.data.id);
-    return res.json({ ok: true, ...result });
-  } catch (err) {
-    next(err);
-  }
-}
-
-export async function updateDietitian(req: Request, res: Response, next: NextFunction) {
-  const idParsed = dietitianIdSchema.safeParse(req.params);
-  if (!idParsed.success) {
-    return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid user id'));
-  }
-
-  const bodyParsed = updateDietitianSchema.safeParse(req.body);
-  if (!bodyParsed.success) {
-    const fields = bodyParsed.error.issues.map(i => ({
-      field: i.path.join('.'),
-      code: i.code,
-    }));
-    return res.status(400).json({
-      error: { code: 'VALIDATION_ERROR', message: 'Validation failed', fields },
-    });
-  }
-
-  try {
-    const result = await adminService.updateDietitian(idParsed.data.id, bodyParsed.data);
-    logAudit({
-      userId: req.user?.sub,
-      action: 'UPDATE_DIETITIAN',
-      resourceType: 'USER',
-      resourceId: idParsed.data.id,
-      ip: req.ip,
-    });
-    return res.json({ ok: true, dietitian: result });
-  } catch (err) {
-    next(err);
-  }
-}
-
-export async function rotateDietitianCode(req: Request, res: Response, next: NextFunction) {
-  const parsed = dietitianIdSchema.safeParse(req.params);
-  if (!parsed.success) {
-    return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid user id'));
-  }
-
-  try {
-    const result = await adminService.rotateDietitianCode(parsed.data.id);
-    logAudit({
-      userId: req.user?.sub,
-      action: 'ROTATE_DIETITIAN_CODE',
-      resourceType: 'USER',
-      resourceId: parsed.data.id,
-      ip: req.ip,
-    });
-    return res.json({ ok: true, ...result });
-  } catch (err) {
-    next(err);
-  }
-}
-
-// ── Dietitian toggle active (52.2) ────────────────────────────────────────
-
-export async function toggleDietitianActive(req: Request, res: Response, next: NextFunction) {
-  const parsed = dietitianIdSchema.safeParse(req.params);
-  if (!parsed.success) return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid user id'));
-
-  try {
-    const user = await prisma.user.findUnique({
-      where: { id: parsed.data.id },
-      select: { deletedAt: true, _count: { select: { companiesAsDietitian: true } } },
-    });
-    if (!user) return res.status(404).json(apiError('NOT_FOUND', 'User not found'));
-
-    const isActive = !user.deletedAt;
-    await prisma.user.update({
-      where: { id: parsed.data.id },
-      data: { deletedAt: isActive ? new Date() : null },
-    });
-
-    await logAudit({
-      userId: req.user?.sub,
-      action: isActive ? 'DELETE_USER' : 'RESTORE_USER',
-      resourceType: 'USER',
-      resourceId: parsed.data.id,
-      ip: req.ip,
-    });
-
-    return res.json({ ok: true, active: !isActive, patientsAffected: user._count.companiesAsDietitian });
   } catch (err) {
     next(err);
   }
@@ -552,9 +385,6 @@ const scoringWeightField = z.number().min(0).max(1);
 const patchScoringWeightsSchema = z.object({
   nutritionFit: scoringWeightField.optional(),
   quality: scoringWeightField.optional(),
-  // TODO(K9-cleanup): patientRating diet residue — drop całkowicie w K9
-  // (NIE rename do companyRating; bambooIT używa Testimonial).
-  patientRating: scoringWeightField.optional(),
   cuisine: scoringWeightField.optional(),
   season: scoringWeightField.optional(),
   diversity: scoringWeightField.optional(),

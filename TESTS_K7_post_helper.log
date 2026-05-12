@@ -1,0 +1,164 @@
+
+> backend@1.0.0 test
+> vitest run
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90mC:/Users/wirig/Desktop/bambooIT/apps/backend[39m
+
+ [32m✓[39m src/__tests__/utils/errors.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m src/__tests__/utils/encryption.test.ts [2m([22m[2m18 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m src/__tests__/services/auditRetention.service.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [31m❯[39m src/__tests__/services/userCleanup.service.test.ts [2m([22m[2m10 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 10[2mms[22m[39m
+     [32m✓[39m defaults to 30 when env var is missing[32m 1[2mms[22m[39m
+     [32m✓[39m parses valid integers from env[32m 0[2mms[22m[39m
+     [32m✓[39m falls back to default on non-numeric env[32m 0[2mms[22m[39m
+     [32m✓[39m falls back to default on zero/negative values[32m 0[2mms[22m[39m
+     [32m✓[39m queries with cutoff = now - retentionDays[32m 0[2mms[22m[39m
+     [32m✓[39m returns what prisma returns[32m 0[2mms[22m[39m
+[31m     [31m×[31m nulls all FK references before deleting the User[39m[32m 4[2mms[22m[39m
+     [32m✓[39m returns empty report when nothing to delete[32m 0[2mms[22m[39m
+     [32m✓[39m deletes each expired user and logs HARD_DELETE_EXPIRED_USER[32m 2[2mms[22m[39m
+     [32m✓[39m records failures without aborting the loop[32m 1[2mms[22m[39m
+ [31m❯[39m src/__tests__/services/auth.service.test.ts [2m([22m[2m23 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[32m 23[2mms[22m[39m
+       [32m✓[39m throws INVALID_CREDENTIALS when user not found[32m 2[2mms[22m[39m
+       [32m✓[39m throws INVALID_CREDENTIALS when password is wrong[32m 0[2mms[22m[39m
+       [32m✓[39m throws EMAIL_NOT_VERIFIED when email not verified[32m 0[2mms[22m[39m
+       [32m✓[39m returns token and user on successful login[32m 3[2mms[22m[39m
+       [32m✓[39m returns companyId=null when no company profile exists[32m 1[2mms[22m[39m
+       [32m✓[39m throws EMAIL_TAKEN when email already registered[32m 0[2mms[22m[39m
+[31m       [31m×[31m throws INVALID_DIETITIAN_CODE when code not found[39m[32m 6[2mms[22m[39m
+[31m       [31m×[31m creates user and company on success[39m[32m 2[2mms[22m[39m
+[31m       [31m×[31m links dietitian when valid code provided[39m[32m 1[2mms[22m[39m
+       [32m✓[39m invalidates old verification tokens before creating new one[32m 0[2mms[22m[39m
+       [32m✓[39m returns silently when user does not exist (anti-enumeration)[32m 0[2mms[22m[39m
+       [32m✓[39m creates token and sends email when user exists[32m 0[2mms[22m[39m
+       [32m✓[39m invalidates existing tokens before creating new one[32m 0[2mms[22m[39m
+       [32m✓[39m throws INVALID_TOKEN when token not found or expired[32m 0[2mms[22m[39m
+       [32m✓[39m updates password hash on success[32m 0[2mms[22m[39m
+       [32m✓[39m invalidates all reset tokens after password change[32m 0[2mms[22m[39m
+       [32m✓[39m logs PASSWORD_RESET audit event[32m 0[2mms[22m[39m
+       [32m✓[39m throws INVALID_TOKEN when token not found or expired[32m 0[2mms[22m[39m
+       [32m✓[39m sets emailVerified on success[32m 0[2mms[22m[39m
+       [32m✓[39m invalidates all verification tokens on success[32m 0[2mms[22m[39m
+       [32m✓[39m logs EMAIL_VERIFIED audit event[32m 0[2mms[22m[39m
+       [32m✓[39m blacklists token in Redis when token has exp[32m 1[2mms[22m[39m
+       [32m✓[39m logs LOGOUT audit event[32m 0[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 4 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/services/auth.service.test.ts[2m > [22mauth.service[2m > [22mregister()[2m > [22mthrows INVALID_DIETITIAN_CODE when code not found
+[31m[1mAssertionError[22m: expected TypeError: Cannot read properties of unde… to match object { Object (code, statusCode) }[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- {[39m
+[32m-   "code": "INVALID_DIETITIAN_CODE",[39m
+[32m-   "statusCode": 400,[39m
+[31m+ TypeError {[39m
+[31m+   "message": "Cannot read properties of undefined (reading 'id')",[39m
+[2m  }[22m
+
+[36m [2m❯[22m src/__tests__/services/auth.service.test.ts:[2m152:7[22m[39m
+    [90m150| [39m      m[33m.[39muser[33m.[39mfindFirst[33m.[39m[34mmockResolvedValue[39m([35mnull[39m)[33m;[39m
+    [90m151| [39m      m[33m.[39mdietitianProfile[33m.[39mfindUnique[33m.[39m[34mmockResolvedValue[39m([35mnull[39m)[33m;[39m
+    [90m152| [39m      [35mawait[39m [34mexpect[39m([34mregister[39m([32m'new@example.com'[39m[33m,[39m [32m'pass'[39m[33m,[39m [32m'BADCODE'[39m))
+    [90m   | [39m      [31m^[39m
+    [90m153| [39m        .rejects.toMatchObject({ code: 'INVALID_DIETITIAN_CODE', statu…
+    [90m154| [39m    })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/services/auth.service.test.ts[2m > [22mauth.service[2m > [22mregister()[2m > [22mcreates user and company on success
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called with arguments: [ { data: { …(4) } } ][90m
+
+Received: 
+
+[1m  1st vi.fn() call:
+
+[22m[2m  [[22m
+[2m    {[22m
+[2m      "data": {[22m
+[32m-       "contactFirstName": "Jan",[90m
+[32m-       "contactLastName": "Kowalski",[90m
+[32m-       "dietitianId": null,[90m
+[31m+       "contactFirstName": undefined,[90m
+[31m+       "contactLastName": "Jan",[90m
+[2m        "userId": "user-new",[22m
+[2m      },[22m
+[2m    },[22m
+[2m  ][22m
+[31m[90m
+
+Number of calls: [1m1[22m
+[31m[39m
+[36m [2m❯[22m src/__tests__/services/auth.service.test.ts:[2m167:32[22m[39m
+    [90m165| [39m
+    [90m166| [39m      expect(result.user).toMatchObject({ id: 'user-new', email: 'new@…
+    [90m167| [39m      [34mexpect[39m(m[33m.[39mcompany[33m.[39mcreate)[33m.[39m[34mtoHaveBeenCalledWith[39m({
+    [90m   | [39m                               [31m^[39m
+    [90m168| [39m        data: { userId: 'user-new', dietitianId: null, contactFirstNam…
+    [90m169| [39m      })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/services/auth.service.test.ts[2m > [22mauth.service[2m > [22mregister()[2m > [22mlinks dietitian when valid code provided
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called with arguments: [ { data: ObjectContaining{…} } ][90m
+
+Received: 
+
+[1m  1st vi.fn() call:
+
+[22m[2m  [[22m
+[2m    {[22m
+[32m-     "data": ObjectContaining {[90m
+[32m-       "dietitianId": "dietitian-1",[90m
+[31m+     "data": {[90m
+[31m+       "contactFirstName": "DIETCODE",[90m
+[31m+       "contactLastName": undefined,[90m
+[31m+       "userId": "user-new",[90m
+[2m      },[22m
+[2m    },[22m
+[2m  ][22m
+[31m[90m
+
+Number of calls: [1m1[22m
+[31m[39m
+[36m [2m❯[22m src/__tests__/services/auth.service.test.ts:[2m184:32[22m[39m
+    [90m182| [39m      [35mawait[39m [34mregister[39m([32m'new@example.com'[39m[33m,[39m [32m'pass'[39m[33m,[39m [32m'DIETCODE'[39m)[33m;[39m
+    [90m183| [39m
+    [90m184| [39m      [34mexpect[39m(m[33m.[39mcompany[33m.[39mcreate)[33m.[39m[34mtoHaveBeenCalledWith[39m({
+    [90m   | [39m                               [31m^[39m
+    [90m185| [39m        data[33m:[39m expect[33m.[39m[34mobjectContaining[39m({ dietitianId[33m:[39m [32m'dietitian-1'[39m })[33m,[39m
+    [90m186| [39m      })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/services/userCleanup.service.test.ts[2m > [22mhardDeleteUser[2m > [22mnulls all FK references before deleting the User
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called with arguments: [ { …(2) } ][90m
+
+Number of calls: [1m0[22m
+[31m[39m
+[36m [2m❯[22m src/__tests__/services/userCleanup.service.test.ts:[2m116:34[22m[39m
+    [90m114| [39m    })[33m;[39m
+    [90m115| [39m    // Tenant, SupplementPrescription, NutritionProtocol mocks dropped…
+    [90m116| [39m    [34mexpect[39m(m[33m.[39mcompany[33m.[39mupdateMany)[33m.[39m[34mtoHaveBeenCalledWith[39m({
+    [90m   | [39m                                 [31m^[39m
+    [90m117| [39m      where[33m:[39m { dietitianId[33m:[39m [32m'u1'[39m }[33m,[39m
+    [90m118| [39m      data[33m:[39m { dietitianId[33m:[39m [35mnull[39m }[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m3 passed[39m[22m[90m (5)[39m
+[2m      Tests [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m61 passed[39m[22m[90m (65)[39m
+[2m   Start at [22m 19:05:35
+[2m   Duration [22m 436ms[2m (transform 501ms, setup 105ms, import 600ms, tests 55ms, environment 1ms)[22m
+
+npm error Lifecycle script `test` failed with error:
+npm error code 1
+npm error path C:\Users\wirig\Desktop\bambooIT\apps\backend
+npm error workspace backend@1.0.0
+npm error location C:\Users\wirig\Desktop\bambooIT\apps\backend
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c vitest run

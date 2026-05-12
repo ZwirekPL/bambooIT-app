@@ -92,7 +92,7 @@ describe('findExpiredSoftDeletedUsers', () => {
   });
 
   it('returns what prisma returns', async () => {
-    const rows = [{ id: 'u1', email: 'a@x', deletedAt: new Date(), role: 'PATIENT' }];
+    const rows = [{ id: 'u1', email: 'a@x', deletedAt: new Date(), role: 'CLIENT' }];
     m.user.findMany.mockResolvedValueOnce(rows);
     const result = await findExpiredSoftDeletedUsers(new Date());
     expect(result).toEqual(rows);
@@ -112,11 +112,7 @@ describe('hardDeleteUser', () => {
       where: { userId: 'u1' },
       data: { userId: null },
     });
-    // Tenant, SupplementPrescription, NutritionProtocol mocks dropped in K5b/K5c
-    expect(m.company.updateMany).toHaveBeenCalledWith({
-      where: { dietitianId: 'u1' },
-      data: { dietitianId: null },
-    });
+    // Company.dietitianId nullification dropped in K7 (column removed entirely)
     expect(m.user.delete).toHaveBeenCalledWith({ where: { id: 'u1' } });
   });
 });
@@ -138,8 +134,8 @@ describe('runUserCleanupJob', () => {
 
   it('deletes each expired user and logs HARD_DELETE_EXPIRED_USER', async () => {
     m.user.findMany.mockResolvedValueOnce([
-      { id: 'u1', email: 'a@x', deletedAt: new Date(), role: 'PATIENT' },
-      { id: 'u2', email: 'b@x', deletedAt: new Date(), role: 'DIETITIAN' },
+      { id: 'u1', email: 'a@x', deletedAt: new Date(), role: 'CLIENT' },
+      { id: 'u2', email: 'b@x', deletedAt: new Date(), role: 'CLIENT' },
     ]);
     const report = await runUserCleanupJob();
 
@@ -161,8 +157,8 @@ describe('runUserCleanupJob', () => {
 
   it('records failures without aborting the loop', async () => {
     m.user.findMany.mockResolvedValueOnce([
-      { id: 'u1', email: 'a@x', deletedAt: new Date(), role: 'PATIENT' },
-      { id: 'u2', email: 'b@x', deletedAt: new Date(), role: 'PATIENT' },
+      { id: 'u1', email: 'a@x', deletedAt: new Date(), role: 'CLIENT' },
+      { id: 'u2', email: 'b@x', deletedAt: new Date(), role: 'CLIENT' },
     ]);
     m.user.delete
       .mockRejectedValueOnce(new Error('FK violation'))

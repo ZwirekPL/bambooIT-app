@@ -56,11 +56,6 @@ export const SETTING_SCORING_WEIGHTS = 'scoring_weights';
 export interface ScoringWeights {
   nutritionFit: number;
   quality: number;
-  // TODO(K9-cleanup): appSettings.patientRating to diet-specific feature
-  // (klient ocenia dietetyka) — DROP całkowicie w K9, NIE rename do
-  // companyRating. bambooIT nie ma analogu (klient może zostawić
-  // Testimonial, ale to inny model).
-  patientRating: number;
   cuisine: number;
   season: number;
   diversity: number;
@@ -75,9 +70,6 @@ export interface ScoringWeights {
 export const DEFAULT_SCORING_WEIGHTS: ScoringWeights = {
   nutritionFit: 0.32,
   quality: 0.08,
-  // TODO(K9-cleanup): patientRating diet residue — drop całkowicie w K9
-  // (NIE rename do companyRating; bambooIT używa Testimonial).
-  patientRating: 0.08,
   cuisine: 0.07,
   season: 0.05,
   diversity: 0.07,

@@ -1,0 +1,32 @@
+
+> bambooit@1.0.0 typecheck
+> npm run generate --workspace=database && npm run build --workspace=database && npm run build --workspace=backend && npm run type-check --workspace=web
+
+
+> database@1.0.0 generate
+> prisma generate
+
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+✔ Generated Prisma Client (v6.19.2) to .\..\..\node_modules\@prisma\client in 102ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+
+
+> database@1.0.0 build
+> tsc -p tsconfig.json
+
+
+> backend@1.0.0 build
+> tsc
+
+
+> web@0.1.0 type-check
+> tsc --noEmit
+
