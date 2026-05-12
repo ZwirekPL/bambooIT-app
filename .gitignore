@@ -14,6 +14,10 @@ NIEISTOTNE
 # Production env (secrets)
 .env.prod
 
+# DB backups (cleanup process)
+backup_pre_*.sql
+backup.log
+
 # Temp debug/migration files
 n8n_*.json
 *_tmp.json
