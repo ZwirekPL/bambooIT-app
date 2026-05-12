@@ -116,7 +116,7 @@ async function listSubscriptionsOnly(params: SubscriptionListParams & { plan?: s
   const [subscriptions, total] = await Promise.all([
     prisma.subscription.findMany({
       where: subWhere,
-      include: { user: { select: { id: true, email: true, patient: { select: { firstName: true, lastName: true } } } } },
+      include: { user: { select: { id: true, email: true, company: { select: { contactFirstName: true, contactLastName: true } } } } },
       orderBy: { createdAt: 'desc' },
       skip: (page - 1) * limit,
       take: limit,
@@ -147,7 +147,7 @@ async function listOrders(params: SubscriptionListParams) {
   const [orders, total] = await Promise.all([
     prisma.order.findMany({
       where,
-      include: { patient: { select: { firstName: true, lastName: true, user: { select: { email: true } } } } },
+      include: { company: { select: { contactFirstName: true, contactLastName: true, user: { select: { email: true } } } } },
       orderBy: { createdAt: 'desc' },
       skip: (page - 1) * limit,
       take: limit,
@@ -176,7 +176,7 @@ async function listAll(params: SubscriptionListParams) {
     const [subscriptions, count] = await Promise.all([
       prisma.subscription.findMany({
         where: subWhere,
-        include: { user: { select: { id: true, email: true, patient: { select: { firstName: true, lastName: true } } } } },
+        include: { user: { select: { id: true, email: true, company: { select: { contactFirstName: true, contactLastName: true } } } } },
         orderBy: { createdAt: 'desc' },
       }),
       prisma.subscription.count({ where: subWhere }),
@@ -202,7 +202,7 @@ async function listAll(params: SubscriptionListParams) {
     const [orders, count] = await Promise.all([
       prisma.order.findMany({
         where: orderWhere,
-        include: { patient: { select: { firstName: true, lastName: true, user: { select: { email: true } } } } },
+        include: { company: { select: { contactFirstName: true, contactLastName: true, user: { select: { email: true } } } } },
         orderBy: { createdAt: 'desc' },
       }),
       prisma.order.count({ where: orderWhere }),
@@ -233,13 +233,13 @@ function mapSubscription(s: {
   currentPeriodEnd: Date | null;
   cancelAtPeriodEnd: boolean;
   stripeSubscriptionId: string | null;
-  user: { email: string; patient: { firstName: string | null; lastName: string | null } | null };
+  user: { email: string; company: { contactFirstName: string | null; contactLastName: string | null } | null };
 }): MappedItem {
   return {
     id: s.id,
     type: 'subscription',
     userEmail: s.user.email,
-    userName: [s.user.patient?.firstName, s.user.patient?.lastName].filter(Boolean).join(' ') || null,
+    userName: [s.user.company?.contactFirstName, s.user.company?.contactLastName].filter(Boolean).join(' ') || null,
     productType: s.plan,
     status: s.status,
     amount: SUB_PRICE[s.plan] ?? 0,
@@ -255,13 +255,13 @@ function mapOrder(o: {
   productType: string;
   status: string;
   createdAt: Date;
-  patient: { firstName: string | null; lastName: string | null; user: { email: string } };
+  company: { contactFirstName: string | null; contactLastName: string | null; user: { email: string } };
 }): MappedItem {
   return {
     id: o.id,
     type: 'order',
-    userEmail: o.patient.user.email,
-    userName: [o.patient.firstName, o.patient.lastName].filter(Boolean).join(' ') || null,
+    userEmail: o.company.user.email,
+    userName: [o.company.contactFirstName, o.company.contactLastName].filter(Boolean).join(' ') || null,
     productType: o.productType,
     status: o.status,
     amount: ORDER_PRICE[o.productType] ?? 0,

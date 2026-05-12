@@ -66,7 +66,7 @@ export async function stripeWebhook(req: Request, res: Response): Promise<void> 
         const subscriptionId =
           typeof session.subscription === 'string' ? session.subscription : null;
 
-        // Handle patient order checkout (has orderId in metadata)
+        // Handle company order checkout (has orderId in metadata)
         if (session.metadata?.orderId) {
           await handleOrderCheckoutCompleted(session.metadata.orderId);
           logAudit({

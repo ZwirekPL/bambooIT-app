@@ -182,12 +182,12 @@ export async function deleteAccount(userId: string, password: string): Promise<v
     },
   });
 
-  // Anonymize patient profile
-  await prisma.patient.updateMany({
+  // Anonymize company profile
+  await prisma.company.updateMany({
     where: { userId },
     data: {
-      firstName: null,
-      lastName: null,
+      contactFirstName: null,
+      contactLastName: null,
     },
   });
 

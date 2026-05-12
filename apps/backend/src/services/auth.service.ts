@@ -60,17 +60,17 @@ export async function login(email: string, password: string) {
   // Update lastLoginAt timestamp
   await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
 
-  const patient = await prisma.patient.findUnique({ where: { userId: user.id } });
+  const company = await prisma.company.findUnique({ where: { userId: user.id } });
 
-  // Resolve firstName: from Patient (for patients) or DietitianProfile (for dietitians)
-  let firstName: string | null = patient?.firstName ?? null;
+  // Resolve firstName: from Company (for patients) or DietitianProfile (for dietitians)
+  let firstName: string | null = company?.contactFirstName ?? null;
   if (!firstName && user.role === 'DIETITIAN') {
     const dietitianProfile = await prisma.dietitianProfile.findUnique({ where: { userId: user.id } });
     firstName = dietitianProfile?.firstName ?? null;
   }
 
   const token = jwt.sign(
-    { sub: user.id, email: user.email, role: user.role, patientId: patient?.id },
+    { sub: user.id, email: user.email, role: user.role, companyId: company?.id },
     process.env.JWT_SECRET!,
     { expiresIn: '7d' }
   );
@@ -94,7 +94,7 @@ export async function login(email: string, password: string) {
       id: user.id,
       email: user.email,
       role: user.role,
-      patientId: patient?.id ?? null,
+      companyId: company?.id ?? null,
       firstName,
     },
   };
@@ -147,8 +147,8 @@ export async function register(
     data: { email, passwordHash, role: 'PATIENT' },
   });
 
-  await prisma.patient.create({
-    data: { userId: user.id, dietitianId, firstName, lastName },
+  await prisma.company.create({
+    data: { userId: user.id, dietitianId, contactFirstName: firstName, contactLastName: lastName },
   });
 
   // Save user consents with version tracking

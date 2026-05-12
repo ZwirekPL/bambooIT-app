@@ -18,7 +18,7 @@ orderRouter.patch('/:id/consultation-phone', requireAuth('PATIENT'), orderContro
 orderRouter.get('/:id/invoice', requireAuth(), orderController.getInvoice);
 
 // ADMIN/DIETITIAN manage orders
-orderRouter.post('/:patientId', requireAuth('ADMIN', 'DIETITIAN'), orderController.createOrder);
+orderRouter.post('/:companyId', requireAuth('ADMIN', 'DIETITIAN'), orderController.createOrder);
 orderRouter.patch('/:id/confirm', requireAuth('ADMIN', 'DIETITIAN'), orderController.confirmOrder);
-orderRouter.get('/:patientId', requireAuth('ADMIN', 'DIETITIAN'), orderController.listOrders);
+orderRouter.get('/:companyId', requireAuth('ADMIN', 'DIETITIAN'), orderController.listOrders);
 orderRouter.get('/detail/:id', requireAuth('ADMIN', 'DIETITIAN'), orderController.getOrder);

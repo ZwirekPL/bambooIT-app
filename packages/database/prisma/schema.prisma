@@ -84,8 +84,8 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  patient                 Patient?                 @relation("PatientUser")
-  patientsAsDietitian     Patient[]                @relation("PatientDietitian")
+  company                 Company?                 @relation("CompanyUser")
+  companiesAsDietitian    Company[]                @relation("CompanyDietitian")
   dietitianProfile        DietitianProfile?
   subscription            Subscription?
   auditLogs               AuditLog[]
@@ -103,23 +103,18 @@ model User {
   // Supplements (79.6)
 }
 
-model Patient {
+model Company {
   id          String   @id @default(cuid())
   userId      String   @unique
   dietitianId String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  firstName String?
-  lastName  String?
-  sex       String?
-  birthYear Int?
-  birthDate DateTime?
-  heightCm  Int?
-  weightKg      Decimal?  @db.Decimal(6, 2)
+  contactFirstName String?
+  contactLastName  String?
 
-  user             User              @relation("PatientUser", fields: [userId], references: [id], onDelete: Cascade)
-  dietitian        User?             @relation("PatientDietitian", fields: [dietitianId], references: [id])
+  user             User              @relation("CompanyUser", fields: [userId], references: [id], onDelete: Cascade)
+  dietitian        User?             @relation("CompanyDietitian", fields: [dietitianId], references: [id])
   orders           Order[]
 
   @@index([dietitianId])
@@ -172,7 +167,7 @@ model EmailVerificationToken {
 
 model Order {
   id                String      @id @default(cuid())
-  patientId         String
+  companyId         String
   productType       ProductType
   status            OrderStatus @default(PENDING_PAYMENT)
   consultationPhone  String?     @db.VarChar(20)
@@ -180,9 +175,9 @@ model Order {
   createdAt          DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
 
-  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-  @@index([patientId])
+  @@index([companyId])
 }
 
 // @deprecated — artifact, scheduled for removal in a future migration (31.7)

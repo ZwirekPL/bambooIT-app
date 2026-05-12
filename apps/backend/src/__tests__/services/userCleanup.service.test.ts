@@ -4,7 +4,7 @@ const m = vi.hoisted(() => ({
   user: { findMany: vi.fn(), delete: vi.fn() },
   auditLog: { updateMany: vi.fn().mockResolvedValue({ count: 0 }) },
   tenant: { updateMany: vi.fn().mockResolvedValue({ count: 0 }) },
-  patient: { updateMany: vi.fn().mockResolvedValue({ count: 0 }) },
+  company: { updateMany: vi.fn().mockResolvedValue({ count: 0 }) },
   supplementPrescription: { updateMany: vi.fn().mockResolvedValue({ count: 0 }) },
   nutritionProtocol: { updateMany: vi.fn().mockResolvedValue({ count: 0 }) },
   logAudit: vi.fn(),
@@ -15,7 +15,7 @@ vi.mock('@db', () => ({
     user: m.user,
     auditLog: m.auditLog,
     tenant: m.tenant,
-    patient: m.patient,
+    company: m.company,
     supplementPrescription: m.supplementPrescription,
     nutritionProtocol: m.nutritionProtocol,
     $transaction: async (fn: (tx: typeof prismaMock) => Promise<unknown>) => fn(prismaMock),
@@ -30,7 +30,7 @@ const prismaMock = {
   user: m.user,
   auditLog: m.auditLog,
   tenant: m.tenant,
-  patient: m.patient,
+  company: m.company,
   supplementPrescription: m.supplementPrescription,
   nutritionProtocol: m.nutritionProtocol,
 };
@@ -112,19 +112,8 @@ describe('hardDeleteUser', () => {
       where: { userId: 'u1' },
       data: { userId: null },
     });
-    expect(m.tenant.updateMany).toHaveBeenCalledWith({
-      where: { ownerId: 'u1' },
-      data: { ownerId: null },
-    });
-    expect(m.patient.updateMany).toHaveBeenCalledWith({
-      where: { dietitianId: 'u1' },
-      data: { dietitianId: null },
-    });
-    expect(m.supplementPrescription.updateMany).toHaveBeenCalledWith({
-      where: { dietitianId: 'u1' },
-      data: { dietitianId: null },
-    });
-    expect(m.nutritionProtocol.updateMany).toHaveBeenCalledWith({
+    // Tenant, SupplementPrescription, NutritionProtocol mocks dropped in K5b/K5c
+    expect(m.company.updateMany).toHaveBeenCalledWith({
       where: { dietitianId: 'u1' },
       data: { dietitianId: null },
     });

@@ -11,13 +11,9 @@ interface UserDataExport {
     lastLoginAt: string | null;
     emailVerified: string | null;
   };
-  patient: {
-    firstName: string | null;
-    lastName: string | null;
-    sex: string | null;
-    birthYear: number | null;
-    heightCm: number | null;
-    weightKg: number | null;
+  company: {
+    contactFirstName: string | null;
+    contactLastName: string | null;
   } | null;
   consents: Array<{
     type: string;
@@ -77,8 +73,8 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
   }
 
   // Fetch all related data in parallel
-  const [patient, consents, subscription, auditLogs] = await Promise.all([
-    prisma.patient.findUnique({ where: { userId } }),
+  const [company, consents, subscription, auditLogs] = await Promise.all([
+    prisma.company.findUnique({ where: { userId } }),
     prisma.userConsent.findMany({
       where: { userId },
       orderBy: { acceptedAt: 'desc' },
@@ -96,7 +92,7 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
     }),
   ]);
 
-  // Interviews and dietPlans require patientId
+  // Interviews and dietPlans require companyId
   // TODO(5b-cleanup): Interview + DietPlan locals dropped (model removed in K5b).
   let orders: Array<{
     id: string;
@@ -105,13 +101,13 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
     createdAt: Date;
   }> = [];
 
-  if (patient) {
+  if (company) {
     // TODO(5b-cleanup): Interview + DietPlan dropped in K5b. RODO export of diet domain
     // rebuild for bambooIT data (Company, Subscription, AuditFormSubmissions,
     // ContactMessages, ChatSessions) in faza 4. Orders export still works (Patient zostaje).
     const [rawOrders] = await Promise.all([
       prisma.order.findMany({
-        where: { patientId: patient.id },
+        where: { companyId: company.id },
         orderBy: { createdAt: 'desc' },
         select: {
           id: true,
@@ -133,14 +129,10 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
       lastLoginAt: user.lastLoginAt?.toISOString() ?? null,
       emailVerified: user.emailVerified?.toISOString() ?? null,
     },
-    patient: patient
+    company: company
       ? {
-          firstName: patient.firstName,
-          lastName: patient.lastName,
-          sex: patient.sex,
-          birthYear: patient.birthYear,
-          heightCm: patient.heightCm,
-          weightKg: patient.weightKg ? Number(patient.weightKg) : null,
+          contactFirstName: company.contactFirstName,
+          contactLastName: company.contactLastName,
         }
       : null,
     consents: consents.map((c) => ({

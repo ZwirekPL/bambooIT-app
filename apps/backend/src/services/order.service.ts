@@ -23,42 +23,42 @@ export type ProductType =
 export type CheckoutProductType = ProductType | 'TRIAL' | 'TRIAL_YEARLY';
 
 interface CreateOrderInput {
-  patientId: string;
+  companyId: string;
   productType: ProductType;
 }
 
 /**
- * Verify that a DIETITIAN owns the given patient (patient.dietitianId === userId).
+ * Verify that a DIETITIAN owns the given company (company.dietitianId === userId).
  * ADMIN always passes. Throws 403 on mismatch.
  */
-export async function assertPatientOwnership(
-  patientId: string,
+export async function assertCompanyOwnership(
+  companyId: string,
   userId: string,
   role: string
 ): Promise<void> {
   if (role === 'ADMIN') return;
 
-  const patient = await prisma.patient.findUnique({
-    where: { id: patientId },
+  const company = await prisma.company.findUnique({
+    where: { id: companyId },
     select: { dietitianId: true },
   });
-  if (!patient) {
-    throw new AppError(404, 'NOT_FOUND', 'Patient not found');
+  if (!company) {
+    throw new AppError(404, 'NOT_FOUND', 'Company not found');
   }
-  if (patient.dietitianId !== userId) {
-    throw new AppError(403, 'FORBIDDEN', 'You do not have access to this patient');
+  if (company.dietitianId !== userId) {
+    throw new AppError(403, 'FORBIDDEN', 'You do not have access to this company');
   }
 }
 
-export async function createOrder({ patientId, productType }: CreateOrderInput) {
-  const patient = await prisma.patient.findUnique({ where: { id: patientId } });
-  if (!patient) {
-    throw new AppError(404, 'NOT_FOUND', 'Patient not found');
+export async function createOrder({ companyId, productType }: CreateOrderInput) {
+  const company = await prisma.company.findUnique({ where: { id: companyId } });
+  if (!company) {
+    throw new AppError(404, 'NOT_FOUND', 'Company not found');
   }
 
   const order = await prisma.order.create({
     data: {
-      patientId,
+      companyId,
       productType,
       status: 'PENDING_PAYMENT',
     },
@@ -67,9 +67,9 @@ export async function createOrder({ patientId, productType }: CreateOrderInput) 
   return order;
 }
 
-export async function listOrders(patientId: string) {
+export async function listOrders(companyId: string) {
   return prisma.order.findMany({
-    where: { patientId },
+    where: { companyId },
     orderBy: { createdAt: 'desc' },
   });
 }
@@ -78,26 +78,26 @@ export async function createMyOrder(
   userId: string,
   data: { productType: ProductType }
 ) {
-  const patient = await prisma.patient.findUnique({
+  const company = await prisma.company.findUnique({
     where: { userId },
     include: { user: { select: { email: true } } },
   });
-  if (!patient) {
-    throw new AppError(404, 'NOT_FOUND', 'Patient profile not found');
+  if (!company) {
+    throw new AppError(404, 'NOT_FOUND', 'Company profile not found');
   }
 
   const order = await prisma.order.create({
     data: {
-      patientId: patient.id,
+      companyId: company.id,
       productType: data.productType,
-      // Dev mode: immediately mark as PAID so patient can proceed to interview
+      // Dev mode: immediately mark as PAID so company can proceed to interview
       status: 'PAID',
     },
   });
 
-  sendOrderConfirmationEmail(patient.user.email, order).catch(() => {});
+  sendOrderConfirmationEmail(company.user.email, order).catch(() => {});
 
-  return { order, patientId: patient.id };
+  return { order, companyId: company.id };
 }
 
 export async function confirmOrder(id: string) {
@@ -111,20 +111,20 @@ export async function confirmOrder(id: string) {
     data: { status: 'PAID' },
   });
 
-  const patient = await prisma.patient.findUnique({
-    where: { id: updated.patientId },
+  const company = await prisma.company.findUnique({
+    where: { id: updated.companyId },
     include: { user: { select: { email: true } } },
   });
-  if (patient) {
-    sendOrderConfirmationEmail(patient.user.email, updated).catch(() => {});
+  if (company) {
+    sendOrderConfirmationEmail(company.user.email, updated).catch(() => {});
   }
 
   return updated;
 }
 
-export async function getOrder(id: string, patientId?: string) {
+export async function getOrder(id: string, companyId?: string) {
   const where: Prisma.OrderWhereInput = { id };
-  if (patientId) where.patientId = patientId;
+  if (companyId) where.companyId = companyId;
 
   const order = await prisma.order.findFirst({ where });
   if (!order) {
@@ -134,15 +134,15 @@ export async function getOrder(id: string, patientId?: string) {
   return order;
 }
 
-/** Lists all orders for the currently authenticated patient. */
+/** Lists all orders for the currently authenticated company. */
 export async function listMyOrders(userId: string) {
-  const patient = await prisma.patient.findUnique({ where: { userId } });
-  if (!patient) {
-    throw new AppError(404, 'NOT_FOUND', 'Patient profile not found');
+  const company = await prisma.company.findUnique({ where: { userId } });
+  if (!company) {
+    throw new AppError(404, 'NOT_FOUND', 'Company profile not found');
   }
 
   return prisma.order.findMany({
-    where: { patientId: patient.id },
+    where: { companyId: company.id },
     orderBy: { createdAt: 'desc' },
   });
 }
@@ -155,12 +155,12 @@ export async function setConsultationPhone(
 ): Promise<void> {
   const order = await prisma.order.findFirst({
     where: { id: orderId },
-    include: { patient: { select: { userId: true } } },
+    include: { company: { select: { userId: true } } },
   });
   if (!order) {
     throw new AppError(404, 'NOT_FOUND', 'Order not found');
   }
-  if (order.patient.userId !== userId) {
+  if (order.company.userId !== userId) {
     throw new AppError(403, 'FORBIDDEN', 'You do not own this order');
   }
   if (order.productType !== 'CONSULTATION') {
@@ -173,7 +173,7 @@ export async function setConsultationPhone(
   });
 }
 
-/** Returns the Subscription record for a patient (if any). */
+/** Returns the Subscription record for a company (if any). */
 export async function getMySubscription(userId: string) {
   return prisma.subscription.findUnique({ where: { userId } });
 }
@@ -241,9 +241,9 @@ const WITHDRAWAL_DAYS = 14;
 
 /** Right of withdrawal (art. 27 ustawy o prawach konsumenta) — 14 days. */
 export async function withdrawFromContract(userId: string) {
-  const patient = await prisma.patient.findUnique({ where: { userId } });
-  if (!patient) {
-    throw new AppError(404, 'NOT_FOUND', 'Patient profile not found');
+  const company = await prisma.company.findUnique({ where: { userId } });
+  if (!company) {
+    throw new AppError(404, 'NOT_FOUND', 'Company profile not found');
   }
 
   const cutoff = new Date();
@@ -251,7 +251,7 @@ export async function withdrawFromContract(userId: string) {
 
   const recentOrder = await prisma.order.findFirst({
     where: {
-      patientId: patient.id,
+      companyId: company.id,
       status: { in: ['PAID', 'ACTIVE'] },
       createdAt: { gte: cutoff },
       productType: { not: 'FREE_7' },
@@ -291,22 +291,22 @@ export async function withdrawFromContract(userId: string) {
   return { orderId: recentOrder.id, productType: recentOrder.productType };
 }
 
-/** Checks if the patient has an eligible order for 14-day withdrawal. */
+/** Checks if the company has an eligible order for 14-day withdrawal. */
 export async function canWithdraw(userId: string): Promise<{
   eligible: boolean;
   orderId?: string;
   daysLeft?: number;
   serviceDelivered?: boolean;
 }> {
-  const patient = await prisma.patient.findUnique({ where: { userId } });
-  if (!patient) return { eligible: false };
+  const company = await prisma.company.findUnique({ where: { userId } });
+  if (!company) return { eligible: false };
 
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - WITHDRAWAL_DAYS);
 
   const recentOrder = await prisma.order.findFirst({
     where: {
-      patientId: patient.id,
+      companyId: company.id,
       status: { in: ['PAID', 'ACTIVE'] },
       createdAt: { gte: cutoff },
       productType: { not: 'FREE_7' },
@@ -337,15 +337,15 @@ const PRICE_MAP: Record<string, number> = {
   FREE_7: 0,
 };
 
-/** Lists paid orders as invoices for the patient. */
+/** Lists paid orders as invoices for the company. */
 export async function listMyInvoices(userId: string) {
-  const patient = await prisma.patient.findUnique({ where: { userId } });
-  if (!patient) {
-    throw new AppError(404, 'NOT_FOUND', 'Patient profile not found');
+  const company = await prisma.company.findUnique({ where: { userId } });
+  if (!company) {
+    throw new AppError(404, 'NOT_FOUND', 'Company profile not found');
   }
 
   const orders = await prisma.order.findMany({
-    where: { patientId: patient.id, status: { in: ['PAID', 'ACTIVE', 'COMPLETED'] } },
+    where: { companyId: company.id, status: { in: ['PAID', 'ACTIVE', 'COMPLETED'] } },
     orderBy: { createdAt: 'desc' },
   });
 

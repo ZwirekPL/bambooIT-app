@@ -1,0 +1,82 @@
+═════════════════════════════════════════════════════════
+K6a Rename Patient → Company — DRY-RUN (read-only)
+═════════════════════════════════════════════════════════
+
+Files scanned: 91
+Files modified: 18
+Files skipped (orphans + email.ts): 7
+Files with FLAGS (manual review): 4
+Total patterns replaced: 230
+Total flags found: 15
+
+--- Modified files (sorted by change count) ---
+    69 changes  apps/backend/src/services/order.service.ts
+    30 changes  apps/backend/src/services/checkout.service.ts
+    26 changes  apps/backend/src/controllers/order.controller.ts
+    22 changes  apps/backend/src/__tests__/services/auth.service.test.ts
+    18 changes  apps/backend/src/services/admin.service.ts
+    16 changes  apps/backend/src/services/dsar.service.ts
+    11 changes  apps/backend/src/services/adminSubscription.service.ts
+    10 changes  apps/backend/src/controllers/admin.controller.ts
+     9 changes  apps/backend/src/services/auth.service.ts
+     6 changes  apps/backend/src/__tests__/services/userCleanup.service.test.ts
+     3 changes  apps/backend/src/services/userCleanup.service.ts
+     2 changes  apps/backend/src/routes/order.routes.ts
+     2 changes  apps/backend/src/services/profile.service.ts
+     2 changes  apps/backend/src/services/testimonial.service.ts
+     1 changes  apps/backend/src/controllers/webhook.controller.ts
+     1 changes  apps/backend/src/middleware/auth.ts
+     1 changes  apps/backend/src/routes/admin.routes.ts
+     1 changes  apps/backend/src/routes/checkout.routes.ts
+
+--- Pattern counts ---
+    68  H. patient (standalone) → company
+    43  D. patientId → companyId
+    37  H. patient.xxx / patient?.xxx → company
+    19  A. prisma.patient → prisma.company
+    13  E. const patient = → const company =
+     7  B. patientsAsDietitian → companiesAsDietitian (K7 territory but consistent rename)
+     7  C. patient.firstName → company.contactFirstName
+     6  G. "Patient profile not found" → "Company profile not found"
+     5  C. patient.lastName → company.contactLastName
+     4  B. patientsCount → companiesCount (K7 sortBy)
+     4  B. getDietitianPatients → getDietitianCompanies (K7)
+     4  B. assertPatientOwnership → assertCompanyOwnership
+     3  B. patientIdParamSchema → companyIdParamSchema
+     3  I. Patient (standalone type) → Company
+     2  G. "Invalid patient id" → "Invalid company id"
+     2  B. totalPatients → totalCompanies
+     2  G. "Patient not found" → "Company not found"
+     1  G. access error message rename
+
+--- FLAGGED files (manual review REQUIRED) ---
+  apps/backend/src/controllers/admin.controller.ts
+    L555: TODO(K9-cleanup) marker — patientRating (diet residue, drop in K9)
+  apps/backend/src/services/admin.service.ts
+    L399: DROP LINE — sex: true in SELECT (field removed)
+    L400: DROP LINE — birthYear: true in SELECT (field removed)
+    L401: DROP LINE — heightCm: true in SELECT (field removed)
+    L402: DROP LINE — weightKg: true in SELECT (field removed)
+    L554: DROP LINE — sex: true in SELECT (field removed)
+    L555: DROP LINE — birthYear: true in SELECT (field removed)
+    L556: DROP LINE — heightCm: true in SELECT (field removed)
+    L557: DROP LINE — weightKg: true in SELECT (field removed)
+  apps/backend/src/services/appSettings.service.ts
+    L59: TODO(K9-cleanup) marker — patientRating (diet residue, drop in K9)
+    L74: TODO(K9-cleanup) marker — patientRating (diet residue, drop in K9)
+  apps/backend/src/services/dsar.service.ts
+    L140: DROP LINE — patient.sex (field removed)
+    L141: DROP LINE — patient.birthYear (field removed)
+    L142: DROP LINE — patient.heightCm (field removed)
+    L143: DROP LINE — patient.weightKg (field removed)
+
+--- Skipped files ---
+  apps/backend/src/utils/composeMealsFlag.ts
+  apps/backend/src/utils/cuisineMapping.ts
+  apps/backend/src/utils/email.ts
+  apps/backend/src/utils/ingredientDisplayName.ts
+  apps/backend/src/utils/mealSchedule.ts
+  apps/backend/src/utils/scaleRecipeSteps.ts
+  apps/backend/src/utils/templateRenderer.ts
+
+DRY-RUN complete. Re-run with --apply to write changes.

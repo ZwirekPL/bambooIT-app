@@ -17,6 +17,7 @@ NIEISTOTNE
 # DB backups (cleanup process)
 backup_pre_*.sql
 backup.log
+backup/
 
 # Temp debug/migration files
 n8n_*.json

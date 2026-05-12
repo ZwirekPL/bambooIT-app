@@ -4,7 +4,7 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 const m = vi.hoisted(() => ({
   // prisma tables
   user: { findFirst: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
-  patient: { findUnique: vi.fn(), create: vi.fn() },
+  company: { findUnique: vi.fn(), create: vi.fn() },
   dietitianProfile: { findUnique: vi.fn(), findFirst: vi.fn().mockResolvedValue(null) },
   passwordResetToken: { findFirst: vi.fn(), create: vi.fn(), updateMany: vi.fn() },
   emailVerificationToken: { findFirst: vi.fn(), create: vi.fn(), updateMany: vi.fn() },
@@ -29,7 +29,7 @@ vi.mock('@db', () => {
   return {
     prisma: {
       user: m.user,
-      patient: m.patient,
+      company: m.company,
       dietitianProfile: m.dietitianProfile,
       passwordResetToken: m.passwordResetToken,
       emailVerificationToken: m.emailVerificationToken,
@@ -39,7 +39,7 @@ vi.mock('@db', () => {
       subscription,
       userConsent,
       $transaction: vi.fn((fn: (tx: unknown) => unknown) => fn({
-        user: m.user, patient: m.patient, dietitianProfile: m.dietitianProfile,
+        user: m.user, company: m.company, dietitianProfile: m.dietitianProfile,
         passwordResetToken: m.passwordResetToken, emailVerificationToken: m.emailVerificationToken,
         referralCode, subscription, userConsent, deviceFingerprint,
       })),
@@ -115,7 +115,7 @@ describe('auth.service', () => {
     it('returns token and user on successful login', async () => {
       m.user.findFirst.mockResolvedValue(makeUser());
       m.bcryptCompare.mockResolvedValue(true);
-      m.patient.findUnique.mockResolvedValue({ id: 'patient-1' });
+      m.company.findUnique.mockResolvedValue({ id: 'company-1' });
 
       const result = await login('test@example.com', 'pass');
 
@@ -124,17 +124,17 @@ describe('auth.service', () => {
         id: 'user-1',
         email: 'test@example.com',
         role: 'PATIENT',
-        patientId: 'patient-1',
+        companyId: 'company-1',
       });
     });
 
-    it('returns patientId=null when no patient profile exists', async () => {
+    it('returns companyId=null when no company profile exists', async () => {
       m.user.findFirst.mockResolvedValue(makeUser({ role: 'ADMIN' }));
       m.bcryptCompare.mockResolvedValue(true);
-      m.patient.findUnique.mockResolvedValue(null);
+      m.company.findUnique.mockResolvedValue(null);
 
       const result = await login('admin@example.com', 'pass');
-      expect(result.user.patientId).toBeNull();
+      expect(result.user.companyId).toBeNull();
     });
   });
 
@@ -153,19 +153,19 @@ describe('auth.service', () => {
         .rejects.toMatchObject({ code: 'INVALID_DIETITIAN_CODE', statusCode: 400 });
     });
 
-    it('creates user and patient on success', async () => {
+    it('creates user and company on success', async () => {
       m.user.findFirst.mockResolvedValue(null);
       m.bcryptHash.mockResolvedValue('hashed-pw');
       m.user.create.mockResolvedValue({ id: 'user-new', email: 'new@example.com', role: 'PATIENT' });
-      m.patient.create.mockResolvedValue({ id: 'patient-new' });
+      m.company.create.mockResolvedValue({ id: 'company-new' });
       m.emailVerificationToken.updateMany.mockResolvedValue({ count: 0 });
       m.emailVerificationToken.create.mockResolvedValue({ id: 'tok-1' });
 
       const result = await register('new@example.com', 'pass', undefined, 'Jan', 'Kowalski');
 
       expect(result.user).toMatchObject({ id: 'user-new', email: 'new@example.com', role: 'PATIENT' });
-      expect(m.patient.create).toHaveBeenCalledWith({
-        data: { userId: 'user-new', dietitianId: null, firstName: 'Jan', lastName: 'Kowalski' },
+      expect(m.company.create).toHaveBeenCalledWith({
+        data: { userId: 'user-new', dietitianId: null, contactFirstName: 'Jan', contactLastName: 'Kowalski' },
       });
       expect(m.sendEmailVerificationEmail).toHaveBeenCalledOnce();
     });
@@ -175,13 +175,13 @@ describe('auth.service', () => {
       m.dietitianProfile.findFirst.mockResolvedValueOnce({ userId: 'dietitian-1' });
       m.bcryptHash.mockResolvedValue('hashed-pw');
       m.user.create.mockResolvedValue({ id: 'user-new', email: 'new@example.com', role: 'PATIENT' });
-      m.patient.create.mockResolvedValue({ id: 'patient-new' });
+      m.company.create.mockResolvedValue({ id: 'company-new' });
       m.emailVerificationToken.updateMany.mockResolvedValue({ count: 0 });
       m.emailVerificationToken.create.mockResolvedValue({ id: 'tok-1' });
 
       await register('new@example.com', 'pass', 'DIETCODE');
 
-      expect(m.patient.create).toHaveBeenCalledWith({
+      expect(m.company.create).toHaveBeenCalledWith({
         data: expect.objectContaining({ dietitianId: 'dietitian-1' }),
       });
     });
@@ -190,7 +190,7 @@ describe('auth.service', () => {
       m.user.findFirst.mockResolvedValue(null);
       m.bcryptHash.mockResolvedValue('hashed-pw');
       m.user.create.mockResolvedValue({ id: 'user-new', email: 'new@example.com', role: 'PATIENT' });
-      m.patient.create.mockResolvedValue({ id: 'patient-new' });
+      m.company.create.mockResolvedValue({ id: 'company-new' });
       m.emailVerificationToken.updateMany.mockResolvedValue({ count: 1 });
       m.emailVerificationToken.create.mockResolvedValue({ id: 'tok-new' });
 

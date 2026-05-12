@@ -7,11 +7,17 @@ import { logAudit } from '../services/audit.service';
 
 export type UserRole = 'ADMIN' | 'DIETITIAN' | 'PATIENT';
 
+// TODO(K6a-deploy): JWT claim renamed `patientId` → `companyId` in K6a.
+// Tokens issued before K6a contain `patientId` and will pass cryptographic
+// jwt.verify() but `req.user.companyId` will be undefined, causing downstream
+// 404/500 errors. In dev this is a non-issue (no real users). In prod K6a
+// deploy: run `redis-cli FLUSHDB` (or equivalent blacklist:user:* mass set)
+// before deploy to force re-login on all clients.
 export interface AuthPayload {
   sub: string;
   email: string;
   role: UserRole;
-  patientId?: string;
+  companyId?: string;
   iat?: number;
   exp?: number;
 }

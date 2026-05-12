@@ -12,7 +12,7 @@ const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2026-02-25.clover' })
   : null;
 
-const patientIdParamSchema = z.object({ patientId: z.string().cuid() });
+const companyIdParamSchema = z.object({ companyId: z.string().cuid() });
 const orderIdParamSchema = z.object({ id: z.string().cuid() });
 
 const createSchema = z.object({
@@ -27,9 +27,9 @@ const createSchema = z.object({
 });
 
 export async function createOrder(req: Request, res: Response, next: NextFunction) {
-  const paramParsed = patientIdParamSchema.safeParse(req.params);
+  const paramParsed = companyIdParamSchema.safeParse(req.params);
   if (!paramParsed.success) {
-    return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid patient id'));
+    return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid company id'));
   }
 
   const bodyParsed = createSchema.safeParse(req.body);
@@ -40,10 +40,10 @@ export async function createOrder(req: Request, res: Response, next: NextFunctio
   try {
     const userId = req.user!.sub;
     const role = req.user!.role;
-    await orderService.assertPatientOwnership(paramParsed.data.patientId, userId, role);
+    await orderService.assertCompanyOwnership(paramParsed.data.companyId, userId, role);
 
     const order = await orderService.createOrder({
-      patientId: paramParsed.data.patientId,
+      companyId: paramParsed.data.companyId,
       ...bodyParsed.data,
     });
     return res.status(201).json({ ok: true, order });
@@ -91,17 +91,17 @@ export async function confirmOrder(req: Request, res: Response, next: NextFuncti
 }
 
 export async function listOrders(req: Request, res: Response, next: NextFunction) {
-  const parsed = patientIdParamSchema.safeParse(req.params);
+  const parsed = companyIdParamSchema.safeParse(req.params);
   if (!parsed.success) {
-    return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid patient id'));
+    return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid company id'));
   }
 
   try {
     const userId = req.user!.sub;
     const role = req.user!.role;
-    await orderService.assertPatientOwnership(parsed.data.patientId, userId, role);
+    await orderService.assertCompanyOwnership(parsed.data.companyId, userId, role);
 
-    const orders = await orderService.listOrders(parsed.data.patientId);
+    const orders = await orderService.listOrders(parsed.data.companyId);
     return res.json({ ok: true, orders });
   } catch (err) {
     next(err);
@@ -120,7 +120,7 @@ export async function getOrder(req: Request, res: Response, next: NextFunction) 
     // DIETITIAN can only see orders of their own patients
     const userId = req.user!.sub;
     const role = req.user!.role;
-    await orderService.assertPatientOwnership(order.patientId, userId, role);
+    await orderService.assertCompanyOwnership(order.companyId, userId, role);
 
     return res.json({ ok: true, order });
   } catch (err) {
@@ -128,7 +128,7 @@ export async function getOrder(req: Request, res: Response, next: NextFunction) 
   }
 }
 
-/** GET /orders/my — patient lists their own orders + subscription info. */
+/** GET /orders/my — company lists their own orders + subscription info. */
 export async function listMyOrders(req: Request, res: Response, next: NextFunction) {
   const userId = req.user?.sub;
   if (!userId) {
@@ -160,7 +160,7 @@ const APP_URL = process.env.APP_URL ?? 'http://localhost:3000';
 const DEFAULT_LOCALE = 'pl';
 const BASE_URL = `${APP_URL}/${DEFAULT_LOCALE}`;
 
-/** GET /orders/my/portal — Stripe Customer Portal for patient subscription. */
+/** GET /orders/my/portal — Stripe Customer Portal for company subscription. */
 export async function getMyPortal(req: Request, res: Response, next: NextFunction) {
   const userId = req.user?.sub;
   if (!userId) {
@@ -185,7 +185,7 @@ export async function getMyPortal(req: Request, res: Response, next: NextFunctio
   }
 }
 
-/** PATCH /orders/:id/consultation-phone — patient saves phone after purchasing consultation. */
+/** PATCH /orders/:id/consultation-phone — company saves phone after purchasing consultation. */
 const consultationPhoneSchema = z.object({
   phone: z
     .string()
@@ -216,7 +216,7 @@ export async function setConsultationPhone(req: Request, res: Response, next: Ne
   }
 }
 
-/** POST /orders/my/cancel-subscription — patient cancels at period end. */
+/** POST /orders/my/cancel-subscription — company cancels at period end. */
 export async function cancelMySubscription(req: Request, res: Response, next: NextFunction) {
   const userId = req.user?.sub;
   if (!userId) {
@@ -231,7 +231,7 @@ export async function cancelMySubscription(req: Request, res: Response, next: Ne
   }
 }
 
-/** POST /orders/my/resume-subscription — patient resumes a pending cancellation. */
+/** POST /orders/my/resume-subscription — company resumes a pending cancellation. */
 export async function resumeMySubscription(req: Request, res: Response, next: NextFunction) {
   const userId = req.user?.sub;
   if (!userId) {
@@ -246,7 +246,7 @@ export async function resumeMySubscription(req: Request, res: Response, next: Ne
   }
 }
 
-/** GET /orders/my/invoices — patient lists their invoices. */
+/** GET /orders/my/invoices — company lists their invoices. */
 export async function listMyInvoices(req: Request, res: Response, next: NextFunction) {
   const userId = req.user?.sub;
   if (!userId) {
@@ -304,8 +304,8 @@ export async function getInvoice(req: Request, res: Response, next: NextFunction
 
     // Ownership check: PATIENT can only see own orders
     if (req.user?.role === 'PATIENT') {
-      const patient = await prisma.patient.findUnique({ where: { userId }, select: { id: true } });
-      if (!patient || order.patientId !== patient.id) {
+      const company = await prisma.company.findUnique({ where: { userId }, select: { id: true } });
+      if (!company || order.companyId !== company.id) {
         return res.status(403).json(apiError('FORBIDDEN', 'Not your order'));
       }
     }

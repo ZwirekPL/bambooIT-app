@@ -25,7 +25,7 @@ const PRICE_ENV_MAP: Partial<Record<CheckoutProductType, string>> = {
 };
 
 /**
- * Creates a Stripe Checkout session for a patient order.
+ * Creates a Stripe Checkout session for a company order.
  * FREE_7 orders skip Stripe and redirect directly to success.
  */
 export async function createSession(
@@ -36,14 +36,14 @@ export async function createSession(
 ) {
   // FREE_7 — no payment required, create order directly
   if (productType === 'FREE_7') {
-    const patient = await prisma.patient.findUnique({ where: { userId } });
-    if (!patient) {
-      throw new AppError(404, 'NOT_FOUND', 'Patient profile not found');
+    const company = await prisma.company.findUnique({ where: { userId } });
+    if (!company) {
+      throw new AppError(404, 'NOT_FOUND', 'Company profile not found');
     }
 
     await prisma.order.create({
       data: {
-        patientId: patient.id,
+        companyId: company.id,
         productType,
         status: 'PAID',
       },
@@ -60,9 +60,9 @@ export async function createSession(
     throw new AppError(500, 'STRIPE_NOT_CONFIGURED', `Stripe price ID not configured for ${productType}`);
   }
 
-  const patient = await prisma.patient.findUnique({ where: { userId } });
-  if (!patient) {
-    throw new AppError(404, 'NOT_FOUND', 'Patient profile not found');
+  const company = await prisma.company.findUnique({ where: { userId } });
+  if (!company) {
+    throw new AppError(404, 'NOT_FOUND', 'Company profile not found');
   }
 
   // Trial types are checkout-only — map to the corresponding DB product type
@@ -85,7 +85,7 @@ export async function createSession(
 
   const order = await prisma.order.create({
     data: {
-      patientId: patient.id,
+      companyId: company.id,
       productType: dbProductType,
       status: mockMode ? 'PAID' : 'PENDING_PAYMENT',
     },
@@ -142,43 +142,43 @@ export async function handleOrderCheckoutCompleted(orderId: string): Promise<voi
 
   // Send consultation-specific emails (29.5)
   if (order?.productType === 'CONSULTATION') {
-    sendConsultationEmails(order.id, order.patientId).catch((err) => {
+    sendConsultationEmails(order.id, order.companyId).catch((err) => {
       console.error('[checkout] Failed to send consultation emails:', err);
     });
   }
 }
 
 /**
- * Sends consultation purchase emails to patient and their dietitian (29.5).
+ * Sends consultation purchase emails to company and their dietitian (29.5).
  * Fire-and-forget — errors are logged but don't block the webhook response.
  */
-async function sendConsultationEmails(orderId: string, patientId: string): Promise<void> {
-  const patient = await prisma.patient.findUnique({
-    where: { id: patientId },
+async function sendConsultationEmails(orderId: string, companyId: string): Promise<void> {
+  const company = await prisma.company.findUnique({
+    where: { id: companyId },
     include: {
       user: { select: { email: true } },
       dietitian: { select: { id: true, email: true } },
     },
   });
-  if (!patient) return;
+  if (!company) return;
 
-  const patientName = [patient.firstName, patient.lastName].filter(Boolean).join(' ') || 'Pacjent';
+  const contactName = [company.contactFirstName, company.contactLastName].filter(Boolean).join(' ') || 'Klient';
 
-  // Email to patient — simplified: "we'll contact you by email to schedule"
+  // Email to company — simplified: "we'll contact you by email to schedule"
   await sendConsultationPatientEmail(
-    patient.user.email,
-    patient.firstName ?? '',
+    company.user.email,
+    company.contactFirstName ?? '',
     { orderId },
   );
 
-  // Email to dietitian with patient data (if patient has an assigned dietitian)
-  if (patient.dietitian) {
+  // Email to dietitian with company data (if company has an assigned dietitian)
+  if (company.dietitian) {
     await sendConsultationDietitianEmail(
-      patient.dietitian.email,
+      company.dietitian.email,
       {
         orderId,
-        patientName,
-        patientEmail: patient.user.email,
+        contactName,
+        contactEmail: company.user.email,
       },
     );
   }

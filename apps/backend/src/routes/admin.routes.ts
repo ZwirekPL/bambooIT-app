@@ -50,7 +50,7 @@ adminRouter.post('/users/:id/revoke-sessions', adminController.revokeUserSession
 
 adminRouter.post('/dietitians', adminController.createDietitian);
 adminRouter.get('/dietitians', adminController.listDietitians);
-adminRouter.get('/dietitians/:id/patients', adminController.getDietitianPatients);
+adminRouter.get('/dietitians/:id/patients', adminController.getDietitianCompanies);
 adminRouter.patch('/dietitians/:id', adminController.updateDietitian);
 adminRouter.post('/dietitians/:id/rotate-code', adminController.rotateDietitianCode);
 adminRouter.patch('/dietitians/:id/toggle-active', adminController.toggleDietitianActive);

@@ -66,7 +66,7 @@ export async function listUsers({ page, limit, search, role, excludeRole, hideDe
     if (subscriptionStatus === 'NONE') {
       where.subscription = { is: null };
     } else if (subscriptionStatus === 'ONE_TIME') {
-      where.patient = { orders: { some: { status: { in: ['PAID', 'ACTIVE'] } } } };
+      where.company = { orders: { some: { status: { in: ['PAID', 'ACTIVE'] } } } };
     } else {
       where.subscription = { status: subscriptionStatus as Prisma.EnumSubscriptionStatusFilter, plan: { not: 'FREE' } };
     }
@@ -93,7 +93,7 @@ export async function listUsers({ page, limit, search, role, excludeRole, hideDe
         subscription: {
           select: { status: true, plan: true, currentPeriodEnd: true },
         },
-        patient: {
+        company: {
           select: {
             orders: {
               where: { status: { in: ['PAID', 'ACTIVE'] } },
@@ -110,7 +110,7 @@ export async function listUsers({ page, limit, search, role, excludeRole, hideDe
 
   const users = rawUsers.map((u) => {
     const sub = u.subscription;
-    const latestOrder = u.patient?.orders?.[0];
+    const latestOrder = u.company?.orders?.[0];
 
     let subscriptionStatus: string = 'NONE';
     let subscriptionProductType: string | null = null;
@@ -162,14 +162,14 @@ export async function getStats() {
     totalUsers,
     activeUsers,
     totalDietitians,
-    totalPatients,
+    totalCompanies,
     // TODO(5a-cleanup): totalRecipes, recipesNeedingWork dropped (prisma.recipe gone)
     // TODO(5b-cleanup): totalInterviews, totalDietPlans, plansGenerated/Reviewed/Sent dropped
   ] = await prisma.$transaction([
     prisma.user.count(),
     prisma.user.count({ where: { deletedAt: null } }),
     prisma.user.count({ where: { role: 'DIETITIAN', deletedAt: null } }),
-    prisma.patient.count(),
+    prisma.company.count(),
     // TODO(5b-cleanup): Interview + DietPlan dropped in K5b
     // prisma.interview.count(),
     // prisma.dietPlan.count(),
@@ -188,7 +188,7 @@ export async function getStats() {
       deleted: totalUsers - activeUsers,
     },
     dietitians: totalDietitians,
-    patients: totalPatients,
+    patients: totalCompanies,
     // TODO(5b-cleanup): Interview + DietPlan dropped in K5b
     // interviews: totalInterviews,
     // dietPlans: { total: totalDietPlans, byStatus: { GENERATED, REVIEWED, SENT } },
@@ -300,8 +300,8 @@ export async function createUser({ email, password, firstName, lastName, dietiti
     data: { email, passwordHash, role: 'PATIENT', emailVerified: new Date() },
   });
 
-  await prisma.patient.create({
-    data: { userId: user.id, dietitianId, firstName, lastName },
+  await prisma.company.create({
+    data: { userId: user.id, dietitianId, contactFirstName: firstName, contactLastName: lastName },
   });
 
   return {
@@ -342,7 +342,7 @@ export async function listDietitians({ page, limit, search, sortBy, sortOrder, h
   if (sortBy === 'email') orderBy = { user: { email: dir } };
   else if (sortBy === 'lastLoginAt') orderBy = { user: { lastLoginAt: dir } };
   else if (sortBy === 'createdAt') orderBy = { createdAt: dir };
-  else if (sortBy === 'patientsCount') orderBy = { user: { patientsAsDietitian: { _count: dir } } };
+  else if (sortBy === 'companiesCount') orderBy = { user: { companiesAsDietitian: { _count: dir } } };
 
   const [profiles, total] = await prisma.$transaction([
     prisma.dietitianProfile.findMany({
@@ -359,7 +359,7 @@ export async function listDietitians({ page, limit, search, sortBy, sortOrder, h
             lastLoginAt: true,
             createdAt: true,
             deletedAt: true,
-            _count: { select: { patientsAsDietitian: true } },
+            _count: { select: { companiesAsDietitian: true } },
           },
         },
       },
@@ -377,29 +377,25 @@ export async function listDietitians({ page, limit, search, sortBy, sortOrder, h
     lastLoginAt: p.user.lastLoginAt,
     createdAt: p.user.createdAt,
     deletedAt: p.user.deletedAt,
-    patientsCount: p.user._count.patientsAsDietitian,
+    companiesCount: p.user._count.companiesAsDietitian,
   }));
 
   return { dietitians, total, page, limit };
 }
 
-export async function getDietitianPatients(userId: string) {
+export async function getDietitianCompanies(userId: string) {
   const profile = await prisma.dietitianProfile.findUnique({ where: { userId } });
   if (!profile) {
     throw new AppError(404, 'NOT_FOUND', 'Dietitian profile not found');
   }
 
-  const patients = await prisma.patient.findMany({
+  const companies = await prisma.company.findMany({
     where: { dietitianId: userId },
     orderBy: { createdAt: 'desc' },
     select: {
       id: true,
-      firstName: true,
-      lastName: true,
-      sex: true,
-      birthYear: true,
-      heightCm: true,
-      weightKg: true,
+      contactFirstName: true,
+      contactLastName: true,
       createdAt: true,
       user: {
         select: {
@@ -412,7 +408,7 @@ export async function getDietitianPatients(userId: string) {
     },
   });
 
-  return { patients, total: patients.length };
+  return { patients: companies, total: companies.length };
 }
 
 export interface UpdateDietitianInput {
@@ -458,7 +454,7 @@ export async function updateDietitian(userId: string, data: UpdateDietitianInput
           role: true,
           createdAt: true,
           deletedAt: true,
-          _count: { select: { patientsAsDietitian: true } },
+          _count: { select: { companiesAsDietitian: true } },
         },
       },
     },
@@ -473,7 +469,7 @@ export async function updateDietitian(userId: string, data: UpdateDietitianInput
     role: updated.user.role,
     createdAt: updated.user.createdAt,
     deletedAt: updated.user.deletedAt,
-    patientsCount: updated.user._count.patientsAsDietitian,
+    companiesCount: updated.user._count.companiesAsDietitian,
   };
 }
 
@@ -547,14 +543,10 @@ export async function getUserById(id: string) {
       grantedAccessUntil: true,
       createdAt: true,
       deletedAt: true,
-      patient: {
+      company: {
         select: {
-          firstName: true,
-          lastName: true,
-          sex: true,
-          birthYear: true,
-          heightCm: true,
-          weightKg: true,
+          contactFirstName: true,
+          contactLastName: true,
         },
       },
       dietitianProfile: {

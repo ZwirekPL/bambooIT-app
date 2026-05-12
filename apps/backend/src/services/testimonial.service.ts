@@ -20,7 +20,7 @@ export async function getApprovedTestimonials() {
       user: {
         select: {
           id: true,
-          patient: { select: { firstName: true, lastName: true } },
+          company: { select: { contactFirstName: true, contactLastName: true } },
         },
       },
     },
@@ -87,7 +87,7 @@ export async function listAllTestimonials({ page, limit, status, search, sortBy,
           select: {
             id: true,
             email: true,
-            patient: { select: { firstName: true, lastName: true } },
+            company: { select: { contactFirstName: true, contactLastName: true } },
           },
         },
       },

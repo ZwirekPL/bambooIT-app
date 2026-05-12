@@ -1,0 +1,123 @@
+
+> bambooit@1.0.0 typecheck
+> npm run generate --workspace=database && npm run build --workspace=database && npm run build --workspace=backend && npm run type-check --workspace=web
+
+
+> database@1.0.0 generate
+> prisma generate
+
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+✔ Generated Prisma Client (v6.19.2) to .\..\..\node_modules\@prisma\client in 107ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Interested in query caching in just a few lines of code? Try Accelerate today! https://pris.ly/tip-3-accelerate
+
+
+> database@1.0.0 build
+> tsc -p tsconfig.json
+
+
+> backend@1.0.0 build
+> tsc
+
+src/controllers/admin.controller.ts(288,54): error TS2561: Object literal may only specify known properties, but 'companiesAsDietitian' does not exist in type 'UserCountOutputTypeSelect<DefaultArgs>'. Did you mean to write 'patientsAsDietitian'?
+src/controllers/admin.controller.ts(306,75): error TS2339: Property '_count' does not exist on type '{ id: string; createdAt: Date; email: string; passwordHash: string | null; role: UserRole; emailVerified: Date | null; lastLoginAt: Date | null; grantedAccessUntil: Date | null; deletedAt: Date | null; updatedAt: Date; }'.
+src/controllers/admin.controller.ts(883,11): error TS2353: Object literal may only specify known properties, and 'company' does not exist in type 'OrderInclude<DefaultArgs>'.
+src/controllers/admin.controller.ts(899,27): error TS2339: Property 'company' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; status: OrderStatus; patientId: string; productType: ProductType; consultationPhone: string | null; stripeInvoiceId: string | null; }'.
+src/controllers/admin.controller.ts(900,26): error TS2339: Property 'company' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; status: OrderStatus; patientId: string; productType: ProductType; consultationPhone: string | null; stripeInvoiceId: string | null; }'.
+src/controllers/admin.controller.ts(901,23): error TS2339: Property 'company' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; status: OrderStatus; patientId: string; productType: ProductType; consultationPhone: string | null; stripeInvoiceId: string | null; }'.
+src/controllers/order.controller.ts(123,53): error TS2339: Property 'companyId' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; status: OrderStatus; patientId: string; productType: ProductType; consultationPhone: string | null; stripeInvoiceId: string | null; }'.
+src/controllers/order.controller.ts(307,36): error TS2339: Property 'company' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/controllers/order.controller.ts(308,29): error TS2339: Property 'companyId' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; status: OrderStatus; patientId: string; productType: ProductType; consultationPhone: string | null; stripeInvoiceId: string | null; }'.
+src/services/admin.service.ts(69,13): error TS2339: Property 'company' does not exist on type 'UserWhereInput'.
+src/services/admin.service.ts(96,9): error TS2353: Object literal may only specify known properties, and 'company' does not exist in type 'UserSelect<DefaultArgs>'.
+src/services/admin.service.ts(112,19): error TS2339: Property 'subscription' does not exist on type '{ id: string; createdAt: Date; email: string; passwordHash: string | null; role: UserRole; emailVerified: Date | null; lastLoginAt: Date | null; grantedAccessUntil: Date | null; deletedAt: Date | null; updatedAt: Date; }'.
+src/services/admin.service.ts(113,27): error TS2339: Property 'company' does not exist on type '{ id: string; createdAt: Date; email: string; passwordHash: string | null; role: UserRole; emailVerified: Date | null; lastLoginAt: Date | null; grantedAccessUntil: Date | null; deletedAt: Date | null; updatedAt: Date; }'.
+src/services/admin.service.ts(172,12): error TS2339: Property 'company' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/services/admin.service.ts(303,16): error TS2339: Property 'company' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/services/admin.service.ts(345,61): error TS2561: Object literal may only specify known properties, but 'companiesAsDietitian' does not exist in type 'UserOrderByWithRelationInput'. Did you mean to write 'patientsAsDietitian'?
+src/services/admin.service.ts(362,33): error TS2561: Object literal may only specify known properties, but 'companiesAsDietitian' does not exist in type 'UserCountOutputTypeSelect<DefaultArgs>'. Did you mean to write 'patientsAsDietitian'?
+src/services/admin.service.ts(375,14): error TS2339: Property 'user' does not exist on type '{ id: string; createdAt: Date; userId: string; updatedAt: Date; code: string; firstName: string | null; lastName: string | null; scoringWeightsOverride: JsonValue; greyListWindow: number; }'.
+src/services/admin.service.ts(376,13): error TS2339: Property 'user' does not exist on type '{ id: string; createdAt: Date; userId: string; updatedAt: Date; code: string; firstName: string | null; lastName: string | null; scoringWeightsOverride: JsonValue; greyListWindow: number; }'.
+src/services/admin.service.ts(377,20): error TS2339: Property 'user' does not exist on type '{ id: string; createdAt: Date; userId: string; updatedAt: Date; code: string; firstName: string | null; lastName: string | null; scoringWeightsOverride: JsonValue; greyListWindow: number; }'.
+src/services/admin.service.ts(378,18): error TS2339: Property 'user' does not exist on type '{ id: string; createdAt: Date; userId: string; updatedAt: Date; code: string; firstName: string | null; lastName: string | null; scoringWeightsOverride: JsonValue; greyListWindow: number; }'.
+src/services/admin.service.ts(379,18): error TS2339: Property 'user' does not exist on type '{ id: string; createdAt: Date; userId: string; updatedAt: Date; code: string; firstName: string | null; lastName: string | null; scoringWeightsOverride: JsonValue; greyListWindow: number; }'.
+src/services/admin.service.ts(380,23): error TS2339: Property 'user' does not exist on type '{ id: string; createdAt: Date; userId: string; updatedAt: Date; code: string; firstName: string | null; lastName: string | null; scoringWeightsOverride: JsonValue; greyListWindow: number; }'.
+src/services/admin.service.ts(392,34): error TS2339: Property 'company' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/services/admin.service.ts(411,12): error TS18004: No value exists in scope for the shorthand property 'patients'. Either declare one or provide an initializer.
+src/services/admin.service.ts(411,29): error TS2304: Cannot find name 'patients'.
+src/services/admin.service.ts(457,31): error TS2561: Object literal may only specify known properties, but 'companiesAsDietitian' does not exist in type 'UserCountOutputTypeSelect<DefaultArgs>'. Did you mean to write 'patientsAsDietitian'?
+src/services/admin.service.ts(468,20): error TS2339: Property 'user' does not exist on type '{ id: string; createdAt: Date; userId: string; updatedAt: Date; code: string; firstName: string | null; lastName: string | null; scoringWeightsOverride: JsonValue; greyListWindow: number; }'.
+src/services/admin.service.ts(469,19): error TS2339: Property 'user' does not exist on type '{ id: string; createdAt: Date; userId: string; updatedAt: Date; code: string; firstName: string | null; lastName: string | null; scoringWeightsOverride: JsonValue; greyListWindow: number; }'.
+src/services/admin.service.ts(470,24): error TS2339: Property 'user' does not exist on type '{ id: string; createdAt: Date; userId: string; updatedAt: Date; code: string; firstName: string | null; lastName: string | null; scoringWeightsOverride: JsonValue; greyListWindow: number; }'.
+src/services/admin.service.ts(471,24): error TS2339: Property 'user' does not exist on type '{ id: string; createdAt: Date; userId: string; updatedAt: Date; code: string; firstName: string | null; lastName: string | null; scoringWeightsOverride: JsonValue; greyListWindow: number; }'.
+src/services/admin.service.ts(472,29): error TS2339: Property 'user' does not exist on type '{ id: string; createdAt: Date; userId: string; updatedAt: Date; code: string; firstName: string | null; lastName: string | null; scoringWeightsOverride: JsonValue; greyListWindow: number; }'.
+src/services/admin.service.ts(546,7): error TS2353: Object literal may only specify known properties, and 'company' does not exist in type 'UserSelect<DefaultArgs>'.
+src/services/adminSubscription.service.ts(119,59): error TS2353: Object literal may only specify known properties, and 'company' does not exist in type 'UserSelect<DefaultArgs>'.
+src/services/adminSubscription.service.ts(127,37): error TS2345: Argument of type '(s: { id: string; plan: string; status: string; createdAt: Date; currentPeriodEnd: Date | null; cancelAtPeriodEnd: boolean; stripeSubscriptionId: string | null; user: { email: string; company: { ...; } | null; }; }) => MappedItem' is not assignable to parameter of type '(value: { id: string; createdAt: Date; userId: string; updatedAt: Date; status: SubscriptionStatus; stripeCustomerId: string | null; stripeSubscriptionId: string | null; ... 4 more ...; cancelAtPeriodEnd: boolean; }, index: number, array: { ...; }[]) => MappedItem'.
+  Types of parameters 's' and 'value' are incompatible.
+    Property 'user' is missing in type '{ id: string; createdAt: Date; userId: string; updatedAt: Date; status: SubscriptionStatus; stripeCustomerId: string | null; stripeSubscriptionId: string | null; ... 4 more ...; cancelAtPeriodEnd: boolean; }' but required in type '{ id: string; plan: string; status: string; createdAt: Date; currentPeriodEnd: Date | null; cancelAtPeriodEnd: boolean; stripeSubscriptionId: string | null; user: { email: string; company: { ...; } | null; }; }'.
+src/services/adminSubscription.service.ts(150,18): error TS2353: Object literal may only specify known properties, and 'company' does not exist in type 'OrderInclude<DefaultArgs>'.
+src/services/adminSubscription.service.ts(158,30): error TS2345: Argument of type '(o: { id: string; productType: string; status: string; createdAt: Date; company: { firstName: string | null; lastName: string | null; user: { email: string; }; }; }) => MappedItem' is not assignable to parameter of type '(value: { id: string; createdAt: Date; updatedAt: Date; status: OrderStatus; patientId: string; productType: ProductType; consultationPhone: string | null; stripeInvoiceId: string | null; }, index: number, array: { ...; }[]) => MappedItem'.
+  Types of parameters 'o' and 'value' are incompatible.
+    Property 'company' is missing in type '{ id: string; createdAt: Date; updatedAt: Date; status: OrderStatus; patientId: string; productType: ProductType; consultationPhone: string | null; stripeInvoiceId: string | null; }' but required in type '{ id: string; productType: string; status: string; createdAt: Date; company: { firstName: string | null; lastName: string | null; user: { email: string; }; }; }'.
+src/services/adminSubscription.service.ts(179,61): error TS2353: Object literal may only specify known properties, and 'company' does not exist in type 'UserSelect<DefaultArgs>'.
+src/services/adminSubscription.service.ts(184,34): error TS2345: Argument of type '(s: { id: string; plan: string; status: string; createdAt: Date; currentPeriodEnd: Date | null; cancelAtPeriodEnd: boolean; stripeSubscriptionId: string | null; user: { email: string; company: { ...; } | null; }; }) => MappedItem' is not assignable to parameter of type '(value: { id: string; createdAt: Date; userId: string; updatedAt: Date; status: SubscriptionStatus; stripeCustomerId: string | null; stripeSubscriptionId: string | null; ... 4 more ...; cancelAtPeriodEnd: boolean; }, index: number, array: { ...; }[]) => MappedItem'.
+  Types of parameters 's' and 'value' are incompatible.
+    Property 'user' is missing in type '{ id: string; createdAt: Date; userId: string; updatedAt: Date; status: SubscriptionStatus; stripeCustomerId: string | null; stripeSubscriptionId: string | null; ... 4 more ...; cancelAtPeriodEnd: boolean; }' but required in type '{ id: string; plan: string; status: string; createdAt: Date; currentPeriodEnd: Date | null; cancelAtPeriodEnd: boolean; stripeSubscriptionId: string | null; user: { email: string; company: { ...; } | null; }; }'.
+src/services/adminSubscription.service.ts(205,20): error TS2353: Object literal may only specify known properties, and 'company' does not exist in type 'OrderInclude<DefaultArgs>'.
+src/services/adminSubscription.service.ts(210,29): error TS2345: Argument of type '(o: { id: string; productType: string; status: string; createdAt: Date; company: { firstName: string | null; lastName: string | null; user: { email: string; }; }; }) => MappedItem' is not assignable to parameter of type '(value: { id: string; createdAt: Date; updatedAt: Date; status: OrderStatus; patientId: string; productType: ProductType; consultationPhone: string | null; stripeInvoiceId: string | null; }, index: number, array: { ...; }[]) => MappedItem'.
+  Types of parameters 'o' and 'value' are incompatible.
+    Property 'company' is missing in type '{ id: string; createdAt: Date; updatedAt: Date; status: OrderStatus; patientId: string; productType: ProductType; consultationPhone: string | null; stripeInvoiceId: string | null; }' but required in type '{ id: string; productType: string; status: string; createdAt: Date; company: { firstName: string | null; lastName: string | null; user: { email: string; }; }; }'.
+src/services/adminSubscription.service.ts(242,32): error TS2339: Property 'contactFirstName' does not exist on type '{ firstName: string | null; lastName: string | null; }'.
+src/services/adminSubscription.service.ts(242,66): error TS2339: Property 'contactLastName' does not exist on type '{ firstName: string | null; lastName: string | null; }'.
+src/services/adminSubscription.service.ts(264,26): error TS2339: Property 'contactFirstName' does not exist on type '{ firstName: string | null; lastName: string | null; user: { email: string; }; }'.
+src/services/adminSubscription.service.ts(264,54): error TS2339: Property 'contactLastName' does not exist on type '{ firstName: string | null; lastName: string | null; user: { email: string; }; }'.
+src/services/auth.service.ts(63,32): error TS2339: Property 'company' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/services/auth.service.ts(150,16): error TS2339: Property 'company' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/services/checkout.service.ts(39,34): error TS2339: Property 'company' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/services/checkout.service.ts(46,9): error TS2353: Object literal may only specify known properties, and 'companyId' does not exist in type '(Without<OrderCreateInput, OrderUncheckedCreateInput> & OrderUncheckedCreateInput) | (Without<...> & OrderCreateInput)'.
+src/services/checkout.service.ts(63,32): error TS2339: Property 'company' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/services/checkout.service.ts(88,7): error TS2353: Object literal may only specify known properties, and 'companyId' does not exist in type '(Without<OrderCreateInput, OrderUncheckedCreateInput> & OrderUncheckedCreateInput) | (Without<...> & OrderCreateInput)'.
+src/services/checkout.service.ts(145,44): error TS2339: Property 'companyId' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; status: OrderStatus; patientId: string; productType: ProductType; consultationPhone: string | null; stripeInvoiceId: string | null; }'.
+src/services/checkout.service.ts(156,32): error TS2339: Property 'company' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/services/dsar.service.ts(77,12): error TS2339: Property 'company' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/services/dsar.service.ts(110,18): error TS2353: Object literal may only specify known properties, and 'companyId' does not exist in type 'OrderWhereInput'.
+src/services/dsar.service.ts(138,29): error TS7006: Parameter 'c' implicitly has an 'any' type.
+src/services/dsar.service.ts(161,30): error TS7006: Parameter 'a' implicitly has an 'any' type.
+src/services/order.service.ts(41,32): error TS2339: Property 'company' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/services/order.service.ts(54,32): error TS2339: Property 'company' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/services/order.service.ts(61,7): error TS2353: Object literal may only specify known properties, and 'companyId' does not exist in type '(Without<OrderCreateInput, OrderUncheckedCreateInput> & OrderUncheckedCreateInput) | (Without<...> & OrderCreateInput)'.
+src/services/order.service.ts(72,14): error TS2353: Object literal may only specify known properties, and 'companyId' does not exist in type 'OrderWhereInput'.
+src/services/order.service.ts(81,32): error TS2339: Property 'company' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/services/order.service.ts(91,7): error TS2353: Object literal may only specify known properties, and 'companyId' does not exist in type '(Without<OrderCreateInput, OrderUncheckedCreateInput> & OrderUncheckedCreateInput) | (Without<...> & OrderCreateInput)'.
+src/services/order.service.ts(114,32): error TS2339: Property 'company' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/services/order.service.ts(115,26): error TS2339: Property 'companyId' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; status: OrderStatus; patientId: string; productType: ProductType; consultationPhone: string | null; stripeInvoiceId: string | null; }'.
+src/services/order.service.ts(127,24): error TS2339: Property 'companyId' does not exist on type 'OrderWhereInput'.
+src/services/order.service.ts(139,32): error TS2339: Property 'company' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/services/order.service.ts(145,14): error TS2353: Object literal may only specify known properties, and 'companyId' does not exist in type 'OrderWhereInput'.
+src/services/order.service.ts(158,16): error TS2353: Object literal may only specify known properties, and 'company' does not exist in type 'OrderInclude<DefaultArgs>'.
+src/services/order.service.ts(163,13): error TS2339: Property 'company' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; status: OrderStatus; patientId: string; productType: ProductType; consultationPhone: string | null; stripeInvoiceId: string | null; }'.
+src/services/order.service.ts(244,32): error TS2339: Property 'company' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/services/order.service.ts(254,7): error TS2353: Object literal may only specify known properties, and 'companyId' does not exist in type 'OrderWhereInput'.
+src/services/order.service.ts(301,32): error TS2339: Property 'company' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/services/order.service.ts(309,7): error TS2353: Object literal may only specify known properties, and 'companyId' does not exist in type 'OrderWhereInput'.
+src/services/order.service.ts(342,32): error TS2339: Property 'company' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/services/order.service.ts(348,14): error TS2353: Object literal may only specify known properties, and 'companyId' does not exist in type 'OrderWhereInput'.
+src/services/profile.service.ts(186,16): error TS2339: Property 'company' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+src/services/testimonial.service.ts(23,11): error TS2353: Object literal may only specify known properties, and 'company' does not exist in type 'UserSelect<DefaultArgs>'.
+src/services/testimonial.service.ts(90,13): error TS2353: Object literal may only specify known properties, and 'company' does not exist in type 'UserSelect<DefaultArgs>'.
+src/services/userCleanup.service.ts(59,14): error TS2339: Property 'company' does not exist on type 'Omit<PrismaClient<PrismaClientOptions, never, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">'.
+npm error Lifecycle script `build` failed with error:
+npm error code 2
+npm error path C:\Users\wirig\Desktop\bambooIT\apps\backend
+npm error workspace backend@1.0.0
+npm error location C:\Users\wirig\Desktop\bambooIT\apps\backend
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c tsc

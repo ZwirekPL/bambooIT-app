@@ -184,7 +184,7 @@ const listDietitiansQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(500).default(20),
   search: z.string().min(1).max(100).optional(),
-  sortBy: z.enum(['email', 'createdAt', 'lastLoginAt', 'patientsCount']).optional(),
+  sortBy: z.enum(['email', 'createdAt', 'lastLoginAt', 'companiesCount']).optional(),
   sortOrder: z.enum(['asc', 'desc']).optional(),
   hideDeleted: z.coerce.boolean().optional(),
 });
@@ -209,14 +209,14 @@ const updateDietitianSchema = z.object({
   email: z.string().email().optional(),
 });
 
-export async function getDietitianPatients(req: Request, res: Response, next: NextFunction) {
+export async function getDietitianCompanies(req: Request, res: Response, next: NextFunction) {
   const parsed = dietitianIdSchema.safeParse(req.params);
   if (!parsed.success) {
     return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid user id'));
   }
 
   try {
-    const result = await adminService.getDietitianPatients(parsed.data.id);
+    const result = await adminService.getDietitianCompanies(parsed.data.id);
     return res.json({ ok: true, ...result });
   } catch (err) {
     next(err);
@@ -285,7 +285,7 @@ export async function toggleDietitianActive(req: Request, res: Response, next: N
   try {
     const user = await prisma.user.findUnique({
       where: { id: parsed.data.id },
-      select: { deletedAt: true, _count: { select: { patientsAsDietitian: true } } },
+      select: { deletedAt: true, _count: { select: { companiesAsDietitian: true } } },
     });
     if (!user) return res.status(404).json(apiError('NOT_FOUND', 'User not found'));
 
@@ -303,7 +303,7 @@ export async function toggleDietitianActive(req: Request, res: Response, next: N
       ip: req.ip,
     });
 
-    return res.json({ ok: true, active: !isActive, patientsAffected: user._count.patientsAsDietitian });
+    return res.json({ ok: true, active: !isActive, patientsAffected: user._count.companiesAsDietitian });
   } catch (err) {
     next(err);
   }
@@ -490,7 +490,7 @@ const aiUsageStatsSchema = z.object({
 });
 
 const aiUsageListSchema = paginationSchema.extend({
-  patientId: z.string().cuid().optional(),
+  companyId: z.string().cuid().optional(),
   source: z.string().optional(),
   success: z.enum(['true', 'false']).optional(),
 });
@@ -552,6 +552,8 @@ const scoringWeightField = z.number().min(0).max(1);
 const patchScoringWeightsSchema = z.object({
   nutritionFit: scoringWeightField.optional(),
   quality: scoringWeightField.optional(),
+  // TODO(K9-cleanup): patientRating diet residue — drop całkowicie w K9
+  // (NIE rename do companyRating; bambooIT używa Testimonial).
   patientRating: scoringWeightField.optional(),
   cuisine: scoringWeightField.optional(),
   season: scoringWeightField.optional(),
@@ -878,7 +880,7 @@ export async function listConsultations(req: Request, res: Response, next: NextF
       prisma.order.findMany({
         where,
         include: {
-          patient: {
+          company: {
             include: { user: { select: { email: true } } },
           },
         },
@@ -894,9 +896,9 @@ export async function listConsultations(req: Request, res: Response, next: NextF
       createdAt: o.createdAt,
       status: o.status,
       consultationPhone: o.consultationPhone,
-      patientFirstName: o.patient.firstName,
-      patientLastName: o.patient.lastName,
-      patientEmail: o.patient.user.email,
+      patientFirstName: o.company.contactFirstName,
+      patientLastName: o.company.contactLastName,
+      patientEmail: o.company.user.email,
     }));
 
     return res.json({ ok: true, consultations, total, page, limit });
