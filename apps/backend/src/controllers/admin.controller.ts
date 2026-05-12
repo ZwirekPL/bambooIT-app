@@ -6,9 +6,11 @@ import * as adminService from '../services/admin.service';
 import { logAudit, type AuditAction } from '../services/audit.service';
 import { prisma } from '@db';
 import { getAiUsageStats, listAiUsageLogs } from '../services/aiUsage.service';
-import { processMealReminders } from '../services/mealReminder.service';
+// TODO(2b-cleanup): mealReminder.service dropped in 2c → triggerMealReminders handler commented below
+// import { processMealReminders } from '../services/mealReminder.service';
 import * as appSettings from '../services/appSettings.service';
-import * as patientService from '../services/patient.service';
+// TODO(2b-cleanup): patient.service dropped in 2c → unlockPatientProfile handler commented below
+// import * as patientService from '../services/patient.service';
 import * as securityMonitoring from '../services/securityMonitoring.service';
 import { adminUnlockAccount } from '../services/antiAbuse.service';
 import * as deviceFingerprint from '../services/deviceFingerprint.service';
@@ -610,14 +612,15 @@ export async function listAiUsage(req: Request, res: Response, next: NextFunctio
   }
 }
 
-export async function triggerMealReminders(req: Request, res: Response, next: NextFunction) {
-  try {
-    const sentCount = await processMealReminders();
-    return res.json({ ok: true, sentCount });
-  } catch (err) {
-    next(err);
-  }
-}
+// TODO(2b-cleanup): mealReminder.service dropped in 2c
+// export async function triggerMealReminders(req: Request, res: Response, next: NextFunction) {
+//   try {
+//     const sentCount = await processMealReminders();
+//     return res.json({ ok: true, sentCount });
+//   } catch (err) {
+//     next(err);
+//   }
+// }
 
 // PRE.10: GET /admin/frequent-inputs?field=dislikes&limit=20
 export async function getFrequentInputs(req: Request, res: Response, next: NextFunction) {
@@ -767,26 +770,27 @@ export async function grantAccess(req: Request, res: Response, next: NextFunctio
   }
 }
 
-// ─── 39.1.2: Unlock patient profile ─────────────────────────────────────────
-
-export async function unlockPatientProfile(req: Request, res: Response, next: NextFunction) {
-  try {
-    const idParsed = z.object({ id: z.string().cuid() }).safeParse(req.params);
-    if (!idParsed.success) return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid id'));
-
-    await patientService.unlockProfile(idParsed.data.id);
-    logAudit({
-      userId: req.user?.sub,
-      action: 'UNLOCK_PATIENT_PROFILE',
-      resourceType: 'PATIENT',
-      resourceId: idParsed.data.id,
-      ip: req.ip,
-    });
-    return res.json({ ok: true });
-  } catch (err) {
-    next(err);
-  }
-}
+// TODO(2b-cleanup): patient.service dropped in 2c
+// // ─── 39.1.2: Unlock patient profile ─────────────────────────────────────────
+//
+// export async function unlockPatientProfile(req: Request, res: Response, next: NextFunction) {
+//   try {
+//     const idParsed = z.object({ id: z.string().cuid() }).safeParse(req.params);
+//     if (!idParsed.success) return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid id'));
+//
+//     await patientService.unlockProfile(idParsed.data.id);
+//     logAudit({
+//       userId: req.user?.sub,
+//       action: 'UNLOCK_PATIENT_PROFILE',
+//       resourceType: 'PATIENT',
+//       resourceId: idParsed.data.id,
+//       ip: req.ip,
+//     });
+//     return res.json({ ok: true });
+//   } catch (err) {
+//     next(err);
+//   }
+// }
 
 // ─── 39.6.3: Admin unlock locked account ────────────────────────────────────
 

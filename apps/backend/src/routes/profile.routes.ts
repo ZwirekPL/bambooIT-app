@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import * as profileController from '../controllers/profile.controller';
 import * as notifController from '../controllers/notificationPreferences.controller';
-import * as noteController from '../controllers/note.controller';
+// TODO(2b-cleanup): note.controller dropped in 2b (diet notes) — listMy mount commented below
+// import * as noteController from '../controllers/note.controller';
 import * as dsarController from '../controllers/dsar.controller';
 
 export const profileRouter = Router();
@@ -22,4 +23,5 @@ profileRouter.patch('/email', profileController.changeEmail);
 profileRouter.get('/notifications', notifController.getNotificationPreferences);
 profileRouter.patch('/notifications', notifController.updateNotificationPreferences);
 profileRouter.delete('/account', profileController.deleteAccount);
-profileRouter.get('/notes', noteController.listMy);
+// TODO(2b-cleanup): note.controller dropped in 2b
+// profileRouter.get('/notes', noteController.listMy);
