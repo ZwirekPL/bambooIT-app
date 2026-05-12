@@ -138,14 +138,11 @@ export async function getCostReport(month: string): Promise<CostReport> {
   const revenue = charges.reduce((s, c) => s + c.amount, 0) / 100;
   const txCount = charges.length;
 
-  // AI costs from AiCostLog (using AiUsageLog model name from DB)
-  const aiLogs = await prisma.aiUsageLog.findMany({
-    where: { triggeredAt: { gte: monthStart, lte: monthEnd } },
-    select: { estimatedCostUsd: true },
-  });
-  const usdRate = await getSetting<number>(SETTING_USD_TO_PLN_RATE, 4.0);
-  const aiCostsUsd = aiLogs.reduce((s, l) => s + Number(l.estimatedCostUsd ?? 0), 0);
-  const aiCosts = Math.round(aiCostsUsd * usdRate * 100) / 100;
+  // TODO(5b-cleanup): AiUsageLog dropped in K5b. Rebuild Claude API cost tracking
+  // for bambooIT in faza 4 with companyId/sessionId/feature semantics.
+  // const aiLogs = await prisma.aiUsageLog.findMany({ ... });
+  // const aiCostsUsd = aiLogs.reduce((s, l) => s + Number(l.estimatedCostUsd ?? 0), 0);
+  const aiCosts = 0;
 
   // Stripe fees
   const feePercent = await getSetting<number>(SETTING_STRIPE_FEE_PERCENT, 1.4);

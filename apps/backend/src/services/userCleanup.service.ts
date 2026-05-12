@@ -56,7 +56,8 @@ export async function hardDeleteUser(userId: string): Promise<void> {
     await tx.auditLog.updateMany({ where: { userId }, data: { userId: null } });
     await tx.tenant.updateMany({ where: { ownerId: userId }, data: { ownerId: null } });
     await tx.patient.updateMany({ where: { dietitianId: userId }, data: { dietitianId: null } });
-    await tx.supplementPrescription.updateMany({ where: { dietitianId: userId }, data: { dietitianId: null } });
+    // TODO(5b-cleanup): SupplementPrescription model dropped in K5b
+    // await tx.supplementPrescription.updateMany({ where: { dietitianId: userId }, data: { dietitianId: null } });
     await tx.nutritionProtocol.updateMany({ where: { dietitianId: userId }, data: { dietitianId: null } });
     await tx.user.delete({ where: { id: userId } });
   });

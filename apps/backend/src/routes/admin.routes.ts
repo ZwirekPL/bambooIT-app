@@ -65,7 +65,8 @@ adminRouter.get('/audit-logs/stats', adminController.getAuditLogStats);
 adminRouter.get('/audit-logs/export', adminController.exportAuditLogsCsv);
 
 // PRE.10: frequent free-text inputs analytics
-adminRouter.get('/frequent-inputs', adminController.getFrequentInputs);
+// TODO(5b-cleanup): FrequentInput model dropped in K5b
+// adminRouter.get('/frequent-inputs', adminController.getFrequentInputs);
 
 // Blog category management (7.12.2)
 adminRouter.get('/blog/categories', blogCategoryController.adminListCategories);
@@ -159,8 +160,9 @@ adminRouter.delete('/posts/:id', blogController.adminDeletePost);
 // adminRouter.patch('/review-queue/:id', importController.processReviewItem);
 
 // AI Usage Telemetry (7.14.1)
-adminRouter.get('/ai-usage/stats', adminController.getAiUsage);
-adminRouter.get('/ai-usage', adminController.listAiUsage);
+// TODO(5b-cleanup): AiUsageLog model dropped in K5b
+// adminRouter.get('/ai-usage/stats', adminController.getAiUsage);
+// adminRouter.get('/ai-usage', adminController.listAiUsage);
 
 // TODO(2b-cleanup): dietCache controller dropped in 2b
 // // Diet Template Cache (17.2)

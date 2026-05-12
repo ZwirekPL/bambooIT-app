@@ -13,27 +13,6 @@ enum UserRole {
   PATIENT
 }
 
-enum DietPlanSource {
-  AI
-  MANUAL
-}
-
-enum DietPlanStatus {
-  AI_DRAFT
-  GENERATED
-  REVIEWED
-  SENT
-  PUBLISHED
-  MANUAL_REVIEW_REQUIRED
-  GENERATION_FAILED
-}
-
-enum DayRegenReason {
-  DONT_LIKE
-  TOO_COMPLEX
-  NO_INGREDIENTS
-}
-
 enum ProductType {
   FREE_7
   OPIEKA_MIESIECZNA
@@ -73,28 +52,6 @@ enum SubscriptionPlan {
   FREE
   PRO_MONTHLY
   PRO_YEARLY
-}
-
-enum ValidationStatus {
-  VALID
-  NEEDS_ADJUST
-  NEEDS_REPAIR_AI
-}
-
-enum MealType {
-  BREAKFAST
-  LUNCH
-  DINNER
-  SNACK
-  SUPPER
-}
-
-enum DietType {
-  STANDARD
-  VEGE
-  VEGAN
-  GLUTEN_FREE
-  LACTOSE_FREE
 }
 
 // ─── Food Database Enums ──────────────────────────────────────────────────────
@@ -167,8 +124,6 @@ model User {
   emailVerificationTokens EmailVerificationToken[]
   testimonial             Testimonial?
   notificationPreferences NotificationPreferences?
-  dietitianNotes          DietitianNote[]          @relation("NoteDietitian")
-  noteTemplates           NoteTemplate[]           @relation("TemplateDietitian")
   referralCode            ReferralCode?
   referralUsagesAsReferred ReferralUsage[]         @relation("ReferredUser")
   consents                UserConsent[]
@@ -179,11 +134,7 @@ model User {
   deviceFingerprints      DeviceFingerprint[]
   protocolAssignments     DietitianProtocolAccess[] @relation("ProtocolAssignments")
   // Chat (79.1)
-  conversationsAsPatient    Conversation[]   @relation("ConversationPatient")
-  conversationsAsDietitian  Conversation[]   @relation("ConversationDietitian")
-  sentMessages              Message[]        @relation("MessageSender")
   // Supplements (79.6)
-  supplementPrescriptions   SupplementPrescription[] @relation("PrescribingDietitian")
 }
 
 model Patient {
@@ -205,37 +156,10 @@ model Patient {
   user             User              @relation("PatientUser", fields: [userId], references: [id], onDelete: Cascade)
   dietitian        User?             @relation("PatientDietitian", fields: [dietitianId], references: [id])
   tenant           Tenant?           @relation(fields: [tenantId], references: [id])
-  interviews       Interview[]
-  dietPlans        DietPlan[]
   orders           Order[]
-  labPanels        LabPanel[]
-  nutritionTargets NutritionTargets?
-  checkIns         CheckIn[]
-  aiUsageLogs      AiUsageLog[]
-  dietitianNotes   DietitianNote[]
-  bodyMeasurements     BodyMeasurement[]
-  supplements          SupplementPrescription[]
 
   @@index([tenantId])
   @@index([dietitianId])
-}
-
-model Interview {
-  id        String        @id @default(cuid())
-  patientId String
-  tenantId  String?
-  orderId   String?
-  createdAt DateTime      @default(now())
-
-  // Stored encrypted via encryptJson() — AES-256-GCM
-  answers         Json
-  medicalFlags    Json?
-  profileSnapshot Json?
-
-  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
-
-  @@index([patientId])
-  @@index([tenantId])
 }
 
 model AuditLog {
@@ -283,73 +207,6 @@ model EmailVerificationToken {
   @@index([userId])
 }
 
-model DietPlan {
-  id        String   @id @default(cuid())
-  patientId String
-  tenantId  String?
-  orderId   String?
-  createdAt DateTime @default(now())
-
-  source DietPlanSource @default(AI)
-  status DietPlanStatus @default(GENERATED)
-
-  kcal     Int?
-  proteinG Int?
-  fatG     Int?
-  carbsG   Int?
-
-  // Stored encrypted via encryptJson() — AES-256-GCM
-  content Json
-
-  // AI audit — must NOT contain raw personal health data
-  aiProvider       String?
-  aiModel          String?
-  rawResponse      Json?
-  validated        Boolean           @default(false)
-  validationStatus ValidationStatus?
-  validationErrors Json?
-
-  /// Policy engine metadata: explanation, applied rules, red flags (not encrypted — no PHI)
-  policyMetadata Json?
-
-  // Protocol / template tracking (28.1.7)
-  templateId  String? // NutritionProtocol.id at time of generation
-  repairCount   Int     @default(0) // number of AI repair attempts
-  dayRegenLimit Int     @default(3) // patient day regeneration limit per plan
-
-  patient        Patient            @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  revisions      DietPlanRevision[]
-  swaps          MealSwap[]
-  dayRegens      DayRegeneration[]
-  dietitianNotes DietitianNote[]
-  protocol       NutritionProtocol? @relation("DietPlanProtocol", fields: [templateId], references: [id])
-  aiCostLogs         AiCostLog[]
-
-  @@index([patientId])
-  @@index([tenantId])
-  @@index([templateId])
-}
-
-model MealSwap {
-  id         String   @id @default(cuid())
-  dietPlanId String
-  dayIndex   Int      // 0-6 (Mon-Sun)
-  mealIndex  Int      // 0-4 (meal position within day)
-
-  originalMeal Json   // snapshot of the original meal (PlanMeal)
-  alternatives Json   // array of 3 alternative meals generated
-  chosenIndex  Int?   // which alternative was chosen (0-2), null = not yet confirmed
-  newMeal      Json?  // the confirmed replacement meal (copied from alternatives[chosenIndex])
-
-  confirmed Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  dietPlan DietPlan @relation(fields: [dietPlanId], references: [id], onDelete: Cascade)
-
-  @@index([dietPlanId])
-  @@index([dietPlanId, createdAt])
-}
-
 model Order {
   id                String      @id @default(cuid())
   patientId         String
@@ -366,20 +223,6 @@ model Order {
 }
 
 // @deprecated — artifact, scheduled for removal in a future migration (31.7)
-model LabPanel {
-  id        String   @id @default(cuid())
-  patientId String
-  orderId   String?
-  createdAt DateTime @default(now())
-
-  // Stored encrypted via encryptJson() — AES-256-GCM
-  data Json
-
-  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
-
-  @@index([patientId])
-}
-
 model Post {
   id          String   @id @default(cuid())
   slug        String   @unique
@@ -468,202 +311,15 @@ model BlogCategoryConfig {
 
 // ─── Nutrition targets ────────────────────────────────────────────────────────
 
-model NutritionTargets {
-  id             String   @id @default(cuid())
-  patientId      String   @unique
-  bmr            Int
-  tdee           Int
-  targetKcal     Int
-  targetProteinG Int
-  targetFatG     Int
-  targetCarbsG   Int
-  activityLevel  String
-  goal           String
-  ageYears       Int?
-  weightKg       Decimal? @db.Decimal(6, 2)
-  heightCm       Int?
-  breakdown      Json?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
-}
-
-model FrequentInput {
-  id        String   @id @default(cuid())
-  field     String
-  value     String
-  count     Int      @default(1)
-  updatedAt DateTime @updatedAt
-
-  @@unique([field, value])
-  @@index([field, count])
-}
-
 // ─── Meal Library ─────────────────────────────────────────────────────────────
-
-model Meal {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  mealType    MealType
-  dietType    DietType @default(STANDARD)
-
-  // Total macros for one serving
-  kcal     Int
-  proteinG Decimal @db.Decimal(6, 2)
-  fatG     Decimal @db.Decimal(6, 2)
-  carbsG   Decimal @db.Decimal(6, 2)
-
-  // Allergen flags — denormalized for fast filtering
-  hasGluten  Boolean @default(false)
-  hasLactose Boolean @default(false)
-  hasNuts    Boolean @default(false)
-  hasSoy     Boolean @default(false)
-  hasEggs    Boolean @default(false)
-  hasFish    Boolean @default(false)
-
-  tags     String[]
-  isActive Boolean  @default(true)
-  source   String   @default("manual") // manual | seed | import
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  templateMeals TemplateMeal[]
-
-  @@index([mealType])
-  @@index([dietType])
-  @@index([isActive])
-  @@index([kcal])
-}
 
 // ─── Template Plans (7.10.2) ──────────────────────────────────────────────────
 
-model TemplatePlan {
-  id             String   @id @default(cuid())
-  name           String
-  description    String?
-  targetKcal     Int
-  targetProteinG Int
-  targetFatG     Int
-  targetCarbsG   Int
-  goal           String // WEIGHT_LOSS | MAINTENANCE | MUSCLE_GAIN
-  dietType       DietType @default(STANDARD)
-  mealCount      Int      @default(5)
-  isActive       Boolean  @default(true)
-  source         String   @default("manual") // manual | seed
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  meals TemplateMeal[]
-
-  @@index([goal])
-  @@index([targetKcal])
-  @@index([dietType])
-  @@index([isActive])
-}
-
-model TemplateMeal {
-  id             String @id @default(cuid())
-  templatePlanId String
-  mealId         String
-  dayNumber      Int // 1–7
-  position       Int // order within day (1 = first meal)
-
-  templatePlan TemplatePlan @relation(fields: [templatePlanId], references: [id], onDelete: Cascade)
-  meal         Meal         @relation(fields: [mealId], references: [id])
-
-  @@unique([templatePlanId, mealId, dayNumber])
-  @@index([templatePlanId])
-}
-
 // ─── Diet plan versioning (7.11) ─────────────────────────────────────────────
-
-enum DietPlanRevisionReason {
-  AI_GENERATED
-  AUTO_ADJUST
-  DIETITIAN_EDIT
-  PUBLISHED
-  CHECKIN_ADJUSTMENT
-  SLOT_REPAIR
-}
-
-model DietPlanRevision {
-  id             String                 @id @default(cuid())
-  dietPlanId     String
-  revisionNumber Int
-  /// userId — null when system-generated (pipeline)
-  createdBy      String?
-  reason         DietPlanRevisionReason
-  /// Stored encrypted via encryptJson() — AES-256-GCM
-  contentJson    Json
-  createdAt      DateTime               @default(now())
-
-  dietPlan DietPlan @relation(fields: [dietPlanId], references: [id], onDelete: Cascade)
-
-  @@unique([dietPlanId, revisionNumber])
-  @@index([dietPlanId])
-}
 
 // ─── Weekly Check-ins (7.13) ─────────────────────────────────────────────────
 
-model CheckIn {
-  id        String   @id @default(cuid())
-  patientId String
-  createdAt DateTime @default(now())
-
-  weightKg   Decimal? @db.Decimal(6, 2)
-  compliance Int? // 0–100 (% diet adherence)
-  hunger     Int? // 1–10
-  energy     Int? // 1–10
-  sleep      Int? // 1–10
-  activity   Int? // 1–10 (optional)
-  mood       Int?     @db.SmallInt // 1–5 (62.3)
-  waistCm    Decimal? @db.Decimal(5, 1) // 62.4
-  hipsCm     Decimal? @db.Decimal(5, 1)
-  thighCm    Decimal? @db.Decimal(5, 1)
-  chestCm    Decimal? @db.Decimal(5, 1)
-  notes      String?  @db.Text
-  // 79.2: GI/digestion fields (shown only for IBS/reflux patients)
-  digestion     Int?     @db.SmallInt // 1–10 comfort scale
-  bloating      Boolean?             // yes/no
-  stoolBristol  Int?     @db.SmallInt // 1–7 Bristol Stool Scale
-  // 79.6: supplement compliance tracking
-  supplementsTaken Json? // [{ supplementId: string, taken: boolean }]
-
-  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
-
-  @@index([patientId])
-  @@index([createdAt])
-}
-
 // ─── Supplement Prescriptions (79.6) ─────────────────────────────────────────
-
-model SupplementPrescription {
-  id          String    @id @default(cuid())
-  patientId   String
-  dietitianId String?   // who prescribed (null = system recommendation)
-
-  nutrientKey String    @db.VarChar(50)  // e.g. "vitaminD", "iron", "omega3"
-  label       String    @db.VarChar(200) // e.g. "Wit. D 2000IU"
-  dose        String    @db.VarChar(50)  // e.g. "2000"
-  unit        String    @db.VarChar(20)  // e.g. "IU", "mg", "g"
-  frequency   String    @db.VarChar(50)  // e.g. "daily", "twice_daily", "weekly"
-  startDate   DateTime  @default(now())
-  endDate     DateTime?
-  active      Boolean   @default(true)
-  notes       String?   @db.Text
-
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  patient     Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  dietitian   User?     @relation("PrescribingDietitian", fields: [dietitianId], references: [id])
-
-  @@index([patientId])
-  @@index([patientId, active])
-}
 
 model Subscription {
   id                   String             @id @default(cuid())
@@ -684,91 +340,7 @@ model Subscription {
 
 // ─── Diet Template Cache (17.2) ─────────────────────────────────────────────
 
-model DietTemplate {
-  id          String @id @default(cuid())
-  segmentHash String @unique // SHA-256 of normalized segment
-
-  // Segment components (denormalized for similarity queries)
-  goal      String // WEIGHT_LOSS | MAINTENANCE | MUSCLE_GAIN
-  kcalBucket Int // rounded to nearest 100
-  dietType  String // STANDARD | VEGE | VEGAN | GLUTEN_FREE | LACTOSE_FREE
-  allergies String[] // sorted array of allergy codes
-  diseases  String[] // sorted array of chronic disease codes
-  mealCount Int // 3 | 4 | 5
-
-  // Plan content (encrypted — same format as DietPlan.content)
-  content Json
-
-  // Macros of the template
-  kcal     Int
-  proteinG Int
-  fatG     Int
-  carbsG   Int
-
-  // Metadata
-  sourceAiModel    String? // which AI model generated this
-  sourceDietPlanId String? // original DietPlan this was extracted from
-  usageCount       Int      @default(0)
-  lastUsedAt       DateTime?
-  qualityScore     Int      @default(0) // 0–100
-  isActive         Boolean  @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([goal])
-  @@index([kcalBucket])
-  @@index([dietType])
-  @@index([isActive])
-  @@index([usageCount])
-}
-
 // ─── AI Usage Telemetry (7.14.1) ────────────────────────────────────────────
-
-model AiUsageLog {
-  id         String   @id @default(cuid())
-  patientId  String
-  dietPlanId String?
-  triggeredAt DateTime @default(now())
-  completedAt DateTime?
-
-  // Pipeline metrics
-  durationMs    Int?  // total pipeline execution time
-  source        String? // template | candidate_meals | fallback | n8n
-  cached        Boolean @default(false)
-  n8nTriggered  Boolean @default(false)
-  blocked       Boolean @default(false)
-
-  // Validation outcome
-  validationStatus String? // VALID | NEEDS_ADJUST | NEEDS_REPAIR_AI
-  autoAdjusted     Boolean @default(false)
-
-  // Policy engine stats
-  policyRulesCount Int @default(0)
-  redFlagsCount    Int @default(0)
-  redFlagSeverity  String? // CRITICAL | HIGH | MODERATE | null
-
-  // Step-level timing (JSON array of { step, durationMs })
-  stepTimings Json?
-
-  // Error tracking
-  error   String? @db.Text
-  success Boolean @default(true)
-
-  // Cost estimation (for future AI provider integration)
-  aiProvider       String? // pipeline | n8n | openai
-  aiModel          String?
-  promptTokens     Int?
-  completionTokens Int?
-  estimatedCostUsd Decimal? @db.Decimal(10, 6)
-
-  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
-
-  @@index([patientId])
-  @@index([triggeredAt])
-  @@index([source])
-  @@index([success])
-}
 
 // ─── Feature Flags (7.14.2) ─────────────────────────────────────────────────
 
@@ -841,36 +413,6 @@ model NotificationPreferences {
   updatedAt DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model DietitianNote {
-  id           String   @id @default(cuid())
-  patientId    String
-  dietitianId  String
-  dietPlanId   String?
-  content      String   @db.Text
-  createdAt    DateTime @default(now())
-
-  patient   Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  dietitian User      @relation("NoteDietitian", fields: [dietitianId], references: [id])
-  dietPlan  DietPlan? @relation(fields: [dietPlanId], references: [id])
-
-  @@index([patientId])
-  @@index([dietitianId])
-}
-
-model NoteTemplate {
-  id           String   @id @default(cuid())
-  dietitianId  String
-  title        String   @db.VarChar(200)
-  content      String   @db.Text
-  category     String?  @db.VarChar(100)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  dietitian User @relation("TemplateDietitian", fields: [dietitianId], references: [id], onDelete: Cascade)
-
-  @@index([dietitianId])
 }
 
 model ReferralCode {
@@ -1045,7 +587,6 @@ model NutritionProtocol {
 
   dietitian      User?                    @relation("DietitianProtocols", fields: [dietitianId], references: [id])
   accessGrants   DietitianProtocolAccess[]
-  dietPlans      DietPlan[]               @relation("DietPlanProtocol")
   triggers       ProtocolTrigger[]
 
   @@index([scope])
@@ -1120,24 +661,6 @@ model ProtocolConflict {
 
 // ─── AI Cost Tracking (33.9) ─────────────────────────────────────────────────
 
-model AiCostLog {
-  id               String   @id @default(cuid())
-  dietPlanId       String
-  model            String
-  promptTokens     Int
-  completionTokens Int
-  totalTokens      Int
-  estimatedCostUsd Float
-  jobType          String // 'generate' | 'repair' | 'partial'
-  jobId            String?
-  createdAt        DateTime @default(now())
-
-  dietPlan DietPlan @relation(fields: [dietPlanId], references: [id], onDelete: Cascade)
-
-  @@index([dietPlanId])
-  @@index([createdAt])
-}
-
 /// Stores Stripe card fingerprints used for trial subscriptions.
 /// Prevents the same card from being used for multiple free trials.
 model TrialFingerprint {
@@ -1189,87 +712,9 @@ model SecurityBan {
 
 // ─── Patient Day Regeneration ─────────────────────────────────────────────────
 
-model DayRegeneration {
-  id           String          @id @default(cuid())
-  dietPlanId   String
-  dayName      String          // e.g. "Poniedziałek"
-  reason       DayRegenReason
-  keepSimilar  Boolean         @default(false)
-
-  originalDay  Json            // snapshot of original PlanDay (for undo)
-  newDay       Json?           // AI-generated replacement day (null while PENDING)
-  status       DayRegenStatus  @default(PENDING)
-
-  createdAt    DateTime        @default(now())
-
-  dietPlan DietPlan @relation(fields: [dietPlanId], references: [id], onDelete: Cascade)
-
-  @@index([dietPlanId])
-  @@index([dietPlanId, status])
-}
-
-enum DayRegenStatus {
-  PENDING
-  SUCCESS
-  FAILED
-}
-
 // ─── Body Measurements (79.3) ────────────────────────────────────────────────
 
-model BodyMeasurement {
-  id          String   @id @default(cuid())
-  patientId   String
-  date        DateTime @default(now())
-  waistCm     Decimal? @db.Decimal(5, 1) // 40-200
-  hipCm       Decimal? @db.Decimal(5, 1) // 50-200
-  chestCm     Decimal? @db.Decimal(5, 1) // 50-200
-  thighCm     Decimal? @db.Decimal(5, 1) // 20-100
-  armCm       Decimal? @db.Decimal(5, 1) // 15-60
-  bodyFatPct  Decimal? @db.Decimal(4, 1) // 3-60%
-  notes       String?  @db.Text
-
-  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
-
-  @@index([patientId, date])
-}
-
 // ─── Patient ↔ Dietitian Chat (79.1) ────────────────────────────────────────
-
-model Conversation {
-  id                    String    @id @default(cuid())
-  patientId             String
-  dietitianId           String
-  lastMessageAt         DateTime?
-  unreadCountPatient    Int       @default(0)
-  unreadCountDietitian  Int       @default(0)
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
-
-  patient   User      @relation("ConversationPatient", fields: [patientId], references: [id], onDelete: Cascade)
-  dietitian User      @relation("ConversationDietitian", fields: [dietitianId], references: [id], onDelete: Cascade)
-  messages  Message[]
-
-  @@unique([patientId, dietitianId])
-  @@index([patientId])
-  @@index([dietitianId])
-  @@index([lastMessageAt])
-}
-
-model Message {
-  id              String    @id @default(cuid())
-  conversationId  String
-  senderId        String
-  senderRole      String    // PATIENT or DIETITIAN
-  content         String    @db.Text  /// Encrypted with AES-256-GCM
-  readAt          DateTime?
-  createdAt       DateTime  @default(now())
-
-  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  sender       User         @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
-
-  @@index([conversationId, createdAt])
-  @@index([senderId])
-}
 
 // ─── 84.4: Email Campaign System ────────────────────────────────────────────
 

@@ -244,24 +244,19 @@ export async function getStats() {
     activeUsers,
     totalDietitians,
     totalPatients,
-    totalInterviews,
-    totalDietPlans,
-    plansGenerated,
-    plansReviewed,
-    plansSent,
-    // TODO(5a-cleanup): prisma.recipe dropped in K5a
-    // totalRecipes,
-    // recipesNeedingWork,
+    // TODO(5a-cleanup): totalRecipes, recipesNeedingWork dropped (prisma.recipe gone)
+    // TODO(5b-cleanup): totalInterviews, totalDietPlans, plansGenerated/Reviewed/Sent dropped
   ] = await prisma.$transaction([
     prisma.user.count(),
     prisma.user.count({ where: { deletedAt: null } }),
     prisma.user.count({ where: { role: 'DIETITIAN', deletedAt: null } }),
     prisma.patient.count(),
-    prisma.interview.count(),
-    prisma.dietPlan.count(),
-    prisma.dietPlan.count({ where: { status: 'GENERATED' } }),
-    prisma.dietPlan.count({ where: { status: 'REVIEWED' } }),
-    prisma.dietPlan.count({ where: { status: 'SENT' } }),
+    // TODO(5b-cleanup): Interview + DietPlan dropped in K5b
+    // prisma.interview.count(),
+    // prisma.dietPlan.count(),
+    // prisma.dietPlan.count({ where: { status: 'GENERATED' } }),
+    // prisma.dietPlan.count({ where: { status: 'REVIEWED' } }),
+    // prisma.dietPlan.count({ where: { status: 'SENT' } }),
     // TODO(5a-cleanup): prisma.recipe dropped in K5a
     // prisma.recipe.count(),
     // prisma.recipe.count({ where: { qualityScore: { lt: 40 } } }),
@@ -275,11 +270,9 @@ export async function getStats() {
     },
     dietitians: totalDietitians,
     patients: totalPatients,
-    interviews: totalInterviews,
-    dietPlans: {
-      total: totalDietPlans,
-      byStatus: { GENERATED: plansGenerated, REVIEWED: plansReviewed, SENT: plansSent },
-    },
+    // TODO(5b-cleanup): Interview + DietPlan dropped in K5b
+    // interviews: totalInterviews,
+    // dietPlans: { total: totalDietPlans, byStatus: { GENERATED, REVIEWED, SENT } },
     // TODO(5a-cleanup): prisma.recipe dropped in K5a
     // recipes: { total: totalRecipes, needingWork: recipesNeedingWork },
   };

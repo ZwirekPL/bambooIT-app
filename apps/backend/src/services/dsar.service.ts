@@ -97,23 +97,7 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
   ]);
 
   // Interviews and dietPlans require patientId
-  let interviews: Array<{
-    id: string;
-    createdAt: Date;
-    answers: unknown;
-    medicalFlags: unknown;
-  }> = [];
-  let dietPlans: Array<{
-    id: string;
-    source: string;
-    status: string;
-    createdAt: Date;
-    content: unknown;
-    kcal: number | null;
-    proteinG: number | null;
-    fatG: number | null;
-    carbsG: number | null;
-  }> = [];
+  // TODO(5b-cleanup): Interview + DietPlan locals dropped (model removed in K5b).
   let orders: Array<{
     id: string;
     productType: string;
@@ -122,32 +106,10 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
   }> = [];
 
   if (patient) {
-    const [rawInterviews, rawDietPlans, rawOrders] = await Promise.all([
-      prisma.interview.findMany({
-        where: { patientId: patient.id },
-        orderBy: { createdAt: 'desc' },
-        select: {
-          id: true,
-          createdAt: true,
-          answers: true,
-          medicalFlags: true,
-        },
-      }),
-      prisma.dietPlan.findMany({
-        where: { patientId: patient.id },
-        orderBy: { createdAt: 'desc' },
-        select: {
-          id: true,
-          source: true,
-          status: true,
-          createdAt: true,
-          content: true,
-          kcal: true,
-          proteinG: true,
-          fatG: true,
-          carbsG: true,
-        },
-      }),
+    // TODO(5b-cleanup): Interview + DietPlan dropped in K5b. RODO export of diet domain
+    // rebuild for bambooIT data (Company, Subscription, AuditFormSubmissions,
+    // ContactMessages, ChatSessions) in faza 4. Orders export still works (Patient zostaje).
+    const [rawOrders] = await Promise.all([
       prisma.order.findMany({
         where: { patientId: patient.id },
         orderBy: { createdAt: 'desc' },
@@ -159,8 +121,6 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
         },
       }),
     ]);
-    interviews = rawInterviews;
-    dietPlans = rawDietPlans;
     orders = rawOrders;
   }
 
@@ -190,25 +150,9 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
       acceptedAt: c.acceptedAt.toISOString(),
       revokedAt: c.revokedAt?.toISOString() ?? null,
     })),
-    interviews: interviews.map((i) => ({
-      id: i.id,
-      createdAt: i.createdAt.toISOString(),
-      answers: decryptJson(i.answers),
-      medicalFlags: i.medicalFlags ? decryptJson(i.medicalFlags) : null,
-    })),
-    dietPlans: dietPlans.map((dp) => ({
-      id: dp.id,
-      source: dp.source,
-      status: dp.status,
-      createdAt: dp.createdAt.toISOString(),
-      content: decryptJson(dp.content),
-      macros: {
-        kcal: dp.kcal,
-        proteinG: dp.proteinG,
-        fatG: dp.fatG,
-        carbsG: dp.carbsG,
-      },
-    })),
+    // TODO(5b-cleanup): Interview + DietPlan dropped in K5b. RODO exports rebuild in faza 4.
+    interviews: [],
+    dietPlans: [],
     orders: orders.map((o) => ({
       id: o.id,
       productType: o.productType,

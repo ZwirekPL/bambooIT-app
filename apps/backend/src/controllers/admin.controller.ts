@@ -5,7 +5,9 @@ import { passwordSchema } from '../utils/validation';
 import * as adminService from '../services/admin.service';
 import { logAudit, type AuditAction } from '../services/audit.service';
 import { prisma } from '@db';
-import { getAiUsageStats, listAiUsageLogs } from '../services/aiUsage.service';
+// TODO(5b-cleanup): aiUsage.service dropped in K5b (AiUsageLog model removed).
+// Claude API tracking rebuild in faza 4 with bambooIT semantics (companyId, sessionId, feature).
+// import { getAiUsageStats, listAiUsageLogs } from '../services/aiUsage.service';
 // TODO(2b-cleanup): mealReminder.service dropped in 2c → triggerMealReminders handler commented below
 // import { processMealReminders } from '../services/mealReminder.service';
 import * as appSettings from '../services/appSettings.service';
@@ -584,33 +586,9 @@ const aiUsageListSchema = paginationSchema.extend({
   success: z.enum(['true', 'false']).optional(),
 });
 
-export async function getAiUsage(req: Request, res: Response, next: NextFunction) {
-  try {
-    const query = aiUsageStatsSchema.safeParse(req.query);
-    if (!query.success) return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid query parameters'));
-    const stats = await getAiUsageStats(query.data.days);
-    return res.json(stats);
-  } catch (err) {
-    next(err);
-  }
-}
-
-export async function listAiUsage(req: Request, res: Response, next: NextFunction) {
-  try {
-    const query = aiUsageListSchema.safeParse(req.query);
-    if (!query.success) return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid query parameters'));
-    const result = await listAiUsageLogs({
-      page: query.data.page,
-      limit: query.data.limit,
-      patientId: query.data.patientId,
-      source: query.data.source,
-      success: query.data.success !== undefined ? query.data.success === 'true' : undefined,
-    });
-    return res.json(result);
-  } catch (err) {
-    next(err);
-  }
-}
+// TODO(5b-cleanup): AiUsageLog model dropped in K5b. Rebuild bambooIT Claude API tracking in faza 4.
+// export async function getAiUsage(req: Request, res: Response, next: NextFunction) { ... }
+// export async function listAiUsage(req: Request, res: Response, next: NextFunction) { ... }
 
 // TODO(2b-cleanup): mealReminder.service dropped in 2c
 // export async function triggerMealReminders(req: Request, res: Response, next: NextFunction) {
@@ -622,29 +600,11 @@ export async function listAiUsage(req: Request, res: Response, next: NextFunctio
 //   }
 // }
 
-// PRE.10: GET /admin/frequent-inputs?field=dislikes&limit=20
-export async function getFrequentInputs(req: Request, res: Response, next: NextFunction) {
-  const schema = z.object({
-    field: z.string().min(1).max(100),
-    limit: z.coerce.number().int().min(1).max(100).default(20),
-  });
-  const parsed = schema.safeParse(req.query);
-  if (!parsed.success) {
-    return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid query params'));
-  }
-
-  try {
-    const results = await prisma.frequentInput.findMany({
-      where: { field: parsed.data.field },
-      orderBy: { count: 'desc' },
-      take: parsed.data.limit,
-      select: { value: true, count: true },
-    });
-    return res.json({ ok: true, field: parsed.data.field, results });
-  } catch (err) {
-    next(err);
-  }
-}
+// TODO(5b-cleanup): FrequentInput model dropped in K5b (was diet interview free-text analytics).
+// // PRE.10: GET /admin/frequent-inputs?field=dislikes&limit=20
+// export async function getFrequentInputs(req: Request, res: Response, next: NextFunction) {
+//   ... prisma.frequentInput.findMany({ ... }) ...
+// }
 
 // ─── App Settings (29.0) ─────────────────────────────────────────────────────
 
