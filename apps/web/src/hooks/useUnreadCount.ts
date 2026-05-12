@@ -20,8 +20,11 @@ export function useUnreadCount() {
     // Only fetch when session is loaded (proxy handles auth — no token needed)
     if (status !== 'authenticated') return;
     try {
-      const res = await api.messages.getUnreadCount('');
-      setCount(res.unreadCount);
+      // TODO(5b.5-cleanup): api.messages dropped in K5b (Message model removed).
+      // Reactivate after bambooIT messaging rebuild in faza 4.
+      // const res = await api.messages.getUnreadCount('');
+      // setCount(res.unreadCount);
+      setCount(0);
     } catch {
       // Silently ignore — sidebar badge is non-critical
     }
