@@ -3,7 +3,7 @@
  * Uses NEXT_PUBLIC_API_URL (client + server) for all requests.
  * Server-only auth requests use API_URL env variable.
  */
-import type { Patient, Order, ProductType, CheckoutProductType, Subscription, AdminStats, UserRole, User, AdminUser, AuditLog, BlogPost, BlogListItem, BlogCategoryConfig, AccessStatus, Testimonial, TestimonialWithUser, PublicTestimonial, NotificationPreferences, MonthlyReport, ClinicalRule, ClinicalRuleHistory, ClinicalRuleType, RuleSeverity, NutritionProtocol, NutritionProtocolCreateData, DietitianProtocolWithAccess, ProtocolAssignedDietitian, ProtocolTrigger, ProtocolTriggerCreateData, ProtocolConflict, ProtocolConflictCreateData, MatchedProtocolsResponse, SubscriptionStats, SubscriptionItem, PatientInvoice } from '@/types/api';
+import type { Patient, Order, ProductType, CheckoutProductType, Subscription, AdminStats, UserRole, User, AdminUser, AuditLog, BlogPost, BlogListItem, BlogCategoryConfig, AccessStatus, Testimonial, TestimonialWithUser, PublicTestimonial, NotificationPreferences, SubscriptionStats, SubscriptionItem, PatientInvoice } from '@/types/api';
 import { getApiBaseUrl } from './api-url';
 
 /** Tracks whether a 401 auto-logout is already in progress to prevent multiple redirects */
@@ -176,12 +176,6 @@ export const api = {
         method: 'POST',
         token,
       }),
-  },
-  report: {
-    get: (month: string, token: string) =>
-      apiFetch<{ ok: boolean; report: MonthlyReport }>(`/dietitian/report?month=${month}`, { token }),
-    exportPdfUrl: (month: string) =>
-      `/api/proxy/dietitian/report/export?month=${month}`,
   },
   profile: {
     get: (token: string) =>
@@ -715,118 +709,6 @@ export const api = {
       }>('/referrals/admin/stats', { token }),
   },
 
-  protocols: {
-    list: (token: string, scope?: 'GLOBAL' | 'DIETITIAN') => {
-      const qs = scope ? `?scope=${scope}` : '';
-      return apiFetch<{ ok: boolean; protocols: NutritionProtocol[] }>(`/admin/protocols${qs}`, { token });
-    },
-    getById: (id: string, token: string) =>
-      apiFetch<{ ok: boolean; protocol: NutritionProtocol }>(`/admin/protocols/${id}`, { token }),
-    create: (data: NutritionProtocolCreateData, token: string) =>
-      apiFetch<{ ok: boolean; protocol: NutritionProtocol }>('/admin/protocols', {
-        method: 'POST',
-        body: JSON.stringify(data),
-        token,
-      }),
-    update: (id: string, data: Partial<NutritionProtocolCreateData> & { isActive?: boolean; isDefault?: boolean }, token: string) =>
-      apiFetch<{ ok: boolean; protocol: NutritionProtocol }>(`/admin/protocols/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(data),
-        token,
-      }),
-    toggle: (id: string, isActive: boolean, token: string) =>
-      apiFetch<{ ok: boolean; protocol: NutritionProtocol }>(`/admin/protocols/${id}/toggle`, {
-        method: 'PATCH',
-        body: JSON.stringify({ isActive }),
-        token,
-      }),
-    listAssigned: (id: string, token: string) =>
-      apiFetch<{ ok: boolean; assigned: ProtocolAssignedDietitian[] }>(`/admin/protocols/${id}/dietitians`, { token }),
-    assign: (id: string, dietitianId: string, token: string) =>
-      apiFetch<{ ok: boolean }>(`/admin/protocols/${id}/assign`, {
-        method: 'POST',
-        body: JSON.stringify({ dietitianId }),
-        token,
-      }),
-    unassign: (id: string, dietitianId: string, token: string) =>
-      apiFetch<{ ok: boolean }>(`/admin/protocols/${id}/assign/${dietitianId}`, {
-        method: 'DELETE',
-        token,
-      }),
-  },
-  dietitianProtocol: {
-    listMy: (token: string) =>
-      apiFetch<{ ok: boolean; protocols: DietitianProtocolWithAccess[] }>('/dietitian/protocol', { token }),
-    setActive: (protocolId: string, token: string) =>
-      apiFetch<{ ok: boolean }>('/dietitian/protocol/active', {
-        method: 'PATCH',
-        body: JSON.stringify({ protocolId }),
-        token,
-      }),
-    matchedProtocols: (patientId: string, token: string) =>
-      apiFetch<MatchedProtocolsResponse>(`/interviews/matched-protocols/${patientId}`, { token }),
-  },
-  protocolTriggers: {
-    list: (params: { field?: string; protocolId?: string; priority?: number; active?: boolean }, token: string) => {
-      const qs = new URLSearchParams();
-      if (params.field) qs.set('field', params.field);
-      if (params.protocolId) qs.set('protocolId', params.protocolId);
-      if (params.priority !== undefined) qs.set('priority', String(params.priority));
-      if (params.active !== undefined) qs.set('active', String(params.active));
-      const q = qs.toString();
-      return apiFetch<{ ok: boolean; triggers: ProtocolTrigger[] }>(`/admin/protocol-triggers${q ? `?${q}` : ''}`, { token });
-    },
-    create: (data: ProtocolTriggerCreateData, token: string) =>
-      apiFetch<{ ok: boolean; trigger: ProtocolTrigger }>('/admin/protocol-triggers', { method: 'POST', body: JSON.stringify(data), token }),
-    update: (id: string, data: Partial<ProtocolTriggerCreateData>, token: string) =>
-      apiFetch<{ ok: boolean; trigger: ProtocolTrigger }>(`/admin/protocol-triggers/${id}`, { method: 'PATCH', body: JSON.stringify(data), token }),
-    toggle: (id: string, isActive: boolean, token: string) =>
-      apiFetch<{ ok: boolean; trigger: ProtocolTrigger }>(`/admin/protocol-triggers/${id}/toggle`, { method: 'PATCH', body: JSON.stringify({ isActive }), token }),
-    remove: (id: string, token: string) =>
-      apiFetch<{ ok: boolean }>(`/admin/protocol-triggers/${id}`, { method: 'DELETE', token }),
-  },
-  protocolConflicts: {
-    list: (params: { severity?: 'BLOCK' | 'WARN'; active?: boolean }, token: string) => {
-      const qs = new URLSearchParams();
-      if (params.severity) qs.set('severity', params.severity);
-      if (params.active !== undefined) qs.set('active', String(params.active));
-      const q = qs.toString();
-      return apiFetch<{ ok: boolean; conflicts: ProtocolConflict[] }>(`/admin/protocol-conflicts${q ? `?${q}` : ''}`, { token });
-    },
-    create: (data: ProtocolConflictCreateData, token: string) =>
-      apiFetch<{ ok: boolean; conflict: ProtocolConflict }>('/admin/protocol-conflicts', { method: 'POST', body: JSON.stringify(data), token }),
-    update: (id: string, data: Partial<ProtocolConflictCreateData>, token: string) =>
-      apiFetch<{ ok: boolean; conflict: ProtocolConflict }>(`/admin/protocol-conflicts/${id}`, { method: 'PATCH', body: JSON.stringify(data), token }),
-    toggle: (id: string, isActive: boolean, token: string) =>
-      apiFetch<{ ok: boolean; conflict: ProtocolConflict }>(`/admin/protocol-conflicts/${id}/toggle`, { method: 'PATCH', body: JSON.stringify({ isActive }), token }),
-    remove: (id: string, token: string) =>
-      apiFetch<{ ok: boolean }>(`/admin/protocol-conflicts/${id}`, { method: 'DELETE', token }),
-  },
-  clinicalRules: {
-    list: (params: { type?: ClinicalRuleType; severity?: RuleSeverity; isActive?: boolean; category?: string; search?: string; page?: number; limit?: number }, token: string) => {
-      const qs = new URLSearchParams();
-      if (params.type) qs.set('type', params.type);
-      if (params.severity) qs.set('severity', params.severity);
-      if (params.isActive !== undefined) qs.set('isActive', String(params.isActive));
-      if (params.category) qs.set('category', params.category);
-      if (params.search) qs.set('search', params.search);
-      if (params.page) qs.set('page', String(params.page));
-      if (params.limit) qs.set('limit', String(params.limit));
-      return apiFetch<{ rules: ClinicalRule[]; total: number; page: number; limit: number }>(`/admin/clinical-rules?${qs}`, { token });
-    },
-    getById: (id: string, token: string) =>
-      apiFetch<ClinicalRule>(`/admin/clinical-rules/${id}`, { token }),
-    create: (data: Record<string, unknown>, token: string) =>
-      apiFetch<ClinicalRule>('/admin/clinical-rules', { method: 'POST', body: JSON.stringify(data), token }),
-    update: (id: string, data: Record<string, unknown>, token: string) =>
-      apiFetch<ClinicalRule>(`/admin/clinical-rules/${id}`, { method: 'PATCH', body: JSON.stringify(data), token }),
-    toggleActive: (id: string, isActive: boolean, token: string) =>
-      apiFetch<ClinicalRule>(`/admin/clinical-rules/${id}/toggle`, { method: 'PATCH', body: JSON.stringify({ isActive }), token }),
-    remove: (id: string, token: string) =>
-      apiFetch<{ ok: boolean }>(`/admin/clinical-rules/${id}`, { method: 'DELETE', token }),
-    getHistory: (id: string, token: string) =>
-      apiFetch<ClinicalRuleHistory[]>(`/admin/clinical-rules/${id}/history`, { token }),
-  },
 
   // ── Measurements (79.3) ──────────────────────────────────────────────────
 
