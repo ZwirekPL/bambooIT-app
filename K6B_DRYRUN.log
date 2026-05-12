@@ -1,0 +1,37 @@
+═════════════════════════════════════════════════════════
+K6b Rename Patient → Company (frontend) — DRY-RUN
+═════════════════════════════════════════════════════════
+
+Files scanned: 137
+Files modified: 8
+Files with FLAGS (manual review): 0
+Total patterns replaced: 46
+Total flags found: 0
+
+--- Modified files (sorted by change count) ---
+    10 changes  apps/web/src/components/admin/UsersTable.tsx
+     8 changes  apps/web/src/auth.ts
+     8 changes  apps/web/src/__tests__/lib/sentry-scrub.test.ts
+     7 changes  apps/web/src/lib/api.ts
+     7 changes  apps/web/src/types/api.ts
+     2 changes  apps/web/src/components/admin/AdminTestimonials.tsx
+     2 changes  apps/web/src/components/admin/AuditLogTable.tsx
+     2 changes  apps/web/src/types/next-auth.d.ts
+
+--- Pattern counts ---
+    14  B. patientId → companyId (word boundary)
+    11  I. patient.xxx / patient?.xxx → company
+     5  F. patient: { → company: {
+     4  J. patient (standalone) → company
+     3  K. Patient (standalone type) → Company
+     2  C. patient.firstName → company.contactFirstName
+     2  C. patient.lastName → company.contactLastName
+     2  E. : Patient → : Company
+     1  L. 'Pacjent' → 'Klient'
+     1  L. 'Pacjenci' → 'Klienci'
+     1  D. const patient = → const company =
+
+--- FLAGGED files (manual review) ---
+  (none)
+
+DRY-RUN complete. Re-run with --apply to write changes.

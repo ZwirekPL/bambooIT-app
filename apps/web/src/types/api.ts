@@ -16,17 +16,11 @@ export interface User {
 
 // TODO(5c-cleanup): Tenant interface dropped per D-025 (bambooIT is B2B, not SaaS multi-tenant).
 
-export interface Patient {
+export interface Company {
   id: string;
   userId: string;
-  // TODO(5c-cleanup): tenantId dropped per D-025
-  // tenantId: string | null;
-  firstName?: string;
-  lastName?: string;
-  sex?: string;
-  birthYear?: number;
-  heightCm?: number;
-  weightKg?: number;
+  contactFirstName?: string;
+  contactLastName?: string;
   createdAt: string;
   updatedAt: string;
   dietitian?: {
@@ -59,7 +53,7 @@ export type OrderStatus = 'PENDING_PAYMENT' | 'PAID' | 'ACTIVE' | 'COMPLETED' | 
 
 export interface Order {
   id: string;
-  patientId: string;
+  companyId: string;
   productType: ProductType;
   status: OrderStatus;
   createdAt: string;
@@ -106,6 +100,11 @@ export interface Subscription {
   updatedAt: string;
 }
 
+// TODO(K9-cleanup): PatientInvoice — decide drop (diet-specific invoice
+// logic) vs rename to CompanyInvoice (generic invoice for company contact).
+// Verify usage in K9 before action. Currently used by lib/api.ts:171
+// (/orders/my/invoices endpoint) — works as generic invoice shape, so
+// rename to CompanyInvoice is likely the right call.
 export interface PatientInvoice {
   id: string;
   date: string;
@@ -159,13 +158,9 @@ export interface AdminUser {
   subscriptionStatus?: string;
   subscriptionProductType?: string | null;
   subscriptionExpiresAt?: string | null;
-  patient?: {
-    firstName?: string | null;
-    lastName?: string | null;
-    sex?: string | null;
-    birthYear?: number | null;
-    heightCm?: number | null;
-    weightKg?: number | null;
+  company?: {
+    contactFirstName?: string | null;
+    contactLastName?: string | null;
   } | null;
   dietitianProfile?: { code: string } | null;
 }
@@ -242,7 +237,7 @@ export type AlertSeverity = 'critical' | 'high' | 'moderate' | 'info';
 export type AlertType = 'plans_awaiting_review' | 'red_flag_plans' | 'dropout_risk' | 'rapid_weight_loss' | 'micronutrient_deficiency';
 
 export interface DietitianAlertPatient {
-  patientId: string;
+  companyId: string;
   firstName: string | null;
   lastName: string | null;
   detail?: string;
@@ -253,7 +248,7 @@ export interface DietitianAlertPatient {
 // ─── Monthly Report (20.4) ──────────────────────────────────────────────────
 
 export interface PatientReportSummary {
-  patientId: string;
+  companyId: string;
   firstName: string | null;
   lastName: string | null;
   currentWeightKg: number | null;
@@ -297,14 +292,14 @@ export interface TestimonialWithUser extends Testimonial {
   user: {
     id: string;
     email?: string;
-    patient?: { firstName: string | null; lastName: string | null } | null;
+    company?: { contactFirstName: string | null; contactLastName: string | null } | null;
   };
 }
 
 export interface PublicTestimonial extends Testimonial {
   user: {
     id: string;
-    patient?: { firstName: string | null; lastName: string | null } | null;
+    company?: { contactFirstName: string | null; contactLastName: string | null } | null;
   };
 }
 

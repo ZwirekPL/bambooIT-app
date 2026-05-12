@@ -158,8 +158,8 @@ export function AdminTestimonials() {
   };
 
   function getUserName(item: TestimonialWithUser): string {
-    const first = item.user?.patient?.firstName;
-    const last = item.user?.patient?.lastName;
+    const first = item.user?.company?.contactFirstName;
+    const last = item.user?.company?.contactLastName;
     if (first && last) return `${first} ${last}`;
     if (first) return first;
     return item.user?.email ?? '—';

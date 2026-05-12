@@ -50,7 +50,7 @@ describe('scrubEvent', () => {
     const event = makeEvent({
       request: {
         data: {
-          patient: {
+          company: {
             name: 'Jan',
             interview: {
               answers: { diseases: ['diabetes'] },
@@ -61,17 +61,17 @@ describe('scrubEvent', () => {
       },
     });
     const scrubbed = scrubEvent(event);
-    const patient = (scrubbed?.request?.data as { patient: { name: string; interview: Record<string, string> } }).patient;
-    expect(patient.name).toBe('Jan');
-    expect(patient.interview.answers).toBe('[REDACTED]');
-    expect(patient.interview.medicalFlags).toBe('[REDACTED]');
+    const company = (scrubbed?.request?.data as { company: { name: string; interview: Record<string, string> } }).company;
+    expect(company.name).toBe('Jan');
+    expect(company.interview.answers).toBe('[REDACTED]');
+    expect(company.interview.medicalFlags).toBe('[REDACTED]');
   });
 
   it('redacts DietPlan.content and DietitianNote.content', () => {
     const event = makeEvent({
       extra: {
         dietPlan: { id: 'p-1', content: 'plan details...' },
-        note: { content: 'patient has depression' },
+        note: { content: 'company has depression' },
       },
     });
     const scrubbed = scrubEvent(event);

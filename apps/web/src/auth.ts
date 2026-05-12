@@ -61,7 +61,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             email: data.user.email,
             name: data.user.firstName ?? data.user.email,
             role: data.user.role,
-            patientId: data.user.patientId ?? null,
+            companyId: data.user.companyId ?? null,
             backendToken: data.token,
           };
         } catch (err) {
@@ -92,19 +92,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     ...authConfig.callbacks,
     async jwt({ token, user }) {
       if (user) {
-        const u = user as { role?: string; patientId?: string | null; backendToken?: string };
+        const u = user as { role?: string; companyId?: string | null; backendToken?: string };
         token.role = u.role;
-        token.patientId = u.patientId ?? null;
+        token.companyId = u.companyId ?? null;
         token.backendToken = u.backendToken;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        const t = token as { sub?: string; role?: string; patientId?: string | null };
+        const t = token as { sub?: string; role?: string; companyId?: string | null };
         if (t.sub) session.user.id = t.sub;
         session.user.role = t.role;
-        session.user.patientId = t.patientId ?? null;
+        session.user.companyId = t.companyId ?? null;
         // NOTE: backendToken is intentionally NOT exposed via session.user.
         // It stays in the encrypted JWT cookie and is read server-side only
         // via getBackendToken() in src/lib/server-token.ts. Client API calls

@@ -3,7 +3,7 @@
  * Uses NEXT_PUBLIC_API_URL (client + server) for all requests.
  * Server-only auth requests use API_URL env variable.
  */
-import type { Patient, Order, ProductType, CheckoutProductType, Subscription, AdminStats, UserRole, User, AdminUser, AuditLog, BlogPost, BlogListItem, BlogCategoryConfig, AccessStatus, Testimonial, TestimonialWithUser, PublicTestimonial, NotificationPreferences, SubscriptionStats, SubscriptionItem, PatientInvoice } from '@/types/api';
+import type { Company, Order, ProductType, CheckoutProductType, Subscription, AdminStats, UserRole, User, AdminUser, AuditLog, BlogPost, BlogListItem, BlogCategoryConfig, AccessStatus, Testimonial, TestimonialWithUser, PublicTestimonial, NotificationPreferences, SubscriptionStats, SubscriptionItem, PatientInvoice } from '@/types/api';
 import { getApiBaseUrl } from './api-url';
 
 /** Tracks whether a 401 auto-logout is already in progress to prevent multiple redirects */
@@ -135,7 +135,7 @@ export const api = {
       data: { productType: CheckoutProductType },
       token: string
     ) =>
-      apiFetch<{ ok: boolean; order: Order; patientId: string }>('/orders/my', {
+      apiFetch<{ ok: boolean; order: Order; companyId: string }>('/orders/my', {
         method: 'POST',
         body: JSON.stringify(data),
         token,
@@ -179,12 +179,12 @@ export const api = {
   },
   profile: {
     get: (token: string) =>
-      apiFetch<{ ok: boolean; patient: Patient }>('/profile', { token }),
+      apiFetch<{ ok: boolean; company: Company }>('/profile', { token }),
     update: (
-      data: Partial<Pick<Patient, 'firstName' | 'lastName' | 'sex' | 'birthYear' | 'heightCm' | 'weightKg'>> & { dietitianCode?: string; unlinkDietitian?: boolean },
+      data: Partial<Pick<Company, 'contactFirstName' | 'contactLastName'>> & { dietitianCode?: string; unlinkDietitian?: boolean },
       token: string
     ) =>
-      apiFetch<{ ok: boolean; patient: Patient }>('/profile', {
+      apiFetch<{ ok: boolean; company: Company }>('/profile', {
         method: 'PATCH',
         body: JSON.stringify(data),
         token,

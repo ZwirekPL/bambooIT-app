@@ -91,7 +91,7 @@ function UserDetailDialog({
   if (!user) return null;
 
   const name =
-    [user.patient?.firstName, user.patient?.lastName].filter(Boolean).join(' ') || '—';
+    [user.company?.contactFirstName, user.company?.contactLastName].filter(Boolean).join(' ') || '—';
 
   return (
     <Dialog open={open} onOpenChange={(v: boolean) => !v && onClose()}>
@@ -105,16 +105,6 @@ function UserDetailDialog({
           <Row label={t('fieldName')} value={name} />
           {user.dietitianProfile && (
             <Row label={t('fieldCode')} value={user.dietitianProfile.code} />
-          )}
-          {user.patient?.sex && <Row label={t('fieldSex')} value={user.patient.sex} />}
-          {user.patient?.birthYear && (
-            <Row label={t('fieldBirthYear')} value={String(user.patient.birthYear)} />
-          )}
-          {user.patient?.heightCm && (
-            <Row label={t('fieldHeight')} value={`${user.patient.heightCm} cm`} />
-          )}
-          {user.patient?.weightKg && (
-            <Row label={t('fieldWeight')} value={`${user.patient.weightKg} kg`} />
           )}
           <Row
             label={t('fieldVerified')}

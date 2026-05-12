@@ -8,7 +8,7 @@ declare module 'next-auth' {
     user: DefaultSession['user'] & {
       id?: string;
       role?: string;
-      patientId?: string | null;
+      companyId?: string | null;
     };
   }
 }
@@ -16,7 +16,7 @@ declare module 'next-auth' {
 declare module 'next-auth/jwt' {
   interface JWT {
     role?: string;
-    patientId?: string | null;
+    companyId?: string | null;
     // backendToken stays in JWT (server-side only, read via getBackendToken)
     backendToken?: string;
   }

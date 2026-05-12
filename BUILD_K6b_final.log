@@ -1,0 +1,96 @@
+
+> bambooit@1.0.0 build
+> npm run generate --workspace=database && npm run build --workspace=database && npm run build --workspace=backend && npm run build --workspace=web
+
+
+> database@1.0.0 generate
+> prisma generate
+
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+✔ Generated Prisma Client (v6.19.2) to .\..\..\node_modules\@prisma\client in 107ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+
+
+> database@1.0.0 build
+> tsc -p tsconfig.json
+
+
+> backend@1.0.0 build
+> tsc
+
+
+> web@0.1.0 build
+> next build
+
+[@sentry/nextjs] ACTION REQUIRED: To instrument navigations, the Sentry SDK requires you to export an `onRouterTransitionStart` hook from your `instrumentation-client.(js|ts)` file. You can do so by adding `export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;` to the file.
+   ▲ Next.js 15.5.12
+   - Experiments (use with caution):
+     · clientTraceMetadata
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 12.6s
+   Linting and checking validity of types ...
+   Collecting page data ...
+ ⚠ Using edge runtime on a page currently disables static generation for that page
+   Generating static pages (0/10) ...
+   Generating static pages (2/10) 
+   Generating static pages (4/10) 
+   Generating static pages (7/10) 
+ ✓ Generating static pages (10/10)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                   Size  First Load JS  Revalidate  Expire
+┌ ○ /                                        356 B         220 kB
+├ ○ /_not-found                            1.16 kB         221 kB
+├ ƒ /[locale]                                357 B         220 kB
+├ ƒ /[locale]/admin                          356 B         220 kB
+├ ƒ /[locale]/admin/audit-log              7.99 kB         292 kB
+├ ƒ /[locale]/admin/bezpieczenstwo           355 B         220 kB
+├ ƒ /[locale]/admin/blog                   6.11 kB         246 kB
+├ ƒ /[locale]/admin/blog/[id]                380 B         262 kB
+├ ƒ /[locale]/admin/blog/nowy                372 B         258 kB
+├ ƒ /[locale]/admin/email-kampanie         1.66 kB         228 kB
+├ ƒ /[locale]/admin/ksiegowosc             7.93 kB         285 kB
+├ ƒ /[locale]/admin/opinie                  5.2 kB         286 kB
+├ ƒ /[locale]/admin/platnosci              9.38 kB         290 kB
+├ ƒ /[locale]/admin/subskrypcje            6.57 kB         287 kB
+├ ƒ /[locale]/admin/ustawienia             4.07 kB         255 kB
+├ ƒ /[locale]/admin/uzytkownicy            20.4 kB         304 kB
+├ ƒ /[locale]/blog                         3.77 kB         256 kB
+├ ƒ /[locale]/blog/[slug]                  3.46 kB         255 kB
+├ ƒ /[locale]/blog/[slug]/opengraph-image    355 B         220 kB
+├ ƒ /[locale]/dokumenty-prawne             49.7 kB         296 kB
+├ ƒ /[locale]/rejestracja                  3.28 kB         266 kB
+├ ƒ /[locale]/resetuj-haslo                5.83 kB         265 kB
+├ ƒ /[locale]/zaloguj                      2.83 kB         269 kB
+├ ƒ /[locale]/zamow                          356 B         220 kB
+├ ƒ /[locale]/zamowienie/anulowano         2.96 kB         253 kB
+├ ƒ /[locale]/zamowienie/sukces            4.07 kB         261 kB
+├ ƒ /[locale]/zapomnialem-hasla             5.1 kB         264 kB
+├ ƒ /[locale]/zweryfikuj-email             3.97 kB         263 kB
+├ ƒ /api/auth/[...nextauth]                  356 B         220 kB
+├ ƒ /api/proxy/[...path]                     356 B         220 kB
+├ ƒ /llms-full.txt                           355 B         220 kB
+├ ƒ /llms.txt                                356 B         220 kB
+├ ○ /manifest.webmanifest                    356 B         220 kB
+├ ○ /robots.txt                              356 B         220 kB
+└ ○ /sitemap.xml                             356 B         220 kB          1h      1y
++ First Load JS shared by all               220 kB
+  ├ chunks/1199-4af07211d7d0022b.js         123 kB
+  ├ chunks/59c6eb5a-670d3ce4b0b65760.js    38.5 kB
+  ├ chunks/87c73c54-b57f94adb6321e84.js    54.4 kB
+  └ other shared chunks (total)            3.73 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
