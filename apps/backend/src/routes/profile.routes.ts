@@ -14,8 +14,9 @@ profileRouter.get('/consents/history', dsarController.getConsentHistory);
 profileRouter.post('/consents/:type/revoke', dsarController.revokeConsent);
 profileRouter.post('/consents/cookies', dsarController.syncCookieConsents);
 
-profileRouter.get('/', profileController.getMyProfile);
-profileRouter.patch('/', profileController.updateMyProfile);
+// TODO(2c-cleanup): handlers commented in profile.controller — patient.service dropped. Rebuild as company profile in fazie 4.
+// profileRouter.get('/', profileController.getMyProfile);
+// profileRouter.patch('/', profileController.updateMyProfile);
 profileRouter.get('/dietitian', profileController.getDietitianProfile);
 profileRouter.patch('/dietitian', profileController.updateDietitianProfile);
 profileRouter.patch('/password', profileController.changePassword);

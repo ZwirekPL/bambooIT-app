@@ -17,14 +17,10 @@ import { checkoutRouter } from './routes/checkout.routes';
 import { blogRouter } from './routes/blog.routes';
 import { testimonialRouter } from './routes/testimonial.routes';
 import { referralRouter } from './routes/referral.routes';
-import { emailCampaignRouter } from './routes/emailCampaign.routes';
 import { errorHandler } from './middleware/errorHandler';
 import { requireAuth } from './middleware/auth';
 import { globalLimiter, authLimiter, userLimiter } from './middleware/rateLimiters';
 import { csrfProtection } from './middleware/csrf';
-import { startDietGenerateWorker } from './workers/dietGenerate.worker';
-import { startDietRepairWorker } from './workers/dietRepair.worker';
-import { startDietPartialWorker } from './workers/dietPartial.worker';
 import {
   scheduleAuditRetention,
   scheduleUserCleanup,
@@ -44,7 +40,6 @@ const REQUIRED_ENV = [
   'SMTP_FROM',
   'APP_URL',
   'REDIS_URL',
-  'OPENAI_API_KEY',
 ] as const;
 for (const key of REQUIRED_ENV) {
   if (!process.env[key]) {
@@ -151,15 +146,11 @@ app.use('/subscriptions', requireAuth('ADMIN', 'DIETITIAN'), userLimiter, subscr
 app.use('/posts', globalLimiter, blogRouter);
 app.use('/testimonials', globalLimiter, testimonialRouter);
 app.use('/referrals', requireAuth(), userLimiter, referralRouter);
-app.use('/email-campaigns', emailCampaignRouter);
 
 // Global error handler — must be last
 app.use(errorHandler);
 
-// ─── Start BullMQ workers ────────────────────────────────────────────────────
-startDietGenerateWorker();
-startDietRepairWorker();
-startDietPartialWorker();
+// ─── Start maintenance worker (diet workers removed in 2c) ──────────────────
 startMaintenanceWorker();
 
 // Schedule cron-like jobs (idempotent — safe to call on every boot).

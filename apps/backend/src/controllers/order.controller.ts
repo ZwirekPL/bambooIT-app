@@ -5,7 +5,8 @@ import { prisma } from '@db';
 import { apiError } from '../utils/errors';
 import * as orderService from '../services/order.service';
 import { isStripeConfigured, createPortalSession } from '../services/stripe.service';
-import { checkAccess } from '../services/paywall.service';
+// TODO(2c-cleanup): paywall.service dropped — diet metrics in AccessStatus. bambooIT gating rebuild w fazie 4.
+// import { checkAccess } from '../services/paywall.service';
 
 const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2026-02-25.clover' })
@@ -138,16 +139,10 @@ export async function listMyOrders(req: Request, res: Response, next: NextFuncti
     const orders = await orderService.listMyOrders(userId);
     const subscription = await orderService.getMySubscription(userId);
 
-    // 61.1: Include usage limits
-    const access = await checkAccess(userId);
-    const limits = access.planLimits && access.weeklyUsage ? {
-      dietsPerWeek: access.planLimits.maxDietsPerWeek,
-      dietsUsedThisWeek: access.weeklyUsage.dietsGenerated,
-      dietsRemaining: Math.max(0, access.planLimits.maxDietsPerWeek - access.weeklyUsage.dietsGenerated),
-      swapsPerWeek: access.planLimits.maxSwapsPerWeek,
-      swapsUsedThisWeek: access.weeklyUsage.swapsUsed,
-      swapsRemaining: Math.max(0, access.planLimits.maxSwapsPerWeek - access.weeklyUsage.swapsUsed),
-    } : null;
+    // TODO(2c-cleanup): paywall.service dropped — diet metrics (dietsPerWeek/swapsPerWeek). Rebuild in fazie 4.
+    // const access = await checkAccess(userId);
+    // const limits = access.planLimits && access.weeklyUsage ? { ... } : null;
+    const limits = null;
 
     return res.json({
       ok: true,

@@ -2,105 +2,30 @@ import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { apiError } from '../utils/errors';
 import { passwordSchema } from '../utils/validation';
-import * as patientService from '../services/patient.service';
+// TODO(2c-cleanup): patient.service dropped — getMyProfile/updateMyProfile handlers commented below. Rebuild as company profile in fazie 4.
+// import * as patientService from '../services/patient.service';
 import * as profileService from '../services/profile.service';
 import { logAudit } from '../services/audit.service';
 import { cacheGet, cacheSet, cacheDel } from '../utils/cache';
 
 const PROFILE_TTL = 60;
 
-const updateSchema = z
-  .object({
-    firstName: z.string().min(1).max(100),
-    lastName: z.string().min(1).max(100),
-    sex: z.string().min(1).max(20),
-    birthYear: z.number().int().min(1900).max(new Date().getFullYear()),
-    heightCm: z.number().int().min(50).max(300),
-    weightKg: z.number().min(10).max(500),
-    dietitianCode: z.string().min(1).max(20),
-    unlinkDietitian: z.literal(true),
-  })
-  .partial();
-
-export async function getMyProfile(req: Request, res: Response, next: NextFunction) {
-  const userId = req.user!.sub;
-  const cacheKey = `cache:profile:${userId}`;
-
-  try {
-    const cached = await cacheGet(cacheKey);
-    if (cached) {
-      return res.json({ ok: true, patient: cached });
-    }
-
-    const patient = await patientService.getPatientByUserId(userId);
-    await cacheSet(cacheKey, patient, PROFILE_TTL);
-    logAudit({
-      userId,
-      action: 'VIEW_PATIENT',
-      resourceType: 'PATIENT',
-      resourceId: patient.id,
-      ip: req.ip,
-    });
-    return res.json({ ok: true, patient });
-  } catch (err) {
-    next(err);
-  }
-}
-
-export async function updateMyProfile(req: Request, res: Response, next: NextFunction) {
-  const bodyParsed = updateSchema.safeParse(req.body);
-  if (!bodyParsed.success) {
-    return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid request body'));
-  }
-
-  if (Object.keys(bodyParsed.data).length === 0) {
-    return res.status(400).json(apiError('VALIDATION_ERROR', 'No fields to update'));
-  }
-
-  // Prevent setting both dietitianCode and unlinkDietitian
-  if (bodyParsed.data.dietitianCode && bodyParsed.data.unlinkDietitian) {
-    return res.status(400).json(apiError('VALIDATION_ERROR', 'Cannot link and unlink dietitian at the same time'));
-  }
-
-  const userId = req.user!.sub;
-
-  try {
-    const existing = await patientService.getPatientByUserId(userId);
-
-    // Handle dietitian code linking / unlinking
-    const { dietitianCode, unlinkDietitian, ...profileData } = bodyParsed.data;
-
-    let patient;
-    if (unlinkDietitian) {
-      patient = await patientService.unlinkDietitian(existing.id);
-    } else if (dietitianCode) {
-      patient = await patientService.linkDietitianByCode(existing.id, dietitianCode);
-    }
-
-    // Update profile fields if any
-    if (Object.keys(profileData).length > 0) {
-      patient = await patientService.updatePatient(existing.id, profileData, undefined, req.user!.role);
-    }
-
-    if (!patient) {
-      // Only dietitianCode/unlinkDietitian was sent, re-fetch
-      patient = await patientService.getPatientByUserId(userId);
-    }
-
-    await cacheDel(`cache:profile:${userId}`);
-    await cacheDel(`cache:patient:${existing.id}`);
-    logAudit({
-      userId,
-      action: 'UPDATE_PATIENT',
-      resourceType: 'PATIENT',
-      resourceId: existing.id,
-      ip: req.ip,
-    });
-    return res.json({ ok: true, patient });
-  } catch (err) {
-    next(err);
-  }
-}
+// TODO(2c-cleanup): patient.service dropped — handlers below commented. Rebuild as company profile in fazie 4.
+// const updateSchema = z
+//   .object({
+//     firstName: z.string().min(1).max(100),
+//     lastName: z.string().min(1).max(100),
+//     sex: z.string().min(1).max(20),
+//     birthYear: z.number().int().min(1900).max(new Date().getFullYear()),
+//     heightCm: z.number().int().min(50).max(300),
+//     weightKg: z.number().min(10).max(500),
+//     dietitianCode: z.string().min(1).max(20),
+//     unlinkDietitian: z.literal(true),
+//   })
+//   .partial();
+//
+// export async function getMyProfile(req: Request, res: Response, next: NextFunction) { ... patientService.getPatientByUserId ... }
+// export async function updateMyProfile(req: Request, res: Response, next: NextFunction) { ... patientService.linkDietitianByCode / unlinkDietitian / updatePatient ... }
 
 const changePasswordSchema = z.object({
   oldPassword: z.string().min(1),
