@@ -249,8 +249,9 @@ export async function getStats() {
     plansGenerated,
     plansReviewed,
     plansSent,
-    totalRecipes,
-    recipesNeedingWork,
+    // TODO(5a-cleanup): prisma.recipe dropped in K5a
+    // totalRecipes,
+    // recipesNeedingWork,
   ] = await prisma.$transaction([
     prisma.user.count(),
     prisma.user.count({ where: { deletedAt: null } }),
@@ -261,8 +262,9 @@ export async function getStats() {
     prisma.dietPlan.count({ where: { status: 'GENERATED' } }),
     prisma.dietPlan.count({ where: { status: 'REVIEWED' } }),
     prisma.dietPlan.count({ where: { status: 'SENT' } }),
-    prisma.recipe.count(),
-    prisma.recipe.count({ where: { qualityScore: { lt: 40 } } }),
+    // TODO(5a-cleanup): prisma.recipe dropped in K5a
+    // prisma.recipe.count(),
+    // prisma.recipe.count({ where: { qualityScore: { lt: 40 } } }),
   ]);
 
   return {
@@ -278,10 +280,8 @@ export async function getStats() {
       total: totalDietPlans,
       byStatus: { GENERATED: plansGenerated, REVIEWED: plansReviewed, SENT: plansSent },
     },
-    recipes: {
-      total: totalRecipes,
-      needingWork: recipesNeedingWork,
-    },
+    // TODO(5a-cleanup): prisma.recipe dropped in K5a
+    // recipes: { total: totalRecipes, needingWork: recipesNeedingWork },
   };
 }
 
@@ -291,14 +291,16 @@ export async function getActionItems() {
   const [
     pendingTestimonials,
     pendingConsultations,
-    recipesNeedingWork,
+    // TODO(5a-cleanup): prisma.recipe dropped in K5a
+    // recipesNeedingWork,
     lockedAccounts,
   ] = await Promise.all([
     prisma.testimonial.count({ where: { status: 'PENDING' } }),
     prisma.order.count({
       where: { productType: 'CONSULTATION', status: 'PAID' },
     }),
-    prisma.recipe.count({ where: { qualityScore: { lt: 40 } } }),
+    // TODO(5a-cleanup): prisma.recipe dropped in K5a
+    // prisma.recipe.count({ where: { qualityScore: { lt: 40 } } }),
     prisma.auditLog.count({
       where: { action: 'ACCOUNT_LOCKED', createdAt: { gte: yesterday } },
     }).catch(() => 0),
@@ -307,7 +309,8 @@ export async function getActionItems() {
   return {
     pendingTestimonials,
     pendingConsultations,
-    recipesNeedingWork,
+    // TODO(5a-cleanup): prisma.recipe dropped in K5a
+    // recipesNeedingWork,
     lockedAccounts,
   };
 }

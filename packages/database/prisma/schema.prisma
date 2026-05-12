@@ -99,144 +99,11 @@ enum DietType {
 
 // ─── Food Database Enums ──────────────────────────────────────────────────────
 
-enum FoodState {
-  RAW
-  COOKED
-  BAKED
-  FRIED
-  GRILLED
-  STEAMED
-  DRIED
-  FROZEN
-  CANNED
-  SMOKED
-  FERMENTED
-  PICKLED
-  PROCESSED
-  RECONSTITUTED
-}
-
-enum FodmapLevel {
-  LOW
-  MODERATE
-  HIGH
-  UNKNOWN
-}
-
-enum PriceCategory {
-  BUDGET
-  STANDARD
-  PREMIUM
-}
-
-enum ProcessingLevel {
-  UNPROCESSED // group 1 NOVA
-  MINIMALLY_PROCESSED // group 1 NOVA
-  PROCESSED_INGREDIENT // group 2 NOVA
-  PROCESSED // group 3 NOVA
-  ULTRA_PROCESSED // group 4 NOVA
-}
-
-enum VerificationStatus {
-  UNVERIFIED
-  AUTO_VERIFIED
-  MANUALLY_VERIFIED
-  REJECTED
-}
-
-enum AllergenPresence {
-  CONTAINS
-  MAY_CONTAIN
-  FREE
-  UNKNOWN
-}
-
-enum DietFlagSource {
-  AUTO_RULE
-  MANUAL
-  HEURISTIC
-  SOURCE_DATA
-}
-
-enum ImportJobStatus {
-  PENDING
-  RUNNING
-  COMPLETED
-  FAILED
-  CANCELLED
-}
-
-enum DataQualitySeverity {
-  INFO
-  WARNING
-  ERROR
-  CRITICAL
-}
-
-enum ReviewItemType {
-  FOOD_PRODUCT
-  RECIPE
-}
-
-enum ReviewItemStatus {
-  PENDING
-  APPROVED
-  REJECTED
-  SKIPPED
-}
-
-enum RecipeDifficulty {
-  EASY
-  MEDIUM
-  HARD
-}
-
-enum RecipeMealType {
-  BREAKFAST
-  SECOND_BREAKFAST
-  LUNCH
-  DINNER
-  SUPPER
-  SNACK
-  DESSERT
-  DRINK
-  SAUCE
-  SIDE_DISH
-}
-
-/// Faza C — czy przepis to samodzielny posiłek czy element składowy.
-/// Solver używa tego pola żeby wiedzieć czy może wybrać przepis solo,
-/// czy musi go uzupełnić o carb_side / veg_side (Faza D).
-enum DishCompleteness {
-  COMPLETE_MEAL  // pełen posiłek — pacjent może to zjeść samodzielnie
-  MAIN_DISH      // białko/mięso, wymaga dodatków (carb + veg dla obiadów)
-  CARB_SIDE      // ziemniaki, kasza, ryż, makaron — tylko jako side
-  VEG_SIDE       // sałatka, surówka, warzywa — tylko jako side
-  COMPONENT      // sos, marynata, polewa, farsz, spread — nigdy solo
-}
-
-/// Faza E — jednostka pola Recipe.servings + nutritionSnapshot.kcal.
-/// Solver używa tego pola żeby właściwie skalować przepis do target kcal.
-/// PER_PORTION (default) — kcal/serving = kcal jednej porcji na talerz
-/// PER_PIECE   — kcal/serving = kcal jednej sztuki (1 naleśnik, 1 placek)
-/// PER_100G    — kcal/serving = kcal 100g produktu (zupy, sosy, napoje)
-enum ServingType {
-  PER_PORTION
-  PER_PIECE
-  PER_100G
-}
-
 // ─── Nutrition Protocols (28.1) ───────────────────────────────────────────────
 
 enum ProtocolScope {
   GLOBAL    // created by ADMIN, visible to all
   DIETITIAN // created by ADMIN, assigned to specific dietitians
-}
-
-enum FoodRestrictionLevel {
-  HARD_BLOCK // treated like allergy — blocks AI, validates output
-  STRONG     // triggers MANUAL_REVIEW_REQUIRED if violated
-  SOFT       // stylistic guideline — only in systemPromptAdditions
 }
 
 enum RecipeComplexity {
@@ -346,9 +213,6 @@ model Patient {
   checkIns         CheckIn[]
   aiUsageLogs      AiUsageLog[]
   dietitianNotes   DietitianNote[]
-  recipeRatings    RecipeRating[]
-  favoriteMeals        FavoriteMeal[]
-  shoppingListChecks   ShoppingListCheck[]
   bodyMeasurements     BodyMeasurement[]
   supplements          SupplementPrescription[]
 
@@ -393,25 +257,6 @@ model AuditLog {
 
 /// Audit trail for BUG-3 ingredient cleanup — every displayName change is logged here
 /// so the operation is reversible per-batch. One row = one mutation (update/split/delete/insert).
-model IngredientRepairLog {
-  id                  String   @id @default(cuid())
-  batchId             String   // groups all mutations applied in a single `apply` run
-  recipeIngredientId  String?  // null when a fresh row was inserted as a result of a split
-  recipeId            String
-  oldDisplayName      String?
-  newDisplayName      String?
-  oldGrams            Decimal? @db.Decimal(10, 2)
-  newGrams            Decimal? @db.Decimal(10, 2)
-  action              String   // 'update' | 'split-into' | 'delete' | 'insert'
-  reason              String   // pattern matched, e.g. 'colon-prefix-list', 'X-lub-Y', 'compound-dish'
-  confidence          String   // 'high' | 'medium' | 'low'
-  createdAt           DateTime @default(now())
-
-  @@index([batchId])
-  @@index([recipeId])
-  @@index([createdAt])
-}
-
 model PasswordResetToken {
   id        String    @id @default(cuid())
   userId    String
@@ -479,7 +324,6 @@ model DietPlan {
   dietitianNotes DietitianNote[]
   protocol       NutritionProtocol? @relation("DietPlanProtocol", fields: [templateId], references: [id])
   aiCostLogs         AiCostLog[]
-  shoppingListChecks ShoppingListCheck[]
 
   @@index([patientId])
   @@index([tenantId])
@@ -580,657 +424,47 @@ model BlogCategoryConfig {
 
 // ─── Food Categories (hierarchical) ──────────────────────────────────────────
 
-model FoodCategory {
-  id          String  @id @default(cuid())
-  name        String // e.g. "Nabiał", "Mięso", "Warzywa"
-  nameEn      String? // English name for mapping to external sources
-  slug        String  @unique
-  parentId    String?
-  sortOrder   Int     @default(0)
-  description String?
-  iconName    String? // for UI rendering
-
-  parent   FoodCategory?  @relation("FoodCategoryTree", fields: [parentId], references: [id])
-  children FoodCategory[] @relation("FoodCategoryTree")
-  products FoodProduct[]
-
-  @@index([parentId])
-  @@index([slug])
-}
-
 // ─── Food Products ───────────────────────────────────────────────────────────
-
-model FoodProduct {
-  id                   String             @id @default(cuid())
-  source               String             @default("manual") // usda | openfoodfacts | manual
-  sourceId             String? // external ID from source database
-  name                 String
-  nameEn               String? // for USDA/international mapping
-  slug                 String             @unique
-  brandId              String?
-  categoryId           String?
-  description          String?            @db.Text
-  state                FoodState          @default(RAW)
-  ediblePortionPercent Decimal?           @db.Decimal(5, 2) // e.g. 85.00 for bananas
-  density_g_per_ml     Decimal?           @db.Decimal(6, 3)
-  defaultServingGrams  Decimal?           @db.Decimal(7, 2)
-  searchableSynonyms   String[] // for search: ["pierś z kurczaka", "filet z kurczaka"]
-  languageCode         String             @default("pl") // ISO 639-1
-  isActive             Boolean            @default(true)
-  qualityScore         Int                @default(0) // 0–100, computed
-  verificationStatus   VerificationStatus @default(UNVERIFIED)
-  verifiedAt           DateTime?
-  verifiedBy           String? // userId of reviewer
-
-  // Professional clinical fields
-  glycemicIndex       Int? // 0–100+
-  glycemicLoadPer100g Decimal?         @db.Decimal(6, 2)
-  fodmapLevel         FodmapLevel?
-  processingLevel     ProcessingLevel?
-  isBabySafe          Boolean?
-  isPregnancySafe     Boolean?
-  isBreastfeedingSafe Boolean?
-  notesClinical       String?          @db.Text
-  notesDietitian      String?          @db.Text
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  brand             FoodBrand?                   @relation(fields: [brandId], references: [id])
-  category          FoodCategory?                @relation(fields: [categoryId], references: [id])
-  nutrients         FoodProductNutrients?
-  allergens         FoodProductAllergen[]
-  dietFlags         FoodProductDietFlag[]
-  aliases           FoodProductAlias[]
-  sourceMeta        FoodProductSourceMeta[]
-  householdMeasures HouseholdMeasure[]
-  recipeIngredients RecipeIngredient[]
-  substitutesFrom   IngredientSubstitutionRule[] @relation("SubstituteFrom")
-  substitutesTo     IngredientSubstitutionRule[] @relation("SubstituteTo")
-
-  @@unique([source, sourceId])
-  @@index([name])
-  @@index([slug])
-  @@index([categoryId])
-  @@index([brandId])
-  @@index([languageCode])
-  @@index([isActive])
-  @@index([verificationStatus])
-  @@index([qualityScore])
-}
 
 // ─── Food Brand ──────────────────────────────────────────────────────────────
 
-model FoodBrand {
-  id        String   @id @default(cuid())
-  name      String
-  slug      String   @unique
-  country   String? // ISO 3166-1 alpha-2
-  logoUrl   String?
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-
-  products FoodProduct[]
-
-  @@index([slug])
-}
-
 // ─── Nutrients (per 100g) ────────────────────────────────────────────────────
-
-model FoodProductNutrients {
-  id            String @id @default(cuid())
-  foodProductId String @unique
-
-  // Macronutrients
-  kcal                 Decimal  @db.Decimal(8, 2)
-  protein_g            Decimal  @db.Decimal(7, 3)
-  fat_g                Decimal  @db.Decimal(7, 3)
-  saturatedFat_g       Decimal? @db.Decimal(7, 3)
-  monounsaturatedFat_g Decimal? @db.Decimal(7, 3)
-  polyunsaturatedFat_g Decimal? @db.Decimal(7, 3)
-  transFat_g           Decimal? @db.Decimal(7, 3)
-  carbs_g              Decimal  @db.Decimal(7, 3)
-  sugars_g             Decimal? @db.Decimal(7, 3)
-  addedSugars_g        Decimal? @db.Decimal(7, 3)
-  fiber_g              Decimal? @db.Decimal(7, 3)
-  starch_g             Decimal? @db.Decimal(7, 3)
-  salt_g               Decimal? @db.Decimal(7, 3)
-
-  // Minerals
-  sodium_mg     Decimal? @db.Decimal(8, 3)
-  potassium_mg  Decimal? @db.Decimal(8, 3)
-  calcium_mg    Decimal? @db.Decimal(8, 3)
-  magnesium_mg  Decimal? @db.Decimal(8, 3)
-  phosphorus_mg Decimal? @db.Decimal(8, 3)
-  iron_mg       Decimal? @db.Decimal(7, 3)
-  zinc_mg       Decimal? @db.Decimal(7, 3)
-  copper_mg     Decimal? @db.Decimal(7, 4)
-  manganese_mg  Decimal? @db.Decimal(7, 4)
-  iodine_ug     Decimal? @db.Decimal(7, 3)
-  selenium_ug   Decimal? @db.Decimal(7, 3)
-  chromium_ug   Decimal? @db.Decimal(7, 3)
-  molybdenum_ug Decimal? @db.Decimal(7, 3)
-
-  // Fat-soluble vitamins
-  vitaminA_ug     Decimal? @db.Decimal(8, 3) // RAE
-  betaCarotene_ug Decimal? @db.Decimal(8, 3)
-  vitaminD_ug     Decimal? @db.Decimal(7, 3)
-  vitaminE_mg     Decimal? @db.Decimal(7, 3) // alpha-tocopherol
-  vitaminK_ug     Decimal? @db.Decimal(7, 3)
-
-  // Water-soluble vitamins
-  vitaminC_mg   Decimal? @db.Decimal(7, 3)
-  vitaminB1_mg  Decimal? @db.Decimal(7, 4) // thiamine
-  vitaminB2_mg  Decimal? @db.Decimal(7, 4) // riboflavin
-  vitaminB3_mg  Decimal? @db.Decimal(7, 3) // niacin NE
-  vitaminB5_mg  Decimal? @db.Decimal(7, 3) // pantothenic acid
-  vitaminB6_mg  Decimal? @db.Decimal(7, 4)
-  folate_ug     Decimal? @db.Decimal(7, 3) // DFE
-  vitaminB12_ug Decimal? @db.Decimal(7, 4)
-  biotin_ug     Decimal? @db.Decimal(7, 3)
-  choline_mg    Decimal? @db.Decimal(7, 3)
-
-  // Other
-  cholesterol_mg Decimal? @db.Decimal(7, 3)
-  water_g        Decimal? @db.Decimal(7, 3)
-  alcohol_g      Decimal? @db.Decimal(7, 3)
-  caffeine_mg    Decimal? @db.Decimal(7, 3)
-  ash_g          Decimal? @db.Decimal(7, 3)
-
-  // Amino acids (nullable, for clinical diets)
-  tryptophan_g    Decimal? @db.Decimal(6, 4)
-  threonine_g     Decimal? @db.Decimal(6, 4)
-  isoleucine_g    Decimal? @db.Decimal(6, 4)
-  leucine_g       Decimal? @db.Decimal(6, 4)
-  lysine_g        Decimal? @db.Decimal(6, 4)
-  methionine_g    Decimal? @db.Decimal(6, 4)
-  phenylalanine_g Decimal? @db.Decimal(6, 4)
-  valine_g        Decimal? @db.Decimal(6, 4)
-  histidine_g     Decimal? @db.Decimal(6, 4)
-
-  // Fatty acids detail
-  omega3_g Decimal? @db.Decimal(7, 4)
-  omega6_g Decimal? @db.Decimal(7, 4)
-  epa_g    Decimal? @db.Decimal(6, 4) // C20:5 n-3
-  dha_g    Decimal? @db.Decimal(6, 4) // C22:6 n-3
-  ala_g    Decimal? @db.Decimal(6, 4) // C18:3 n-3
-
-  // Purines (for gout diets)
-  purines_mg Decimal? @db.Decimal(7, 3)
-
-  // Oxalates (for renal diets)
-  oxalate_mg Decimal? @db.Decimal(7, 3)
-
-  foodProduct FoodProduct @relation(fields: [foodProductId], references: [id], onDelete: Cascade)
-}
 
 // ─── Allergens (EU 14) ───────────────────────────────────────────────────────
 
-model FoodProductAllergen {
-  id             String           @id @default(cuid())
-  foodProductId  String
-  allergenCode   String // gluten | crustaceans | eggs | fish | peanuts | soy | milk | nuts | celery | mustard | sesame | sulphites | lupin | molluscs
-  presence       AllergenPresence @default(UNKNOWN)
-  source         DietFlagSource   @default(AUTO_RULE) // how was this determined
-  confidence     Int              @default(50) // 0–100
-  manualOverride Boolean          @default(false)
-  notes          String?
-
-  foodProduct FoodProduct @relation(fields: [foodProductId], references: [id], onDelete: Cascade)
-
-  @@unique([foodProductId, allergenCode])
-  @@index([foodProductId])
-  @@index([allergenCode])
-}
-
 // ─── Diet Flags ──────────────────────────────────────────────────────────────
-
-model FoodProductDietFlag {
-  id             String         @id @default(cuid())
-  foodProductId  String
-  flagCode       String // vegetarian | vegan | pescatarian | lactoseFree | glutenFree | lowFodmap | lowSodium | lowSugar | lowFat | highProtein | highFiber | ketoCompatible | diabeticFriendly | renalFriendly | liverFriendly | ibsFriendly | pregnancyFriendly | goutFriendly | heartFriendly | pancreasFriendly
-  value          Boolean        @default(true)
-  source         DietFlagSource @default(AUTO_RULE)
-  confidence     Int            @default(50) // 0–100
-  manualOverride Boolean        @default(false)
-  notes          String?
-  computedAt     DateTime       @default(now())
-
-  foodProduct FoodProduct @relation(fields: [foodProductId], references: [id], onDelete: Cascade)
-
-  @@unique([foodProductId, flagCode])
-  @@index([foodProductId])
-  @@index([flagCode])
-  @@index([value])
-}
 
 // ─── Product Aliases (synonyms, translations) ────────────────────────────────
 
-model FoodProductAlias {
-  id            String  @id @default(cuid())
-  foodProductId String
-  alias         String
-  languageCode  String  @default("pl") // ISO 639-1
-  isPrimary     Boolean @default(false)
-
-  foodProduct FoodProduct @relation(fields: [foodProductId], references: [id], onDelete: Cascade)
-
-  @@index([foodProductId])
-  @@index([alias])
-  @@index([languageCode])
-}
-
 // ─── Source Metadata (traceability) ──────────────────────────────────────────
 
-model FoodProductSourceMeta {
-  id            String   @id @default(cuid())
-  foodProductId String
-  source        String // usda | openfoodfacts | manual | nzz | polish_tables
-  sourceId      String? // FDC ID, OFF barcode, etc.
-  sourceUrl     String?
-  sourceLicense String? // public_domain | odbl | cc_by_sa | proprietary
-  sourceVersion String? // e.g. "SR Legacy 2021-10"
-  importedAt    DateTime @default(now())
-  rawData       Json? // original source record for audit
-
-  foodProduct FoodProduct @relation(fields: [foodProductId], references: [id], onDelete: Cascade)
-
-  @@index([foodProductId])
-  @@index([source, sourceId])
-}
-
 // ─── Household Measures ──────────────────────────────────────────────────────
-
-model HouseholdMeasure {
-  id            String  @id @default(cuid())
-  foodProductId String
-  name          String // "łyżka stołowa", "szklanka", "plaster"
-  nameEn        String? // "tablespoon", "glass", "slice"
-  grams         Decimal @db.Decimal(7, 2)
-  source        String  @default("manual") // usda | manual
-  sortOrder     Int     @default(0)
-
-  foodProduct FoodProduct @relation(fields: [foodProductId], references: [id], onDelete: Cascade)
-
-  @@index([foodProductId])
-}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // RECIPES
 // ═══════════════════════════════════════════════════════════════════════════════
 
-model Recipe {
-  id                 String             @id @default(cuid())
-  source             String             @default("manual") // manual | imported | generated
-  sourceId           String?
-  title              String
-  slug               String             @unique
-  description        String?            @db.Text
-  category           String? // "zupy", "sałatki", "dania główne"
-  cuisineType        String? // "polska", "włoska", "azjatycka"
-  mealType           RecipeMealType     @default(LUNCH)
-  difficulty         RecipeDifficulty   @default(MEDIUM)
-  prepTimeMinutes    Int?
-  cookTimeMinutes    Int?
-  totalTimeMinutes   Int?
-  servings           Int                @default(1)
-  servingWeightG     Decimal?           @db.Decimal(7, 2) // final weight per serving
-  yieldWeightG       Decimal?           @db.Decimal(8, 2) // total yield after cooking
-  yieldFactor        Decimal?           @db.Decimal(4, 3) // weight after / weight before cooking
-  tips               String?            @db.Text
-  notesDietitian     String?            @db.Text
-  imageUrl           String?
-  videoUrl           String?
-  sourceUrl          String?            // original recipe URL (for imported recipes)
-  estimatedCost      PriceCategory      @default(STANDARD) // BUDGET | STANDARD | PREMIUM
-  isActive           Boolean            @default(true)
-  qualityScore       Int                @default(0) // 0–100
-  averageRating      Decimal?           @db.Decimal(3, 2) // cached avg 1.00-5.00
-  ratingCount        Int                @default(0) // cached count
-  verificationStatus VerificationStatus @default(UNVERIFIED)
-  mealPrepFriendly   Boolean            @default(false) // 37.7
-  cookingMethod      String?            // 84.3: BAKED, BOILED, FRIED, GRILLED, STEAMED, RAW, OTHER
-  seasons            Int[]              // months 1-12 (1=January, 12=December)
-  tags               String[]
-  languageCode       String             @default("pl")
-  // AI recipe management
-  origin             String             @default("manual") // manual | scraped | ai_generated
-  aiApproved         Boolean            @default(false)    // for ai_generated: true after admin review
-
-  // Faza C — Dish completeness (null = jeszcze nie przeklasyfikowane).
-  // Solver po backfillu filtruje pełne posiłki vs komponenty. Dopóki null,
-  // istniejący filtr po mealType (Faza A) trzyma starą logikę.
-  dishCompleteness         DishCompleteness?
-  // Czy przepis już zawiera ≥100 g warzyw (audit RecipeIngredient/CleanProduct).
-  // Faza D: jeśli main ma true, solver pomija dobieranie veg_side.
-  containsVegetableServing Boolean           @default(false)
-  // Suma gramów warzyw w przepisie (do tie-breakingu i raportu jakości).
-  vegetableWeightG         Int?
-
-  // Faza E — jednostka servings (PER_PORTION default, PER_PIECE dla naleśników/
-  // placek/kotlet jajeczny, PER_100G dla zup/sosów/napojów). Solver używa do
-  // odpowiedniego skalowania (np. 5 naleśników zamiast 17 servings).
-  servingType ServingType @default(PER_PORTION)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  ingredients       RecipeIngredient[]
-  instructionSteps  RecipeInstructionStep[]
-  nutritionSnapshot RecipeNutritionSnapshot?
-  allergens         RecipeAllergen[]
-  dietFlags         RecipeDietFlag[]
-  ratings           RecipeRating[]
-  meals             Meal[]
-
-  @@unique([source, sourceId])
-  @@index([slug])
-  @@index([title])
-  @@index([category])
-  @@index([mealType])
-  @@index([isActive])
-  @@index([qualityScore])
-  @@index([averageRating])
-  @@index([dishCompleteness])
-  @@index([servingType])
-}
-
 // ─── Recipe Ingredients ──────────────────────────────────────────────────────
-
-model RecipeIngredient {
-  id              String  @id @default(cuid())
-  recipeId        String
-  foodProductId   String? // legacy FK — old recipes use this
-  cleanProductId  String? // new FK — new recipes use this
-  sortOrder       Int     @default(0)
-  quantity        Decimal @db.Decimal(8, 3) // numeric quantity (e.g. 2.5)
-  unit            String  @default("g") // g | ml | szt | łyżka | szklanka | etc.
-  grams           Decimal @db.Decimal(7, 2) // always resolved to grams
-  displayName     String? // optional override: "2 ząbki czosnku" instead of "czosnek 6g"
-  isOptional      Boolean @default(false)
-  groupName       String? // "Sos", "Ciasto", "Nadzienie" — for ingredient grouping
-  notes           String? // "drobno posiekany", "obrany"
-
-  // Retention factor for cooked weight (1.0 = no change, 0.7 = 30% weight loss)
-  retentionFactor Decimal? @db.Decimal(4, 3)
-
-  recipe       Recipe        @relation(fields: [recipeId], references: [id], onDelete: Cascade)
-  foodProduct  FoodProduct?  @relation(fields: [foodProductId], references: [id], onDelete: Cascade)
-  cleanProduct CleanProduct? @relation(fields: [cleanProductId], references: [id], onDelete: Cascade)
-
-  @@index([recipeId])
-  @@index([foodProductId])
-  @@index([cleanProductId])
-}
 
 // ─── Recipe Instruction Steps ────────────────────────────────────────────────
 
-model RecipeInstructionStep {
-  id              String  @id @default(cuid())
-  recipeId        String
-  stepNumber      Int
-  instruction     String  @db.Text
-  durationMinutes Int? // how long this step takes
-  phase           String  @default("prep") // "prep" or "cook"
-  imageUrl        String?
-
-  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
-
-  @@unique([recipeId, stepNumber])
-  @@index([recipeId])
-}
-
 // ─── Recipe Nutrition Snapshot ───────────────────────────────────────────────
-
-model RecipeNutritionSnapshot {
-  id         String   @id @default(cuid())
-  recipeId   String   @unique
-  computedAt DateTime @default(now())
-
-  // Per serving values
-  kcal           Decimal  @db.Decimal(8, 2)
-  protein_g      Decimal  @db.Decimal(7, 3)
-  fat_g          Decimal  @db.Decimal(7, 3)
-  saturatedFat_g Decimal? @db.Decimal(7, 3)
-  carbs_g        Decimal  @db.Decimal(7, 3)
-  sugars_g       Decimal? @db.Decimal(7, 3)
-  fiber_g        Decimal? @db.Decimal(7, 3)
-  salt_g         Decimal? @db.Decimal(7, 3)
-
-  // Fat fractions per serving
-  monounsaturatedFat_g Decimal? @db.Decimal(7, 3)
-  polyunsaturatedFat_g Decimal? @db.Decimal(7, 3)
-  transFat_g           Decimal? @db.Decimal(7, 3)
-  omega3_g             Decimal? @db.Decimal(7, 4)
-  omega6_g             Decimal? @db.Decimal(7, 4)
-  epa_g                Decimal? @db.Decimal(6, 4)
-  dha_g                Decimal? @db.Decimal(6, 4)
-  ala_g                Decimal? @db.Decimal(6, 4)
-
-  // Carb fractions per serving
-  starch_g      Decimal? @db.Decimal(7, 3)
-  addedSugars_g Decimal? @db.Decimal(7, 3)
-
-  // Minerals per serving
-  sodium_mg      Decimal? @db.Decimal(8, 3)
-  potassium_mg   Decimal? @db.Decimal(8, 3)
-  calcium_mg     Decimal? @db.Decimal(8, 3)
-  magnesium_mg   Decimal? @db.Decimal(8, 3)
-  phosphorus_mg  Decimal? @db.Decimal(8, 3)
-  iron_mg        Decimal? @db.Decimal(7, 3)
-  zinc_mg        Decimal? @db.Decimal(7, 3)
-  copper_mg      Decimal? @db.Decimal(7, 4)
-  manganese_mg   Decimal? @db.Decimal(7, 4)
-  iodine_ug      Decimal? @db.Decimal(7, 3)
-  selenium_ug    Decimal? @db.Decimal(7, 3)
-  chromium_ug    Decimal? @db.Decimal(7, 3)
-  molybdenum_ug  Decimal? @db.Decimal(7, 3)
-  fluoride_ug    Decimal? @db.Decimal(7, 3)
-  chloride_mg    Decimal? @db.Decimal(8, 3)
-
-  // Fat-soluble vitamins per serving
-  vitaminA_ug    Decimal? @db.Decimal(8, 3)
-  vitaminD_ug    Decimal? @db.Decimal(7, 3)
-  vitaminE_mg    Decimal? @db.Decimal(7, 3)
-  vitaminK_ug    Decimal? @db.Decimal(7, 3)
-
-  // Water-soluble vitamins per serving
-  vitaminC_mg    Decimal? @db.Decimal(7, 3)
-  vitaminB1_mg   Decimal? @db.Decimal(7, 4)
-  vitaminB2_mg   Decimal? @db.Decimal(7, 4)
-  vitaminB3_mg   Decimal? @db.Decimal(7, 3)
-  vitaminB5_mg   Decimal? @db.Decimal(7, 3)
-  vitaminB6_mg   Decimal? @db.Decimal(7, 4)
-  folate_ug      Decimal? @db.Decimal(7, 3)
-  vitaminB12_ug  Decimal? @db.Decimal(7, 4)
-  biotin_ug      Decimal? @db.Decimal(7, 3)
-  choline_mg     Decimal? @db.Decimal(7, 3)
-
-  // Other
-  cholesterol_mg Decimal? @db.Decimal(7, 3)
-
-  // Whole recipe totals
-  totalKcal      Decimal @db.Decimal(9, 2)
-  totalProtein_g Decimal @db.Decimal(8, 3)
-  totalFat_g     Decimal @db.Decimal(8, 3)
-  totalCarbs_g   Decimal @db.Decimal(8, 3)
-
-  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
-}
 
 // ─── Recipe Allergens (computed from ingredients) ────────────────────────────
 
-model RecipeAllergen {
-  id           String           @id @default(cuid())
-  recipeId     String
-  allergenCode String // same codes as FoodProductAllergen
-  presence     AllergenPresence @default(UNKNOWN)
-  computedAt   DateTime         @default(now())
-
-  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
-
-  @@unique([recipeId, allergenCode])
-  @@index([recipeId])
-}
-
 // ─── Recipe Diet Flags (computed from ingredients) ───────────────────────────
-
-model RecipeDietFlag {
-  id         String         @id @default(cuid())
-  recipeId   String
-  flagCode   String // same codes as FoodProductDietFlag
-  value      Boolean        @default(true)
-  source     DietFlagSource @default(AUTO_RULE)
-  confidence Int            @default(50)
-  computedAt DateTime       @default(now())
-
-  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
-
-  @@unique([recipeId, flagCode])
-  @@index([recipeId])
-  @@index([flagCode])
-}
 
 // ─── Recipe Ratings (37.5) ──────────────────────────────────────────────────
 
-model RecipeRating {
-  id         String   @id @default(cuid())
-  recipeId   String
-  patientId  String
-  rating     Int      // 1-5
-  comment    String?  @db.Text
-  source     String   @default("inline") // "checkin" | "inline" | "manual"
-  dietPlanId String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  recipe  Recipe  @relation(fields: [recipeId], references: [id], onDelete: Cascade)
-  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
-
-  @@unique([recipeId, patientId])
-  @@index([recipeId])
-  @@index([patientId])
-}
-
 // ─── Shopping List Checks (63.3) ────────────────────────────────────────────
-
-model ShoppingListCheck {
-  id         String   @id @default(cuid())
-  patientId  String
-  dietPlanId String
-  itemName   String   @db.VarChar(300)
-  checked    Boolean  @default(false)
-  updatedAt  DateTime @updatedAt
-
-  patient  Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  dietPlan DietPlan @relation(fields: [dietPlanId], references: [id], onDelete: Cascade)
-
-  @@unique([patientId, dietPlanId, itemName])
-  @@index([patientId, dietPlanId])
-}
 
 // ─── Favorite Meals (64.2) ──────────────────────────────────────────────────
 
-model FavoriteMeal {
-  id         String   @id @default(cuid())
-  patientId  String
-  recipeName String   @db.VarChar(300)
-  recipeId   String?
-  dietPlanId String?
-  createdAt  DateTime @default(now())
-
-  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
-
-  @@unique([patientId, recipeName])
-  @@index([patientId])
-}
-
 // ─── Ingredient Substitution Rules ───────────────────────────────────────────
-
-model IngredientSubstitutionRule {
-  id               String  @id @default(cuid())
-  fromProductId    String
-  toProductId      String
-  conversionFactor Decimal @db.Decimal(5, 3) // grams ratio: 100g of A → X grams of B
-  notes            String?
-  dietContext      String? // "vegan" | "glutenFree" | "lactoseFree" — when this substitution is relevant
-  isActive         Boolean @default(true)
-
-  fromProduct FoodProduct @relation("SubstituteFrom", fields: [fromProductId], references: [id], onDelete: Cascade)
-  toProduct   FoodProduct @relation("SubstituteTo", fields: [toProductId], references: [id], onDelete: Cascade)
-
-  @@unique([fromProductId, toProductId, dietContext])
-  @@index([fromProductId])
-  @@index([toProductId])
-}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // DATA QUALITY & IMPORT INFRASTRUCTURE
 // ═══════════════════════════════════════════════════════════════════════════════
-
-model ImportJob {
-  id             String          @id @default(cuid())
-  source         String // usda | openfoodfacts | csv | recipe_generator
-  status         ImportJobStatus @default(PENDING)
-  startedAt      DateTime?
-  completedAt    DateTime?
-  totalRecords   Int             @default(0)
-  importedCount  Int             @default(0)
-  skippedCount   Int             @default(0)
-  errorCount     Int             @default(0)
-  duplicateCount Int             @default(0)
-  config         Json? // import configuration / parameters
-  errorLog       Json? // array of { line, error, data }
-  summary        Json? // post-import report
-  createdBy      String? // userId
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-
-  @@index([source])
-  @@index([status])
-  @@index([createdAt])
-}
-
-model DataQualityIssue {
-  id           String              @id @default(cuid())
-  entityType   String // FoodProduct | Recipe
-  entityId     String
-  field        String? // which field has the issue
-  severity     DataQualitySeverity @default(WARNING)
-  issueCode    String // NEGATIVE_VALUE | KCAL_MISMATCH | MISSING_MICRONUTRIENT | SUSPICIOUS_VALUE | DUPLICATE_SUSPECT
-  description  String
-  suggestedFix String?
-  isResolved   Boolean             @default(false)
-  resolvedAt   DateTime?
-  resolvedBy   String? // userId
-  importJobId  String?
-  createdAt    DateTime            @default(now())
-
-  @@index([entityType, entityId])
-  @@index([severity])
-  @@index([isResolved])
-  @@index([issueCode])
-  @@index([importJobId])
-}
-
-model ManualReviewQueue {
-  id          String           @id @default(cuid())
-  itemType    ReviewItemType
-  itemId      String
-  status      ReviewItemStatus @default(PENDING)
-  priority    Int              @default(0) // higher = more urgent
-  reason      String // why this needs review
-  assignedTo  String? // userId
-  reviewNotes String?          @db.Text
-  resolvedAt  DateTime?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-
-  @@index([itemType, status])
-  @@index([status])
-  @@index([priority])
-  @@index([assignedTo])
-}
 
 // ─── Nutrition targets ────────────────────────────────────────────────────────
 
@@ -1293,13 +527,9 @@ model Meal {
   isActive Boolean  @default(true)
   source   String   @default("manual") // manual | seed | import
 
-  // Optional link to a Recipe for full ingredient breakdown
-  recipeId String?
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  recipe        Recipe?        @relation(fields: [recipeId], references: [id])
   templateMeals TemplateMeal[]
 
   @@index([mealType])
@@ -1755,241 +985,19 @@ model UserConsent {
 // CLEAN PRODUCT DATABASE (FAZA 25)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-enum CleanProductType {
-  BASE // from ilewazy + USDA merge
-  RETAIL // from Open Food Facts
-  MANUAL // added by dietitian
-}
-
-enum CleanProductSource {
-  ILEWAZY
-  USDA
-  OPENFOODFACTS
-  MANUAL
-}
-
-enum CleanVerificationStatus {
-  VERIFIED
-  UNVERIFIED
-  FLAGGED
-}
-
 // ─── Clean Product ──────────────────────────────────────────────────────────
-
-model CleanProduct {
-  id            String                  @id @default(cuid())
-  name          String
-  nameEn        String?
-  slug          String                  @unique
-  type          CleanProductType
-  brand         String?
-  barcode       String?
-  category      String // one of 12 Polish categories from ilewazy
-  subcategory   String?
-  description   String?                 @db.Text
-  imageUrl      String?
-
-  // Source traceability
-  sourcePrimary   CleanProductSource
-  sourceSecondary CleanProductSource?
-  sourceUrl       String?
-  sourceId        String? // external ID (USDA FDC ID, OFF barcode, ilewazy ID)
-
-  // Quality
-  qualityScore       Int                     @default(0) // 0–100
-  verificationStatus CleanVerificationStatus @default(UNVERIFIED)
-  hasMicronutrients  Boolean                 @default(false)
-
-  // Clinical (26.C + 26.F)
-  glycemicIndex       Int?
-  glycemicLoadPer100g Decimal?     @db.Decimal(6, 2)
-  fodmapLevel         FodmapLevel?
-
-  // Budget heuristic (37.6)
-  priceCategory        PriceCategory @default(STANDARD)
-  estimatedPricePer100g Decimal?     @db.Decimal(6, 2) // PLN per 100g, null = unknown
-
-  // Retail-specific
-  packageWeightG  Int?
-  servingWeightG  Int?
-
-  // Audit
-  createdByUserId String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  // Relations
-  nutrients         CleanProductNutrients?
-  aminoAcids        CleanProductAminoAcids?
-  bioactives        CleanProductBioactives?
-  portions          CleanProductPortion[]
-  allergens         CleanProductAllergen[]
-  dietFlags         CleanProductDietFlag[]
-  recipeIngredients RecipeIngredient[]
-
-  @@index([name])
-  @@index([category])
-  @@index([type])
-  @@index([verificationStatus])
-  @@index([qualityScore])
-}
 
 // ─── Clean Product Nutrients (per 100g, 1:1) ────────────────────────────────
 
-model CleanProductNutrients {
-  id             String @id @default(cuid())
-  cleanProductId String @unique
-
-  // Macronutrients per 100g
-  kcalPer100g         Decimal  @db.Decimal(8, 2)
-  proteinPer100g      Decimal  @db.Decimal(7, 3)
-  fatPer100g          Decimal  @db.Decimal(7, 3)
-  carbsPer100g        Decimal  @db.Decimal(7, 3)
-  fiberPer100g        Decimal? @db.Decimal(7, 3)
-  sugarsPer100g       Decimal? @db.Decimal(7, 3)
-  saltPer100g         Decimal? @db.Decimal(7, 3)
-  saturatedFatPer100g Decimal? @db.Decimal(7, 3)
-
-  // Fat fractions (26.B)
-  monounsaturatedFatPer100g Decimal? @db.Decimal(7, 3)
-  polyunsaturatedFatPer100g Decimal? @db.Decimal(7, 3)
-  transFatPer100g           Decimal? @db.Decimal(7, 3)
-  omega3Per100g             Decimal? @db.Decimal(7, 4)
-  omega6Per100g             Decimal? @db.Decimal(7, 4)
-  epaPer100g                Decimal? @db.Decimal(6, 4) // C20:5 n-3
-  dhaPer100g                Decimal? @db.Decimal(6, 4) // C22:6 n-3
-  alaPer100g                Decimal? @db.Decimal(6, 4) // C18:3 n-3
-
-  // Carb fractions (26.C)
-  starchPer100g      Decimal? @db.Decimal(7, 3)
-  addedSugarsPer100g Decimal? @db.Decimal(7, 3)
-
-  // Minerals per 100g (nullable — empty for RETAIL products)
-  sodiumMg      Decimal? @db.Decimal(8, 3)
-  potassiumMg   Decimal? @db.Decimal(8, 3)
-  calciumMg     Decimal? @db.Decimal(8, 3)
-  magnesiumMg   Decimal? @db.Decimal(8, 3)
-  phosphorusMg  Decimal? @db.Decimal(8, 3)
-  ironMg        Decimal? @db.Decimal(7, 3)
-  zincMg        Decimal? @db.Decimal(7, 3)
-  copperMg      Decimal? @db.Decimal(7, 4)
-  manganeseMg   Decimal? @db.Decimal(7, 4)
-  iodineUg      Decimal? @db.Decimal(7, 3)
-  seleniumUg    Decimal? @db.Decimal(7, 3)
-  chromiumUg    Decimal? @db.Decimal(7, 3)
-  molybdenumUg  Decimal? @db.Decimal(7, 3)
-  fluorideUg    Decimal? @db.Decimal(7, 3)
-  chlorideMg    Decimal? @db.Decimal(8, 3)
-
-  // Fat-soluble vitamins per 100g
-  vitaminAUg    Decimal? @db.Decimal(8, 3) // RAE
-  vitaminDUg    Decimal? @db.Decimal(7, 3)
-  vitaminEMg    Decimal? @db.Decimal(7, 3) // alpha-tocopherol
-  vitaminKUg    Decimal? @db.Decimal(7, 3)
-
-  // Water-soluble vitamins per 100g
-  vitaminCMg    Decimal? @db.Decimal(7, 3)
-  vitaminB1Mg   Decimal? @db.Decimal(7, 4) // thiamine
-  vitaminB2Mg   Decimal? @db.Decimal(7, 4) // riboflavin
-  vitaminB3Mg   Decimal? @db.Decimal(7, 3) // niacin NE
-  vitaminB5Mg   Decimal? @db.Decimal(7, 3) // pantothenic acid
-  vitaminB6Mg   Decimal? @db.Decimal(7, 4)
-  folateUg      Decimal? @db.Decimal(7, 3) // DFE
-  vitaminB12Ug  Decimal? @db.Decimal(7, 4)
-  biotinUg      Decimal? @db.Decimal(7, 3)
-  cholineMg     Decimal? @db.Decimal(7, 3)
-
-  // Other
-  cholesterolMg Decimal? @db.Decimal(7, 3)
-
-  cleanProduct CleanProduct @relation(fields: [cleanProductId], references: [id], onDelete: Cascade)
-}
-
 // ─── Clean Product Portions (1:N) ───────────────────────────────────────────
-
-model CleanProductPortion {
-  id             String @id @default(cuid())
-  cleanProductId String
-  portionName    String // łyżka, szklanka, szt, plaster, garść, kromka, porcja, opakowanie
-  weightG        Decimal @db.Decimal(7, 2)
-  source         CleanProductSource
-
-  cleanProduct CleanProduct @relation(fields: [cleanProductId], references: [id], onDelete: Cascade)
-
-  @@unique([cleanProductId, portionName])
-  @@index([cleanProductId])
-}
 
 // ─── Clean Product Allergens (1:N) ──────────────────────────────────────────
 
-model CleanProductAllergen {
-  id             String           @id @default(cuid())
-  cleanProductId String
-  allergenCode   String // gluten | crustaceans | eggs | fish | peanuts | soy | milk | nuts | celery | mustard | sesame | sulphites | lupin | molluscs
-  presence       AllergenPresence @default(UNKNOWN)
-  source         DietFlagSource   @default(AUTO_RULE)
-  confidence     Int              @default(50) // 0–100
-
-  cleanProduct CleanProduct @relation(fields: [cleanProductId], references: [id], onDelete: Cascade)
-
-  @@unique([cleanProductId, allergenCode])
-  @@index([cleanProductId])
-  @@index([allergenCode])
-}
-
 // ─── Clean Product Diet Flags (1:N) ─────────────────────────────────────────
-
-model CleanProductDietFlag {
-  id             String         @id @default(cuid())
-  cleanProductId String
-  flagCode       String // vegetarian | vegan | glutenFree | lactoseFree | etc.
-  value          Boolean        @default(true)
-  source         DietFlagSource @default(AUTO_RULE)
-  confidence     Int            @default(50) // 0–100
-  computedAt     DateTime       @default(now())
-
-  cleanProduct CleanProduct @relation(fields: [cleanProductId], references: [id], onDelete: Cascade)
-
-  @@unique([cleanProductId, flagCode])
-  @@index([cleanProductId])
-  @@index([flagCode])
-}
 
 // ─── Clean Product Amino Acids (1:1, 26.D) ──────────────────────────────────
 
-model CleanProductAminoAcids {
-  id             String @id @default(cuid())
-  cleanProductId String @unique
-
-  tryptophanPer100g    Decimal? @db.Decimal(6, 4)
-  threoninePer100g     Decimal? @db.Decimal(6, 4)
-  isoleucinePer100g    Decimal? @db.Decimal(6, 4)
-  leucinePer100g       Decimal? @db.Decimal(6, 4)
-  lysinePer100g        Decimal? @db.Decimal(6, 4)
-  methioninePer100g    Decimal? @db.Decimal(6, 4)
-  phenylalaninePer100g Decimal? @db.Decimal(6, 4)
-  valinePer100g        Decimal? @db.Decimal(6, 4)
-  histidinePer100g     Decimal? @db.Decimal(6, 4)
-
-  cleanProduct CleanProduct @relation(fields: [cleanProductId], references: [id], onDelete: Cascade)
-}
-
 // ─── Clean Product Bioactives (1:1, 26.E) ───────────────────────────────────
-
-model CleanProductBioactives {
-  id             String @id @default(cuid())
-  cleanProductId String @unique
-
-  purinesMg          Decimal? @db.Decimal(7, 3)
-  oxalateMg          Decimal? @db.Decimal(7, 3)
-  caffeineMg         Decimal? @db.Decimal(7, 3)
-  polyphenolsMg      Decimal? @db.Decimal(7, 3)
-  betaCaroteneUg     Decimal? @db.Decimal(8, 3)
-  lycopeneUg         Decimal? @db.Decimal(8, 3)
-  luteinZeaxanthinUg Decimal? @db.Decimal(8, 3)
-
-  cleanProduct CleanProduct @relation(fields: [cleanProductId], references: [id], onDelete: Cascade)
-}
 
 // ─── Nutrition Protocols (28.1) ───────────────────────────────────────────────
 

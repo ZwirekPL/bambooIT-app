@@ -111,78 +111,18 @@ adminRouter.delete('/posts/:id', blogController.adminDeletePost);
 // adminRouter.patch('/recipes/:id', recipeController.update);
 // adminRouter.delete('/recipes/:id', recipeController.remove);
 
-// AI recipe review — list pending/approved
-adminRouter.get('/recipes/ai-review', async (req, res, next) => {
-  try {
-    const filter = (req.query.filter as string) ?? 'all';
-    const page = Math.max(1, Number(req.query.page ?? 1));
-    const limit = Math.min(50, Math.max(1, Number(req.query.limit ?? 20)));
-    const skip = (page - 1) * limit;
-
-    const where: Record<string, unknown> = { origin: 'ai_generated' };
-    if (filter === 'pending') where.aiApproved = false;
-    if (filter === 'approved') where.aiApproved = true;
-
-    const [items, total, pending, approved] = await Promise.all([
-      prisma.recipe.findMany({
-        where,
-        orderBy: { createdAt: 'desc' },
-        skip,
-        take: limit,
-        select: {
-          id: true, title: true, source: true, origin: true, aiApproved: true,
-          category: true, mealType: true, qualityScore: true, isActive: true,
-          verificationStatus: true, createdAt: true,
-        },
-      }),
-      prisma.recipe.count({ where }),
-      prisma.recipe.count({ where: { origin: 'ai_generated', aiApproved: false } }),
-      prisma.recipe.count({ where: { origin: 'ai_generated', aiApproved: true } }),
-    ]);
-
-    return res.json({ ok: true, items, total, pending, approved, page, limit });
-  } catch (err) { next(err); }
-});
-
-// AI recipe stats
-adminRouter.get('/recipes/ai-stats', async (req, res, next) => {
-  try {
-    const [total, aiGenerated, aiApproved] = await Promise.all([
-      prisma.recipe.count({ where: { isActive: true } }),
-      prisma.recipe.count({ where: { origin: 'ai_generated' } }),
-      prisma.recipe.count({ where: { origin: 'ai_generated', aiApproved: true } }),
-    ]);
-    return res.json({ ok: true, stats: {
-      total,
-      aiGenerated,
-      aiApproved,
-      aiPending: aiGenerated - aiApproved,
-      humanCreated: total - aiGenerated,
-    } });
-  } catch (err) { next(err); }
-});
-
-// Approve AI recipe → move to trusted pool
-adminRouter.post('/recipes/:id/approve-ai', async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    if (!id || !/^c[a-z0-9]{24}$/i.test(id)) {
-      return res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: 'Invalid recipe id' } });
-    }
-    const recipe = await prisma.recipe.findUnique({ where: { id }, select: { id: true, origin: true } });
-    if (!recipe) return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Recipe not found' } });
-    if (recipe.origin !== 'ai_generated') return res.status(422).json({ error: { code: 'NOT_AI', message: 'Recipe is not AI-generated' } });
-
-    await prisma.recipe.update({
-      where: { id },
-      data: { aiApproved: true, source: 'manual', verificationStatus: 'MANUALLY_VERIFIED', isActive: true },
-    });
-
-    logAudit({ userId: req.user?.sub, action: 'UPDATE_RECIPE', resourceType: 'RECIPE', resourceId: id, metadata: { approvedFromAi: true } });
-
-    return res.json({ ok: true });
-  } catch (err) { next(err); }
-});
+// TODO(5a-cleanup): prisma.recipe model dropped in K5a. Inline handlers below commented.
+// // AI recipe review — list pending/approved
+// adminRouter.get('/recipes/ai-review', async (req, res, next) => { ... prisma.recipe.findMany/count ... });
+// // AI recipe stats
+// adminRouter.get('/recipes/ai-stats', async (req, res, next) => { ... prisma.recipe.count ... });
+// // Approve AI recipe → move to trusted pool
+// adminRouter.post('/recipes/:id/approve-ai', async (req, res, next) => {
+//   ... prisma.recipe.findUnique / update ...
+//   logAudit({ userId: req.user?.sub, action: 'UPDATE_RECIPE', resourceType: 'RECIPE', resourceId: id, metadata: { approvedFromAi: true } });
+//   return res.json({ ok: true });
+// } catch (err) { next(err); }
+// });
 
 // TODO(2b-cleanup): meal/template/import controllers dropped in 2b
 // // Meal Library management (7.10.1)
