@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import { AnimatedStat } from './AnimatedStat';
+import { ManifestoText } from './ManifestoText';
 
 export async function ManifestoSection() {
   const t = await getTranslations('home.manifesto');
@@ -29,14 +30,11 @@ export async function ManifestoSection() {
   return (
     <section className="relative border-t border-line bg-paper px-5 py-24 md:px-12 md:py-32 lg:py-40">
       <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 items-start gap-16 md:grid-cols-[1.2fr_1fr] md:gap-24">
-        {/* Manifesto sentence — em-wrapped words become italic green-deep */}
-        <p className="font-display text-3xl font-light leading-[1.15] tracking-[-0.025em] text-navy md:text-4xl lg:text-5xl xl:text-[3.5rem]">
-          {t.rich('text', {
-            em: (chunks) => (
-              <em className="font-semibold italic text-bamboo-deep">{chunks}</em>
-            ),
-          })}
-        </p>
+        {/* Manifesto sentence — A7 char-by-char color reveal driven by scroll.
+            Raw i18n string parsed in <ManifestoText /> client child so the
+            outer section keeps its server render for the static numbers
+            stack on the right. */}
+        <ManifestoText raw={t('text')} />
 
         {/* Numbers stack — A8 counter animation triggers when row scrolls into view */}
         <ul className="flex flex-col gap-12 pt-6">
