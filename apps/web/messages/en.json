@@ -250,8 +250,7 @@
         "2": { "name": "Law offices" },
         "3": { "name": "Medical practices" },
         "4": { "name": "Manufacturing" },
-        "5": { "name": "Hotels and hospitality" },
-        "6": { "name": "Architecture and design" }
+        "5": { "name": "Hotels and hospitality" }
       }
     },
     "auditForm": {
@@ -684,6 +683,72 @@
           "title": "We say no",
           "desc": "When a project doesn't make sense, we say so directly. When a cheaper solution suffices — we propose it, even at lower margin."
         }
+      }
+    }
+  },
+  "branze": {
+    "biura-rachunkowe": {
+      "meta": {
+        "title": "IT for accounting firms — bambooIT",
+        "description": "Specialised IT support for accounting firms. Client data security, integrations with Comarch/Wapro/Insert, backups, GDPR. Wrocław + remote."
+      },
+      "header": {
+        "eyebrow": "Industry: accounting firms",
+        "heading": "IT for accounting firms — because client data <em>doesn't forgive mistakes.</em>",
+        "lede": "Accounting lives on computers — Comarch Optima, Wapro, Insert, e-Deklaracje, JPK, archives. A breakdown in February is a catastrophe. A client data leak is the end of the firm. We know what hurts here because we've worked with accounting firms in Wrocław for years."
+      },
+      "painPoints": {
+        "heading": "What most often <em>hurts</em> in an accounting firm",
+        "items": {
+          "1": {
+            "tag": "Seasonality",
+            "title": "February-March is a spike",
+            "desc": "Computers crash at the worst moment — when clients are waiting for tax returns. Without support with guaranteed response time every hour of downtime is real money."
+          },
+          "2": {
+            "tag": "GDPR",
+            "title": "Client data is GDPR 'extra'",
+            "desc": "PESEL numbers, employee data of clients, salaries. These are sensitive data. A leak = a 100k+ fine from UODO and the end of the client relationship."
+          },
+          "3": {
+            "tag": "Integrations",
+            "title": "Comarch/Wapro/Insert under control",
+            "desc": "Clients have various programs. Migrations, integrations with e-Government, JPK, KSeF — everything must work. A standard IT company doesn't handle this."
+          },
+          "4": {
+            "tag": "Backup",
+            "title": "Database backups, not just files",
+            "desc": "Backing up only documents is not enough. Comarch/Wapro SQL databases require special handling. Without the proper strategy you lose a month of work in case of failure."
+          }
+        }
+      },
+      "valueProp": {
+        "label": "What we do specifically",
+        "heading": "Specialised care <em>tailored to accounting firms</em>",
+        "items": {
+          "1": {
+            "title": "Seasonal capacity reserve",
+            "desc": "In February-March we're on full alert. Response in 30 minutes, not 4 hours. We know you're on the edge of deadlines."
+          },
+          "2": {
+            "title": "Quarterly GDPR audit",
+            "desc": "We check the data protection policy, access, logs, backups. A compliance report ready to present in case of a UODO inspection."
+          },
+          "3": {
+            "title": "Comarch/Wapro/Insert configuration",
+            "desc": "We configure database servers, integrations with e-Deklaracje and JPK. SQL backups with a recovery test once a month — actually tested, not just written."
+          },
+          "4": {
+            "title": "Remote work for accountants",
+            "desc": "Secure access to office resources from home (VPN + 2FA + access audit), no compromises on client data protection."
+          }
+        }
+      },
+      "caseStudy": {
+        "tag": "Case study (coming)",
+        "heading": "A real example — <em>once we can</em> share it",
+        "body": "We work with accounting firms in the Wrocław region. A specific case study (numbers, savings, time to recover data after an incident) will be published once we get client consent. In the meantime — start with a free audit and see for yourself what 'specialised IT for accounting firms' means.",
+        "cta": "Book a free audit"
       }
     }
   },

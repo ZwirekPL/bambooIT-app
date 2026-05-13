@@ -59,14 +59,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Listing routes that 404 is a SEO anti-pattern — crawlers de-prioritise
   // the whole sitemap when they hit broken entries.
   const staticPages: MetadataRoute.Sitemap = [
-    ...bilingualEntry('',                  'weekly',  1.0),
-    ...bilingualEntry('/pakiety',          'monthly', 0.9),
-    ...bilingualEntry('/audyt',            'monthly', 0.9),
-    ...bilingualEntry('/o-nas',            'monthly', 0.7),
-    ...bilingualEntry('/kontakt',          'monthly', 0.7),
-    ...bilingualEntry('/pomoc-zdalna',     'monthly', 0.6),
-    ...bilingualEntry('/blog',             'daily',   0.8),
-    ...bilingualEntry('/dokumenty-prawne', 'monthly', 0.3),
+    ...bilingualEntry('',                            'weekly',  1.0),
+    ...bilingualEntry('/pakiety',                    'monthly', 0.9),
+    ...bilingualEntry('/audyt',                      'monthly', 0.9),
+    ...bilingualEntry('/o-nas',                      'monthly', 0.7),
+    ...bilingualEntry('/kontakt',                    'monthly', 0.7),
+    ...bilingualEntry('/pomoc-zdalna',               'monthly', 0.6),
+    ...bilingualEntry('/branze/biura-rachunkowe',    'monthly', 0.7),
+    ...bilingualEntry('/blog',                       'daily',   0.8),
+    ...bilingualEntry('/dokumenty-prawne',           'monthly', 0.3),
   ];
 
   const blogPages: MetadataRoute.Sitemap = posts.flatMap((post) =>

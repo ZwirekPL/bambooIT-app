@@ -250,8 +250,7 @@
         "2": { "name": "Kancelarie prawne" },
         "3": { "name": "Gabinety medyczne" },
         "4": { "name": "Firmy produkcyjne" },
-        "5": { "name": "Hotele i gastronomia" },
-        "6": { "name": "Architektura i projektowanie" }
+        "5": { "name": "Hotele i gastronomia" }
       }
     },
     "auditForm": {
@@ -684,6 +683,72 @@
           "title": "Mówimy „nie\"",
           "desc": "Gdy projekt nie ma sensu, mówimy to wprost. Gdy tańsze rozwiązanie wystarczy — proponujemy je, mimo niższej marży."
         }
+      }
+    }
+  },
+  "branze": {
+    "biura-rachunkowe": {
+      "meta": {
+        "title": "Obsługa IT dla biur rachunkowych — bambooIT",
+        "description": "Wyspecjalizowana obsługa IT dla biur rachunkowych. Bezpieczeństwo danych klientów, integracje z Comarch/Wapro/Insert, kopie zapasowe, RODO. Wrocław + zdalnie."
+      },
+      "header": {
+        "eyebrow": "Branża: biura rachunkowe",
+        "heading": "IT dla biur rachunkowych — bo dane klientów <em>nie wybaczają błędów.</em>",
+        "lede": "Księgowość żyje na komputerach — Comarch Optima, Wapro, Insert, e-Deklaracje, JPK, archiwum. Awaria w lutym to katastrofa. Wyciek danych klienta to koniec biura. Wiemy, co tu boli, bo obsługujemy biura we Wrocławiu od lat."
+      },
+      "painPoints": {
+        "heading": "Co najczęściej <em>boli</em> w biurze rachunkowym",
+        "items": {
+          "1": {
+            "tag": "Sezonowość",
+            "title": "Luty-marzec to spike",
+            "desc": "Komputery padają zawsze w najgorszym momencie — gdy klienci czekają na rozliczenia. Bez wsparcia z gwarantowanym czasem reakcji każda godzina przestoju to realne pieniądze."
+          },
+          "2": {
+            "tag": "RODO",
+            "title": "Dane klientów to RODO „extra\"",
+            "desc": "Numery PESEL, dane osobowe pracowników klientów, wynagrodzenia. To są dane wrażliwe. Wyciek = grzywna 100k+ od UODO i koniec relacji z klientem."
+          },
+          "3": {
+            "tag": "Integracje",
+            "title": "Comarch/Wapro/Insert pod kontrolą",
+            "desc": "Klienci mają różne programy. Migracje, integracje z e-Urzędem, JPK, KSeF — wszystko musi działać. Standardowa firma IT tego nie ogarnia."
+          },
+          "4": {
+            "tag": "Backup",
+            "title": "Backup baz, nie tylko plików",
+            "desc": "Backup samych dokumentów to za mało. Bazy SQL Comarch/Wapro wymagają specjalnej obsługi. Bez właściwej strategii w razie awarii tracisz miesiąc pracy."
+          }
+        }
+      },
+      "valueProp": {
+        "label": "Co robimy konkretnie",
+        "heading": "Wyspecjalizowana opieka <em>pod biuro rachunkowe</em>",
+        "items": {
+          "1": {
+            "title": "Sezonowa rezerwa kompetencji",
+            "desc": "W lutym-marcu jesteśmy na pełnej gotowości. Reakcja w 30 minut, nie 4 godziny. Wiemy, że stoisz na granicy deadline'ów."
+          },
+          "2": {
+            "title": "Audyt RODO co kwartał",
+            "desc": "Sprawdzamy aktualność polityki ochrony danych, dostępów, logów, kopii zapasowych. Raport zgodności do przedstawienia w razie kontroli UODO."
+          },
+          "3": {
+            "title": "Konfiguracja Comarch/Wapro/Insert",
+            "desc": "Konfigurujemy serwery baz danych, integracje z e-Deklaracjami i JPK. Backup baz SQL z testem recovery raz w miesiącu — naprawdę testowanym, nie tylko zapisem."
+          },
+          "4": {
+            "title": "Praca zdalna księgowych",
+            "desc": "Bezpieczny dostęp do biurowych zasobów z domu (VPN + 2FA + audyt dostępu), bez kompromisów na ochronę danych klientów."
+          }
+        }
+      },
+      "caseStudy": {
+        "tag": "Case study (wkrótce)",
+        "heading": "Realny przykład — <em>kiedy będziemy mogli</em> go opowiedzieć",
+        "body": "Pracujemy z biurami rachunkowymi w regionie Wrocław. Konkretny case study (liczby, oszczędności, czas odzyskania danych po incydencie) opublikujemy gdy uzyskamy zgodę klienta na publikację. Tymczasem — zacznij od bezpłatnego audytu, zobaczysz sam co dla Ciebie znaczy „wyspecjalizowane IT pod biuro rachunkowe\".",
+        "cta": "Umów bezpłatny audyt"
       }
     }
   },

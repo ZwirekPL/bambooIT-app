@@ -7,17 +7,14 @@ const INDUSTRIES = [
   { id: '3', slug: 'gabinety' },
   { id: '4', slug: 'produkcja' },
   { id: '5', slug: 'hotele' },
-  { id: '6', slug: 'architektura' },
 ] as const;
 
 export async function IndustriesSection() {
   const t = await getTranslations('home.industries');
 
-  // NOTE: mockup lists 6 industries (biura-rach + kancelarie + gabinety +
-  // produkcja + hotele + architektura). TODO.md FE-7 plans 5 industry pages
-  // (drops hotele + architektura, adds salony). The page list and this
-  // homepage list will need to be reconciled — for now matching mockup.
-  // Wirgiliusz: decide which set is final before FE-7 implementation.
+  // 5 industries — final set per Wirgiliusz decision 2026-05-13 (option B):
+  // biura-rachunkowe + kancelarie + gabinety + produkcja + hotele. Dropped
+  // architektura (mockup had it as 6th) and salony (TODO.md FE-7 had it).
 
   return (
     <section
