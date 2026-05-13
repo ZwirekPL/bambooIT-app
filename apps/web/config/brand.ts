@@ -1,51 +1,56 @@
 /**
- * Brand configuration — single source of truth.
+ * Brand configuration — single source of truth for bambooIT identity.
  * To rename the brand, change this file only.
  * All pages, headers, footers, and metadata reference BRAND.*
  */
 export const BRAND = {
-  name:       'e-dietetyk.com',
-  shortName:  'e-dietetyk',
-  domain:     'e-dietetyk.com',
-  tagline:    'Twój dietetyk online — AI + opieka dietetyka',
-  taglineEn:  'Your online dietitian — AI + dietitian care',
-  email:      'kontakt@e-dietetyk.com',
-  phone:      '+48 515 530 088',
+  name:       'bambooIT',
+  shortName:  'bambooIT',
+  domain:     'bambooit.pl',
+  tagline:    'Outsourcing IT, strony, aplikacje i automatyzacje dla małych i średnich firm.',
+  taglineEn:  'IT outsourcing, websites, custom apps and process automation for SMBs.',
+  email:      'hello@bambooit.pl',
+  // TODO: placeholder from mockup — replace with real phone number when registered.
+  phone:      '+48 71 777 17 77',
+  // TODO: empty until real Facebook/Instagram profiles exist; Footer hides icons when blank.
   social: {
-    facebook:  'https://facebook.com/edietetyk',
-    instagram: 'https://instagram.com/edietetyk',
+    facebook:  '',
+    instagram: '',
   },
+  // TODO: placeholder NIP — replace with real value after Bambooit Sp. z o.o. is registered.
+  nip:        '000-000-00-00',
   seo: {
-    title:       'e-dietetyk.com — Twój dietetyk online',
-    description: 'Spersonalizowane plany żywieniowe tworzone przez AI i weryfikowane przez dietetyków. Bezpieczne, zgodne z RODO.',
+    title:       'bambooIT — Ekologiczne myślenie o IT',
+    description: 'Outsourcing IT dla MŚP w Polsce. Stała opieka, szybka reakcja, przewidywalny koszt. Pakiety od 390 zł/mies. Wrocław + zdalnie.',
     ogImage:     '/images/og-image.png',
   },
   author: {
-    name:     'Zespół e-dietetyk.com',
-    bio:      'Jesteśmy zespołem dietetyków i specjalistów AI. Tworzymy spersonalizowane plany żywieniowe oparte na nauce i nowoczesnej technologii.',
-    bioEn:    'We are a team of dietitians and AI specialists. We create personalised nutrition plans based on science and modern technology.',
+    name:     'Zespół bambooIT',
+    bio:      'Jesteśmy dwuosobowym zespołem IT. Remigiusz prowadzi obsługę IT i pakiety abonamentowe. Wirgiliusz buduje strony, aplikacje i automatyzacje. Bez infolinii, bez korporacyjnej dystansy.',
+    bioEn:    'We are a two-person IT team. Remigiusz runs IT support and subscription packages. Wirgiliusz builds websites, apps and automation. No call centers, no corporate distance.',
     image:    '',
     aboutUrl: '/o-nas',
   },
-  /** Design token references — for use in JS/metadata contexts */
+  /** Design token references — for use in JS/metadata contexts (PWA theme, llms.txt, etc.) */
   colors: {
-    brandGreen:  '#1B7937',  // darkened from #1F8F3A → WCAG AA 4.9:1 on white
-    brandOrange: '#F57C00',
-    aiBlue:      '#1E6BFF',
+    navy:   '#1A2735',  // navy-deep — PWA theme color, mockup nav/footer canvas
+    bamboo: '#8BC34A',  // accent — mockup --green
+    paper:  '#F6F4EE',  // page canvas — mockup --paper
   },
   /** GEO (Generative Engine Optimization) metadata */
   geo: {
-    foundingYear: 2025,
-    headquarters: 'Poland',
-    address: 'ul. Pod Brzozami 16/8a, 03-995 Warsaw, Poland',
+    foundingYear: 2026,
+    headquarters: 'Wrocław, Poland',
+    // TODO: real registered address when Bambooit Sp. z o.o. is incorporated.
+    address: 'Wrocław, Poland',
     specialties: [
-      'dietetyka kliniczna',
-      'plany żywieniowe AI',
-      'nutrigenomika',
-      'zarządzanie wagą',
-      'dieta cukrzycowa',
-      'dieta sportowa',
-      'alergie i nietolerancje pokarmowe',
+      'outsourcing IT',
+      'obsługa IT dla MŚP',
+      'strony internetowe',
+      'aplikacje webowe na zamówienie',
+      'automatyzacje procesów',
+      'cyberbezpieczeństwo i RODO',
+      'Microsoft 365 i Google Workspace',
     ],
   },
 } as const;

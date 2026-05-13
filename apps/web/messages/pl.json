@@ -1,19 +1,22 @@
 {
   "nav": {
     "home": "Strona główna",
-    "about": "O nas",
-    "blog": "Blog",
-    "pricing": "Oferta",
+    "whatWeDo": "Co robimy",
+    "services": "Obsługa IT",
+    "packages": "Cennik",
+    "howWeWork": "Jak działamy",
+    "aboutUs": "O nas",
+    "audit": "Audyt",
     "faq": "FAQ",
-    "glossary": "Słownik",
-    "howAiWorks": "Jak to działa",
+    "blog": "Blog",
     "legal": "Dokumenty prawne",
     "login": "Zaloguj się",
     "start": "Rozpocznij",
     "dashboard": "Panel",
     "logout": "Wyloguj",
     "openMenu": "Otwórz menu",
-    "closeMenu": "Zamknij menu"
+    "closeMenu": "Zamknij menu",
+    "ctaAudit": "Bezpłatny audyt →"
   },
   "notFound": {
     "title": "Strona nie istnieje",
@@ -196,14 +199,13 @@
     "products": {}
   },
   "footer": {
-    "tagline": "Twój osobisty dietetyk AI",
-    "linksTitle": "Nawigacja",
-    "legalTitle": "Prawne",
-    "contactTitle": "Kontakt",
+    "tagline": "Ekologiczne myślenie o IT.",
     "rights": "Wszelkie prawa zastrzeżone.",
+    "aboutUs": "O nas",
     "privacy": "Polityka prywatności",
     "terms": "Regulamin",
     "cookies": "Polityka cookies",
+    "rodo": "RODO",
     "manageCookies": "Zarządzaj cookies"
   },
   "admin": {

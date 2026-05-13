@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { Menu, LogOut } from 'lucide-react';
@@ -18,10 +17,29 @@ function getDashboardHref(role?: string): string {
   return '/';
 }
 
+// Anchor-based links scroll to homepage sections; route-based links go to dedicated pages.
+// Routes /pakiety, /o-nas, /audyt land in W2.CC; until then they 404 but Header renders OK.
 const navLinks = [
-  { href: '/blog',             label: 'blog'    },
-  { href: '/dokumenty-prawne', label: 'legal'   },
+  { href: '/#offer',    labelKey: 'whatWeDo'  },
+  { href: '/#services', labelKey: 'services'  },
+  { href: '/pakiety',   labelKey: 'packages'  },
+  { href: '/#process',  labelKey: 'howWeWork' },
+  { href: '/o-nas',     labelKey: 'aboutUs'   },
+  { href: '/audyt',     labelKey: 'audit'     },
+  { href: '/#faq',      labelKey: 'faq'       },
 ] as const;
+
+function BrandMark({ className }: { className?: string }) {
+  // bambooIT wordmark with bamboo-green accents on `m` and `it`.
+  return (
+    <span
+      className={cn('font-display font-black tracking-tight leading-none', className)}
+      aria-label={BRAND.shortName}
+    >
+      ba<span className="text-bamboo">m</span>boo<span className="text-bamboo">it</span>
+    </span>
+  );
+}
 
 export function Header() {
   const t = useTranslations('nav');
@@ -40,44 +58,34 @@ export function Header() {
   return (
     <header
       className={cn(
-        'sticky top-0 z-40 w-full transition-all duration-300',
-        scrolled
-          ? 'bg-background/95 backdrop-blur-md shadow-sm border-b border-border'
-          : 'bg-transparent'
+        'sticky top-0 z-40 w-full bg-paper/85 backdrop-blur-md text-navy-deep transition-all duration-300',
+        scrolled && 'border-b border-line shadow-sm',
       )}
     >
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
+      <div className="container mx-auto flex items-center justify-between px-4 md:px-6 py-4">
         {/* Logo */}
-        <Link href="/" className="hover:opacity-90 transition-opacity" aria-label={BRAND.shortName}>
-          <Image
-            src="/logo.png"
-            alt={BRAND.shortName}
-            width={200}
-            height={200}
-            className="h-10 w-auto md:h-12 rounded-md"
-            priority
-          />
+        <Link href="/" className="hover:opacity-80 transition-opacity" aria-label={BRAND.shortName}>
+          <BrandMark className="text-2xl" />
         </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden items-center gap-6 md:flex" aria-label="Main navigation">
-          {navLinks.map(({ href, label }) => (
+        {/* Desktop nav links */}
+        <nav className="hidden lg:flex items-center gap-7" aria-label="Main navigation">
+          {navLinks.map(({ href, labelKey }) => (
             <Link
               key={href}
               href={href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="text-sm font-medium py-1.5 transition-colors hover:text-bamboo-deep"
             >
-              {t(label)}
+              {t(labelKey)}
             </Link>
           ))}
         </nav>
 
-        {/* Desktop Right */}
-        <div className="hidden items-center gap-3 md:flex">
-          <LocaleSwitcher />
+        {/* Desktop right cluster — auth + locale + CTA */}
+        <div className="hidden lg:flex items-center gap-3">
           {isLoggedIn ? (
             <>
-              <Button asChild variant="green-outline" size="sm">
+              <Button asChild variant="ghost" size="sm">
                 <Link href={panelHref}>{t('dashboard')}</Link>
               </Button>
               <Button
@@ -91,19 +99,21 @@ export function Header() {
               </Button>
             </>
           ) : (
-            <>
-              <Button asChild variant="green-outline" size="sm">
-                <Link href="/zaloguj">{t('login')}</Link>
-              </Button>
-              <Button asChild variant="orange" size="sm">
-                <Link href="/zaloguj">{t('start')}</Link>
-              </Button>
-            </>
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/zaloguj">{t('login')}</Link>
+            </Button>
           )}
+          <LocaleSwitcher />
+          <Link
+            href="/audyt"
+            className="inline-flex items-center gap-2 rounded-full bg-bamboo px-5 py-2.5 text-sm font-semibold text-navy-deep transition-all hover:bg-white hover:-translate-y-0.5"
+          >
+            {t('ctaAudit')}
+          </Link>
         </div>
 
-        {/* Mobile Menu Trigger */}
-        <div className="flex items-center gap-2 md:hidden">
+        {/* Mobile menu */}
+        <div className="flex items-center gap-2 lg:hidden">
           <LocaleSwitcher />
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
@@ -111,34 +121,34 @@ export function Header() {
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-full max-w-[280px]">
+            <SheetContent
+              side="right"
+              className="bg-navy-deep text-white border-l border-navy-soft w-full max-w-[320px]"
+            >
               <SheetHeader>
-                <SheetTitle className="flex items-center gap-2 text-foreground">
-                  <Image src="/logo.png" alt={BRAND.shortName} width={28} height={28} className="rounded-md" />
+                <SheetTitle className="text-white">
+                  <BrandMark className="text-xl" />
                 </SheetTitle>
               </SheetHeader>
-              <nav className="flex flex-col gap-1 px-6 pt-2" aria-label="Mobile navigation">
-                <Link
-                  href="/"
-                  onClick={() => setOpen(false)}
-                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                >
-                  {t('home')}
-                </Link>
-                {navLinks.map(({ href, label }) => (
+              <nav className="flex flex-col gap-1 pt-8" aria-label="Mobile navigation">
+                {navLinks.map(({ href, labelKey }) => (
                   <Link
                     key={href}
                     href={href}
                     onClick={() => setOpen(false)}
-                    className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    className="rounded-lg px-3 py-3 font-display text-lg font-normal transition-colors hover:text-bamboo"
                   >
-                    {t(label)}
+                    {t(labelKey)}
                   </Link>
                 ))}
-                <div className="mt-4 flex flex-col gap-2 pt-4 border-t border-border">
+                <div className="mt-6 flex flex-col gap-3 pt-6 border-t border-navy-soft">
                   {isLoggedIn ? (
                     <>
-                      <Button asChild variant="green-outline" size="default" className="w-full">
+                      <Button
+                        asChild
+                        size="default"
+                        className="w-full bg-bamboo text-navy-deep hover:bg-white"
+                      >
                         <Link href={panelHref} onClick={() => setOpen(false)}>
                           {t('dashboard')}
                         </Link>
@@ -146,7 +156,7 @@ export function Header() {
                       <Button
                         variant="ghost"
                         size="default"
-                        className="w-full gap-1.5"
+                        className="w-full gap-1.5 justify-start text-white hover:text-bamboo hover:bg-transparent"
                         onClick={() => {
                           setOpen(false);
                           performFullLogout('/');
@@ -158,16 +168,23 @@ export function Header() {
                     </>
                   ) : (
                     <>
-                      <Button asChild variant="green-outline" size="default" className="w-full">
+                      <Button
+                        asChild
+                        variant="ghost"
+                        size="default"
+                        className="w-full justify-start text-white hover:text-bamboo hover:bg-transparent"
+                      >
                         <Link href="/zaloguj" onClick={() => setOpen(false)}>
                           {t('login')}
                         </Link>
                       </Button>
-                      <Button asChild variant="orange" size="default" className="w-full">
-                        <Link href="/zaloguj" onClick={() => setOpen(false)}>
-                          {t('start')}
-                        </Link>
-                      </Button>
+                      <Link
+                        href="/audyt"
+                        onClick={() => setOpen(false)}
+                        className="inline-flex items-center justify-center gap-2 rounded-full bg-bamboo px-5 py-3 text-sm font-semibold text-navy-deep transition-all hover:bg-white"
+                      >
+                        {t('ctaAudit')}
+                      </Link>
                     </>
                   )}
                 </div>

@@ -1,19 +1,22 @@
 {
   "nav": {
     "home": "Home",
-    "about": "About",
-    "blog": "Blog",
-    "pricing": "Pricing",
+    "whatWeDo": "What we do",
+    "services": "IT support",
+    "packages": "Pricing",
+    "howWeWork": "How we work",
+    "aboutUs": "About us",
+    "audit": "Audit",
     "faq": "FAQ",
-    "glossary": "Glossary",
-    "howAiWorks": "How it works",
+    "blog": "Blog",
     "legal": "Legal documents",
     "login": "Log in",
     "start": "Get started",
     "dashboard": "Dashboard",
     "logout": "Log out",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "ctaAudit": "Free audit →"
   },
   "notFound": {
     "title": "Page not found",
@@ -196,14 +199,13 @@
     "products": {}
   },
   "footer": {
-    "tagline": "Your personal AI dietitian",
-    "linksTitle": "Navigation",
-    "legalTitle": "Legal",
-    "contactTitle": "Contact",
+    "tagline": "Sustainable thinking about IT.",
     "rights": "All rights reserved.",
+    "aboutUs": "About us",
     "privacy": "Privacy policy",
     "terms": "Terms of service",
     "cookies": "Cookie policy",
+    "rodo": "GDPR",
     "manageCookies": "Manage cookies"
   },
   "admin": {
