@@ -494,6 +494,43 @@
       }
     }
   },
+  "kontakt": {
+    "meta": {
+      "title": "Kontakt — bambooIT",
+      "description": "Napisz lub zadzwoń do bambooIT. Odpowiadamy w ciągu 4 godzin roboczych. Wrocław i okolice, wsparcie zdalne w całej Polsce."
+    },
+    "header": {
+      "eyebrow": "Kontakt",
+      "heading": "Napisz do <em>nas.</em>",
+      "lede": "Krótkie pytanie? Zadzwoń lub wypełnij formularz. Odpowiadamy w ciągu 4 godzin roboczych — zawsze konkretną osobą po drugiej stronie."
+    },
+    "form": {
+      "fields": {
+        "name": "Imię",
+        "email": "Email",
+        "phone": "Telefon (opcjonalnie)",
+        "message": "Wiadomość",
+        "messagePlaceholder": "Napisz krótko o czym chcesz porozmawiać...",
+        "rodo": "Wyrażam zgodę na przetwarzanie danych osobowych w celu kontaktu zgodnie z Polityką prywatności. Administratorem danych jest bambooIT."
+      },
+      "submitBtn": "Wyślij wiadomość",
+      "success": {
+        "title": "Dziękujemy!",
+        "message": "Otrzymaliśmy Twoją wiadomość. Odpowiemy w ciągu 4 godzin roboczych. Jeśli sprawa jest pilna, zadzwoń bezpośrednio.",
+        "resetCta": "Wyślij kolejną wiadomość"
+      },
+      "info": {
+        "phoneLabel": "Telefon",
+        "emailLabel": "Email",
+        "hoursLabel": "Godziny pracy",
+        "hours": "Pon–Pt, 8:00–18:00",
+        "responseTime": "Odpowiadamy w ciągu 4h roboczych",
+        "areaLabel": "Obszar działania",
+        "area": "Wrocław + zdalnie",
+        "areaNote": "Wizyty stacjonarne w promieniu 50 km od Wrocławia"
+      }
+    }
+  },
   "notFound": {
     "title": "Strona nie istnieje",
     "description": "Nie możemy znaleźć strony, której szukasz.",

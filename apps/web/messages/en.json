@@ -494,6 +494,43 @@
       }
     }
   },
+  "kontakt": {
+    "meta": {
+      "title": "Contact — bambooIT",
+      "description": "Write or call bambooIT. We respond within 4 business hours. Wrocław and surrounding area, remote support across Poland."
+    },
+    "header": {
+      "eyebrow": "Contact",
+      "heading": "Write to <em>us.</em>",
+      "lede": "Quick question? Call or fill in the form. We respond within 4 business hours — always a specific person on the other end."
+    },
+    "form": {
+      "fields": {
+        "name": "First name",
+        "email": "Email",
+        "phone": "Phone (optional)",
+        "message": "Message",
+        "messagePlaceholder": "Briefly write what you'd like to discuss...",
+        "rodo": "I consent to processing of personal data for contact purposes per the Privacy Policy. Data controller: bambooIT."
+      },
+      "submitBtn": "Send message",
+      "success": {
+        "title": "Thank you!",
+        "message": "We've received your message. We'll respond within 4 business hours. If urgent, please call directly.",
+        "resetCta": "Send another message"
+      },
+      "info": {
+        "phoneLabel": "Phone",
+        "emailLabel": "Email",
+        "hoursLabel": "Office hours",
+        "hours": "Mon–Fri, 8:00–18:00",
+        "responseTime": "We respond within 4 business hours",
+        "areaLabel": "Service area",
+        "area": "Wrocław + remote",
+        "areaNote": "On-site visits within 50 km of Wrocław"
+      }
+    }
+  },
   "notFound": {
     "title": "Page not found",
     "description": "We can't find the page you're looking for.",
