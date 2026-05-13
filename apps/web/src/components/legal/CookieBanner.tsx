@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { Button } from '@/components/ui/button';
 import { Cookie, X } from 'lucide-react';
 import { CookieSettings } from './CookieSettings';
 import {
@@ -68,35 +67,48 @@ export function CookieBanner() {
   return (
     <>
       {visible && (
-        <div className="fixed bottom-0 inset-x-0 z-50 p-4 sm:p-6">
-          <div className="mx-auto max-w-2xl rounded-xl border border-border bg-background/95 backdrop-blur-sm shadow-lg p-5 sm:p-6">
+        <div className="fixed inset-x-0 bottom-0 z-50 p-4 sm:p-6">
+          <div className="mx-auto max-w-2xl rounded-2xl border border-line-strong bg-white/95 p-5 shadow-2xl backdrop-blur-md sm:p-6">
             <div className="flex items-start gap-3">
-              <Cookie className="h-5 w-5 text-sage-600 shrink-0 mt-0.5" />
+              <Cookie className="mt-0.5 h-5 w-5 shrink-0 text-bamboo-deep" aria-hidden="true" />
               <div className="flex-1 space-y-3">
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <p className="text-sm leading-relaxed text-navy-soft">
                   {t('message')}{' '}
                   <Link
                     href="/dokumenty-prawne?tab=cookies"
-                    className="text-sage-600 hover:text-sage-700 underline underline-offset-2"
+                    className="text-bamboo-deep underline underline-offset-2 hover:text-navy"
                   >
                     {t('learnMore')}
                   </Link>
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  <Button variant="sage" size="sm" onClick={handleAcceptAll}>
+                  <button
+                    type="button"
+                    onClick={handleAcceptAll}
+                    className="inline-flex items-center rounded-full bg-bamboo px-5 py-2 text-sm font-semibold text-navy-deep transition-all hover:-translate-y-0.5 hover:bg-bamboo-deep"
+                  >
                     {t('acceptAll')}
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={handleEssentialOnly}>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleEssentialOnly}
+                    className="inline-flex items-center rounded-full border border-line-strong bg-white px-5 py-2 text-sm font-medium text-navy transition-colors hover:border-navy-soft"
+                  >
                     {t('essentialOnly')}
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => setSettingsOpen(true)}>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSettingsOpen(true)}
+                    className="inline-flex items-center rounded-full px-4 py-2 text-sm font-medium text-navy-soft transition-colors hover:text-navy"
+                  >
                     {t('customize')}
-                  </Button>
+                  </button>
                 </div>
               </div>
               <button
+                type="button"
                 onClick={handleEssentialOnly}
-                className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
+                className="shrink-0 text-navy-soft transition-colors hover:text-navy"
                 aria-label={t('close')}
               >
                 <X className="h-4 w-4" />

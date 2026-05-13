@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import type { CookieConsent } from '@/lib/cookie-consent';
 
@@ -42,28 +41,32 @@ export function CookieSettings({ open, initial, onSave, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-navy-deep/50 p-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby="cookie-settings-title"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="w-full max-w-lg rounded-xl border border-border bg-background shadow-xl">
-        <div className="flex items-start justify-between p-5 border-b border-border">
-          <h2 id="cookie-settings-title" className="text-lg font-semibold">
+      <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-line-strong bg-paper shadow-2xl">
+        <div className="flex items-start justify-between border-b border-line bg-white p-6">
+          <h2
+            id="cookie-settings-title"
+            className="font-display text-xl font-semibold tracking-[-0.02em] text-navy"
+          >
             {t('settingsTitle')}
           </h2>
           <button
+            type="button"
             onClick={onClose}
-            className="text-muted-foreground hover:text-foreground transition-colors"
+            className="text-navy-soft transition-colors hover:text-navy"
             aria-label={t('close')}
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="p-5 space-y-4 max-h-[60vh] overflow-y-auto">
-          <p className="text-sm text-muted-foreground">{t('settingsIntro')}</p>
+        <div className="max-h-[60vh] space-y-3 overflow-y-auto p-6">
+          <p className="text-sm leading-relaxed text-navy-soft">{t('settingsIntro')}</p>
 
           <CategoryRow
             title={t('categoryNecessary')}
@@ -98,28 +101,28 @@ export function CookieSettings({ open, initial, onSave, onClose }: Props) {
           />
         </div>
 
-        <div className="flex flex-wrap gap-2 justify-end p-5 border-t border-border">
-          <Button
-            variant="outline"
-            size="sm"
+        <div className="flex flex-wrap justify-end gap-2 border-t border-line bg-white p-6">
+          <button
+            type="button"
             onClick={() => onSave({ functional: false, analytics: false, marketing: false })}
+            className="inline-flex items-center rounded-full border border-line-strong bg-white px-5 py-2 text-sm font-medium text-navy transition-colors hover:border-navy-soft"
           >
             {t('essentialOnly')}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
+          </button>
+          <button
+            type="button"
             onClick={() => onSave({ functional, analytics, marketing })}
+            className="inline-flex items-center rounded-full border border-line-strong bg-white px-5 py-2 text-sm font-medium text-navy transition-colors hover:border-navy-soft"
           >
             {t('savePreferences')}
-          </Button>
-          <Button
-            variant="sage"
-            size="sm"
+          </button>
+          <button
+            type="button"
             onClick={() => onSave({ functional: true, analytics: GA_ENABLED, marketing: false })}
+            className="inline-flex items-center rounded-full bg-bamboo px-5 py-2 text-sm font-semibold text-navy-deep transition-all hover:-translate-y-0.5 hover:bg-bamboo-deep"
           >
             {t('acceptAll')}
-          </Button>
+          </button>
         </div>
       </div>
     </div>
@@ -140,17 +143,23 @@ function CategoryRow({
   disabled?: boolean;
 }) {
   return (
-    <label className={`flex items-start gap-3 rounded-lg border border-border p-3 ${disabled ? 'opacity-60' : 'cursor-pointer hover:bg-muted/30'}`}>
+    <label
+      className={
+        disabled
+          ? 'flex items-start gap-3 rounded-xl border border-line bg-white p-4 opacity-60'
+          : 'flex cursor-pointer items-start gap-3 rounded-xl border border-line bg-white p-4 transition-colors hover:border-line-strong'
+      }
+    >
       <input
         type="checkbox"
         checked={checked}
         disabled={disabled}
         onChange={(e) => onChange(e.target.checked)}
-        className="mt-1 h-4 w-4 rounded border-border text-sage-600 focus:ring-sage-600"
+        className="mt-1 h-4 w-4 shrink-0 accent-bamboo-deep"
       />
       <div className="flex-1">
-        <p className="text-sm font-medium text-foreground">{title}</p>
-        <p className="text-xs text-muted-foreground mt-1">{description}</p>
+        <p className="font-display text-sm font-semibold text-navy">{title}</p>
+        <p className="mt-1 text-xs leading-relaxed text-navy-soft">{description}</p>
       </div>
     </label>
   );
