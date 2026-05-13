@@ -22,3 +22,7 @@ Sentry.init({
 
   beforeSend: scrubEvent,
 });
+
+// Required by Sentry to instrument App Router navigations. Without this
+// hook Sentry can't tie performance traces to client-side route changes.
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
