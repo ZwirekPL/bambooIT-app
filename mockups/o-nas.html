@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>O nas — Bambooit. Dwie osoby, dwie specjalizacje, jeden zespół.</title>
+<meta name="description" content="Poznaj zespół Bambooit. Remigiusz — obsługa IT. Wirgiliusz — strony, aplikacje, automatyzacje. Bez infolinii, bez korporacyjnej dystansy." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;900&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --navy:#2C3E50;
+  --navy-deep:#1a2735;
+  --navy-soft:#3d556e;
+  --green:#8BC34A;
+  --green-deep:#6fa336;
+  --green-soft:#c8e6a0;
+  --paper:#f6f4ee;
+  --white:#ffffff;
+  --ink:#0e1822;
+  --line:rgba(44,62,80,0.12);
+  --line-strong:rgba(44,62,80,0.25);
+
+  --f-display:'Fraunces', Georgia, serif;
+  --f-sans:'Archivo', system-ui, sans-serif;
+  --f-mono:'JetBrains Mono', monospace;
+
+  --maxw:1440px;
+  --pad:clamp(20px, 4vw, 64px);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--f-sans);
+  font-weight:400;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+img,svg{display:block;max-width:100%;}
+a{color:inherit;text-decoration:none;}
+button{font:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+::selection{background:var(--green);color:var(--navy-deep);}
+
+/* ---------- NAV ---------- */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px var(--pad);
+  background:rgba(246,244,238,0.85);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--line);
+}
+.nav-logo{
+  font-family:var(--f-display);font-weight:900;font-size:22px;letter-spacing:-0.04em;
+  color:var(--navy-deep);
+}
+.nav-logo .accent{color:var(--green-deep);font-style:italic;}
+.nav-links{
+  display:flex;align-items:center;gap:32px;
+}
+.nav-links a{
+  font-size:14px;color:var(--navy);transition:color 0.3s;
+}
+.nav-links a:hover{color:var(--green-deep);}
+.nav-links a.active{color:var(--navy-deep);font-weight:700;}
+.nav-cta{
+  padding:10px 22px;border-radius:999px;background:var(--navy-deep);color:var(--white);
+  font-family:var(--f-mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;
+  transition:background 0.3s, transform 0.3s;
+}
+.nav-cta:hover{background:var(--green-deep);color:var(--navy-deep);transform:translateY(-1px);}
+.burger{display:none;}
+
+@media (max-width:980px){
+  .nav-links{
+    position:fixed;top:0;right:-100%;width:min(360px,80vw);height:100vh;
+    background:var(--paper);flex-direction:column;justify-content:center;gap:32px;
+    transition:right 0.5s cubic-bezier(.7,0,.2,1);
+    padding:32px;border-left:1px solid var(--line);
+  }
+  .nav-links.open{right:0;}
+  .nav-links a{font-size:22px;font-family:var(--f-display);font-weight:600;}
+  .burger{display:flex;flex-direction:column;justify-content:center;gap:5px;width:32px;height:32px;z-index:101;}
+  .burger span{width:24px;height:2px;background:var(--navy-deep);transition:transform 0.3s, opacity 0.3s;}
+  .burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+  .burger.open span:nth-child(2){opacity:0;}
+  .burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+}
+
+/* ---------- HERO ---------- */
+.hero{
+  padding:160px var(--pad) 80px;
+  max-width:var(--maxw);margin:0 auto;
+  position:relative;
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--f-mono);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--green-deep);margin-bottom:40px;
+}
+.hero-eyebrow .dot{
+  width:8px;height:8px;border-radius:50%;background:var(--green);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{
+  0%,100%{opacity:1;transform:scale(1);}
+  50%{opacity:0.5;transform:scale(1.4);}
+}
+.hero-title{
+  font-family:var(--f-display);font-weight:900;
+  font-size:clamp(48px,8vw,128px);line-height:0.92;letter-spacing:-0.04em;
+  color:var(--navy-deep);
+  margin-bottom:40px;
+  max-width:1100px;
+}
+.hero-title em{color:var(--green-deep);font-style:italic;}
+.hero-lede{
+  font-size:clamp(18px,1.6vw,24px);line-height:1.5;color:var(--navy-soft);
+  max-width:720px;
+}
+.hero-lede strong{color:var(--navy-deep);font-weight:600;}
+
+/* ---------- STATS STRIP ---------- */
+.stats{
+  background:var(--navy-deep);color:var(--white);
+  padding:80px var(--pad);
+  margin-top:40px;
+}
+.stats-inner{
+  max-width:var(--maxw);margin:0 auto;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:48px;
+}
+.stat{border-left:1px solid rgba(255,255,255,0.15);padding-left:24px;}
+.stat:first-child{border-left:none;padding-left:0;}
+.stat-num{
+  font-family:var(--f-display);font-weight:900;
+  font-size:clamp(40px,5vw,72px);line-height:1;letter-spacing:-0.03em;
+  color:var(--green);
+}
+.stat-label{
+  font-size:14px;color:rgba(255,255,255,0.7);margin-top:12px;line-height:1.4;
+}
+@media (max-width:780px){
+  .stats-inner{grid-template-columns:repeat(2,1fr);gap:32px;}
+  .stat{border-left:none;padding-left:0;}
+}
+
+/* ---------- STORY ---------- */
+.story{
+  padding:140px var(--pad);
+  max-width:var(--maxw);margin:0 auto;
+}
+.story-grid{
+  display:grid;grid-template-columns:1fr 1.4fr;gap:100px;
+}
+.story-label{
+  font-family:var(--f-mono);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--green-deep);margin-bottom:24px;
+  position:relative;padding-left:32px;
+}
+.story-label::before{
+  content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:20px;height:1px;background:var(--green-deep);
+}
+.story-head h2{
+  font-family:var(--f-display);font-weight:900;
+  font-size:clamp(36px,4.5vw,68px);line-height:0.98;letter-spacing:-0.03em;
+  color:var(--navy-deep);
+}
+.story-head h2 em{color:var(--green-deep);font-style:italic;}
+.story-text p{
+  font-size:clamp(16px,1.25vw,19px);line-height:1.7;color:var(--navy-soft);
+  margin-bottom:24px;
+}
+.story-text p strong{color:var(--navy-deep);font-weight:600;}
+@media (max-width:980px){
+  .story{padding:80px var(--pad);}
+  .story-grid{grid-template-columns:1fr;gap:48px;}
+}
+
+/* ---------- TEAM ---------- */
+.team{
+  background:var(--white);
+  padding:140px var(--pad);
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+}
+.team-inner{max-width:var(--maxw);margin:0 auto;}
+.team-head{
+  text-align:center;margin-bottom:100px;
+}
+.team-head .section-label{
+  font-family:var(--f-mono);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--green-deep);margin-bottom:24px;display:inline-block;
+}
+.team-head h2{
+  font-family:var(--f-display);font-weight:900;
+  font-size:clamp(40px,5.5vw,84px);line-height:0.95;letter-spacing:-0.03em;
+  color:var(--navy-deep);max-width:900px;margin:0 auto;
+}
+.team-head h2 em{color:var(--green-deep);font-style:italic;}
+
+.persons{
+  display:grid;grid-template-columns:1fr 1fr;gap:60px;
+}
+.person{
+  background:var(--paper);
+  border-radius:32px;
+  padding:48px 40px;
+  position:relative;
+  transition:transform 0.4s, box-shadow 0.4s;
+}
+.person:hover{
+  transform:translateY(-4px);
+  box-shadow:0 32px 64px -24px rgba(44,62,80,0.18);
+}
+.person-photo{
+  width:160px;height:160px;border-radius:50%;
+  background:linear-gradient(135deg, var(--green-soft), var(--green-deep));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--f-display);font-weight:900;font-size:64px;color:var(--navy-deep);
+  margin-bottom:32px;
+  border:4px solid var(--white);
+  box-shadow:0 12px 24px -8px rgba(44,62,80,0.2);
+}
+.person-role{
+  font-family:var(--f-mono);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--green-deep);margin-bottom:12px;
+}
+.person-name{
+  font-family:var(--f-display);font-weight:700;
+  font-size:clamp(32px,3.5vw,52px);line-height:1;letter-spacing:-0.02em;
+  color:var(--navy-deep);margin-bottom:24px;
+}
+.person-bio{
+  font-size:16.5px;line-height:1.65;color:var(--navy-soft);margin-bottom:32px;
+}
+.person-bio strong{color:var(--navy-deep);font-weight:600;}
+.person-skills{
+  margin-top:24px;padding-top:24px;border-top:1px solid var(--line);
+}
+.person-skills-label{
+  font-family:var(--f-mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--navy-soft);margin-bottom:16px;
+}
+.person-skills-list{
+  display:flex;flex-wrap:wrap;gap:8px;
+}
+.person-skills-list span{
+  padding:8px 14px;border-radius:999px;
+  background:var(--white);border:1px solid var(--line);
+  font-size:13px;color:var(--navy);
+}
+@media (max-width:980px){
+  .team{padding:80px var(--pad);}
+  .team-head{margin-bottom:60px;}
+  .persons{grid-template-columns:1fr;gap:32px;}
+  .person{padding:36px 28px;}
+  .person-photo{width:120px;height:120px;font-size:48px;}
+}
+
+/* ---------- VALUES ---------- */
+.values{
+  padding:140px var(--pad);
+  max-width:var(--maxw);margin:0 auto;
+}
+.values-head{margin-bottom:80px;max-width:780px;}
+.values-head .section-label{
+  font-family:var(--f-mono);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--green-deep);margin-bottom:24px;display:inline-block;
+  position:relative;padding-left:32px;
+}
+.values-head .section-label::before{
+  content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:20px;height:1px;background:var(--green-deep);
+}
+.values-head h2{
+  font-family:var(--f-display);font-weight:900;
+  font-size:clamp(40px,5vw,76px);line-height:0.98;letter-spacing:-0.03em;
+  color:var(--navy-deep);
+}
+.values-head h2 em{color:var(--green-deep);font-style:italic;}
+
+.values-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:24px;
+}
+.value-card{
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:20px;padding:32px 28px;
+  min-height:240px;
+  display:flex;flex-direction:column;justify-content:space-between;
+  transition:border-color 0.4s, transform 0.4s;
+}
+.value-card:hover{
+  border-color:var(--green);
+  transform:translateY(-4px);
+}
+.value-num{
+  font-family:var(--f-mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--green-deep);margin-bottom:auto;
+}
+.value-card h3{
+  font-family:var(--f-display);font-weight:600;
+  font-size:24px;line-height:1.1;letter-spacing:-0.02em;
+  margin:48px 0 12px;color:var(--navy-deep);
+}
+.value-card p{
+  font-size:14.5px;line-height:1.55;color:var(--navy-soft);
+}
+@media (max-width:980px){
+  .values{padding:80px var(--pad);}
+  .values-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media (max-width:560px){
+  .values-grid{grid-template-columns:1fr;}
+}
+
+/* ---------- FINAL CTA ---------- */
+.final-cta{
+  background:var(--navy-deep);color:var(--white);
+  padding:140px var(--pad);
+  text-align:center;
+}
+.final-cta-inner{max-width:1000px;margin:0 auto;}
+.final-cta h2{
+  font-family:var(--f-display);font-weight:900;
+  font-size:clamp(40px,6vw,96px);line-height:0.95;letter-spacing:-0.03em;
+  margin-bottom:48px;
+}
+.final-cta h2 em{color:var(--green);font-style:italic;}
+.big-btn{
+  display:inline-flex;align-items:center;gap:20px;
+  padding:20px 40px;border-radius:999px;background:var(--green);color:var(--navy-deep);
+  font-family:var(--f-mono);font-size:14px;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;
+  transition:background 0.3s, transform 0.3s;
+  margin-bottom:40px;
+}
+.big-btn:hover{background:var(--green-deep);transform:translateY(-2px);}
+.big-btn .arrow-circle{
+  width:32px;height:32px;border-radius:50%;background:var(--navy-deep);color:var(--green);
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.final-contact{
+  display:flex;justify-content:center;gap:64px;flex-wrap:wrap;
+  padding-top:40px;border-top:1px solid rgba(255,255,255,0.15);
+}
+.final-contact > div{display:flex;flex-direction:column;gap:6px;text-align:left;}
+.final-contact span{
+  font-family:var(--f-mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;
+  color:rgba(255,255,255,0.6);
+}
+.final-contact a{font-family:var(--f-display);font-weight:600;font-size:24px;color:var(--white);}
+.final-contact a:hover{color:var(--green);}
+
+/* ---------- FOOTER ---------- */
+footer{
+  background:var(--navy-deep);color:rgba(255,255,255,0.5);
+  padding:32px var(--pad);
+  border-top:1px solid rgba(255,255,255,0.1);
+}
+.footer-inner{
+  max-width:var(--maxw);margin:0 auto;
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;
+  font-size:13px;
+}
+.footer-inner a{color:rgba(255,255,255,0.7);}
+.footer-inner a:hover{color:var(--green);}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a href="index.html" class="nav-logo">ba<span class="accent">m</span>boo<span class="accent">it</span></a>
+  <div class="nav-links" id="navLinks">
+    <a href="index.html#offer">Co robimy</a>
+    <a href="index.html#services">Obsługa IT</a>
+    <a href="index.html#pricing">Cennik</a>
+    <a href="index.html#process">Jak działamy</a>
+    <a href="o-nas.html" class="active">O nas</a>
+    <a href="index.html#audit">Audyt</a>
+    <a href="index.html#audit" class="nav-cta">Bezpłatny audyt →</a>
+  </div>
+  <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">
+    <span class="dot"></span>
+    O nas — dwie osoby, jeden zespół
+  </div>
+  <h1 class="hero-title">
+    Po drugiej stronie<br>siedzi <em>konkretny człowiek.</em>
+  </h1>
+  <p class="hero-lede">
+    <strong>Nie infolinia. Nie konsultant numer 7. Nie chatbot z pierwszej linii wsparcia.</strong>
+    Bambooit to dwuosobowy zespół, w którym każdy zna swoich klientów po imieniu, pamięta szczegóły ich infrastruktury i odpowiada osobiście — nawet na pytania, które zadaje się po raz dziesiąty.
+  </p>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="stats-inner">
+    <div class="stat">
+      <div class="stat-num">2</div>
+      <div class="stat-label">Specjalistów<br>w zespole</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">4</div>
+      <div class="stat-label">Obszary kompetencji<br>pod jednym dachem</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">0</div>
+      <div class="stat-label">Infolinii<br>i botów</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">100%</div>
+      <div class="stat-label">Decyzji<br>po stronie klienta</div>
+    </div>
+  </div>
+</section>
+
+<!-- STORY -->
+<section class="story">
+  <div class="story-grid">
+    <div class="story-head">
+      <div class="story-label">Skąd Bambooit</div>
+      <h2>Z prostej <em>obserwacji.</em></h2>
+    </div>
+    <div class="story-text">
+      <p>Małe i średnie firmy mają dwa wybory na rynku IT: <strong>jednoosobowy „informatyk od wszystkiego"</strong>, który znika na urlopie, albo <strong>duża agencja</strong>, w której rozmawiasz z pięcioma osobami i żadna nie wie, jak nazywa się Twoja firma.</p>
+      <p>Bambooit powstał z prostego pomysłu: <strong>zostawmy z tego tylko to co dobre.</strong> Bliskość i osobistą relację jednoosobowego informatyka. Pełnię kompetencji agencji. I zamknijmy to w dwuosobowym, wyspecjalizowanym zespole, w którym każdy ma swój obszar — ale obaj rozumieją całość.</p>
+      <p>Stąd nasza nazwa. Bambus rośnie powoli, ale jak już wyrośnie — jest jednocześnie elastyczny i nie do złamania. Twoja technologia powinna działać tak samo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="team">
+  <div class="team-inner">
+    <div class="team-head">
+      <span class="section-label">Zespół</span>
+      <h2>Dwie osoby. Dwie<br>specjalizacje. Jeden <em>kontakt.</em></h2>
+    </div>
+
+    <div class="persons">
+      <div class="person">
+        <div class="person-photo">R</div>
+        <div class="person-role">01 / Obsługa IT</div>
+        <h3 class="person-name">Remigiusz</h3>
+        <p class="person-bio">
+          Opiekuje się <strong>obsługą IT i pakietami abonamentowymi</strong>. Od lat rozwiązuje codzienne problemy techniczne małych firm — od drukarek i poczty, po sieci, bezpieczeństwo i konfigurację stanowisk. <strong>Twoja pierwsza linia kontaktu</strong>, gdy coś przestaje działać.
+        </p>
+        <div class="person-skills">
+          <div class="person-skills-label">Specjalizacja</div>
+          <div class="person-skills-list">
+            <span>Pomoc zdalna</span>
+            <span>Sieci i Wi-Fi</span>
+            <span>Microsoft 365</span>
+            <span>Bezpieczeństwo</span>
+            <span>Backup</span>
+            <span>Drukarki i sprzęt</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="person">
+        <div class="person-photo">W</div>
+        <div class="person-role">02 / Strony, aplikacje, automatyzacje</div>
+        <h3 class="person-name">Wirgiliusz</h3>
+        <p class="person-bio">
+          Buduje <strong>strony internetowe, aplikacje webowe i automatyzacje procesów</strong>. Pracuje w nowoczesnych technologiach (Next.js, React, n8n, Make). Twórca SaaS-u e-dietetyk.com dla profesjonalnych dietetyków. <strong>Twój partner</strong>, gdy firma rośnie i potrzebuje czegoś więcej niż gotowca z internetu.
+        </p>
+        <div class="person-skills">
+          <div class="person-skills-label">Specjalizacja</div>
+          <div class="person-skills-list">
+            <span>Next.js / React</span>
+            <span>TypeScript</span>
+            <span>PostgreSQL</span>
+            <span>n8n / Make</span>
+            <span>Stripe</span>
+            <span>Anthropic API</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUES -->
+<section class="values">
+  <div class="values-head">
+    <span class="section-label">Jak pracujemy</span>
+    <h2>Cztery zasady,<br>których <em>nie łamiemy.</em></h2>
+  </div>
+
+  <div class="values-grid">
+    <div class="value-card">
+      <div class="value-num">01</div>
+      <h3>Bez infolinii</h3>
+      <p>Piszesz, dzwonisz, klikasz — trafia bezpośrednio do osoby, która zna Twoją firmę. Zero przekierowań, zero ticketów w czyśćcu.</p>
+    </div>
+    <div class="value-card">
+      <div class="value-num">02</div>
+      <h3>Transparentne ceny</h3>
+      <p>Stała opłata, jasny zakres, zero ukrytych kosztów. Wycena projektowa zawsze przed startem, nie po fakcie.</p>
+    </div>
+    <div class="value-card">
+      <div class="value-num">03</div>
+      <h3>Twoja własność</h3>
+      <p>Kod, hasła, dostępy, dokumentacja — wszystko należy do Ciebie. Możesz w każdej chwili odejść, zabierając wszystko.</p>
+    </div>
+    <div class="value-card">
+      <div class="value-num">04</div>
+      <h3>Mówimy „nie"</h3>
+      <p>Gdy projekt nie ma sensu, mówimy to wprost. Gdy tańsze rozwiązanie wystarczy — proponujemy je, mimo niższej marży.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="final-cta-inner">
+    <h2>Porozmawiajmy <em>konkretnie.</em></h2>
+    <a href="index.html#audit" class="big-btn">
+      Umów bezpłatną rozmowę
+      <span class="arrow-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </a>
+    <div class="final-contact">
+      <div><span>Telefon</span><a href="tel:+48717771777">+48 71 777 17 77</a></div>
+      <div><span>Email</span><a href="mailto:hello@bambooit.pl">hello@bambooit.pl</a></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div>© 2026 Bambooit Sp. z o.o. — Ekologiczne myślenie o IT.</div>
+    <div>NIP 000-000-00-00 · <a href="o-nas.html">O nas</a> · <a href="#">Polityka prywatności</a> · <a href="#">RODO</a></div>
+  </div>
+</footer>
+
+<script>
+  // Mobile menu toggle
+  const burger = document.getElementById('burger');
+  const navLinks = document.getElementById('navLinks');
+  if (burger && navLinks) {
+    burger.addEventListener('click', () => {
+      burger.classList.toggle('open');
+      navLinks.classList.toggle('open');
+    });
+  }
+</script>
+
+</body>
+</html>

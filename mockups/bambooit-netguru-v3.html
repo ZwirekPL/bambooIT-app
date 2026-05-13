@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bambooit — Ekologiczne myślenie o IT</title>
+<meta name="description" content="Outsourcing IT, strony, aplikacje i automatyzacje dla MŚP. Stała opieka, szybka reakcja, przewidywalny koszt. Pakiety od 390 zł/mies." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;900&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --navy:#2C3E50;
+  --navy-deep:#1a2735;
+  --navy-soft:#3d556e;
+  --green:#8BC34A;
+  --green-deep:#6fa336;
+  --green-soft:#c8e6a0;
+  --paper:#f6f4ee;
+  --white:#ffffff;
+  --ink:#0e1822;
+  --line:rgba(44,62,80,0.12);
+  --line-strong:rgba(44,62,80,0.25);
+
+  --f-display:'Fraunces', Georgia, serif;
+  --f-sans:'Archivo', system-ui, sans-serif;
+  --f-mono:'JetBrains Mono', monospace;
+
+  --maxw:1440px;
+  --pad:clamp(20px, 4vw, 64px);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--f-sans);
+  font-weight:400;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+body.lock{overflow:hidden;height:100vh;}
+img,svg{display:block;max-width:100%;}
+a{color:inherit;text-decoration:none;}
+button{font:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+::selection{background:var(--green);color:var(--navy-deep);}
+
+/* ---------- LOADER ---------- */
+.loader{
+  position:fixed;inset:0;background:var(--navy-deep);z-index:1000;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:24px;
+  animation:loaderOut 0.8s cubic-bezier(.7,0,.2,1) 1.8s forwards;
+  pointer-events:none;
+}
+@keyframes loaderOut{
+  0%{opacity:1;transform:translateY(0);}
+  100%{opacity:0;transform:translateY(-100%);visibility:hidden;}
+}
+.loader.gsap-controlled{animation:none;}
+.loader-mark{
+  font-family:var(--f-display);font-weight:900;font-size:clamp(48px,10vw,120px);
+  color:var(--white);letter-spacing:-0.04em;line-height:1;
+}
+.loader-mark .accent{color:var(--green);font-style:italic;}
+.loader-bar{
+  width:min(280px,60vw);height:2px;background:rgba(255,255,255,0.12);
+  position:relative;overflow:hidden;
+}
+.loader-bar::after{
+  content:"";position:absolute;inset:0;background:var(--green);
+  transform:translateX(-100%);animation:loaderFill 1.2s cubic-bezier(.7,0,.2,1) forwards;
+}
+@keyframes loaderFill{to{transform:translateX(0);}}
+
+/* ---------- NAV ---------- */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px var(--pad);
+  transition:background .4s ease, padding .4s ease, color .4s ease;
+  mix-blend-mode:difference;color:#fff;
+}
+.nav.solid{
+  mix-blend-mode:normal;
+  background:rgba(246,244,238,0.85);
+  backdrop-filter:blur(14px) saturate(140%);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+  padding:14px var(--pad);
+  border-bottom:1px solid var(--line);
+  color:var(--navy);
+}
+.nav-logo{
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--f-sans);font-weight:900;font-size:22px;
+  letter-spacing:-0.02em;
+}
+.nav-logo .accent{color:var(--green);}
+.nav-links{display:flex;align-items:center;gap:36px;}
+.nav-links a{
+  font-size:14px;font-weight:500;
+  position:relative;padding:6px 0;
+}
+.nav-links a::after{
+  content:"";position:absolute;left:0;bottom:0;height:1px;width:0;
+  background:var(--green);transition:width .4s ease;
+}
+.nav-links a:hover::after{width:100%;}
+.nav-cta{
+  background:var(--green);color:var(--navy-deep) !important;
+  padding:12px 22px;border-radius:999px;font-size:14px;font-weight:600;
+  display:inline-flex;align-items:center;gap:8px;
+  transition:background .3s ease, transform .3s ease;
+}
+.nav-cta:hover{background:var(--white);transform:translateY(-1px);}
+.nav-cta::after{display:none !important;}
+
+.burger{display:none;width:32px;height:32px;flex-direction:column;justify-content:center;gap:5px;}
+.burger span{display:block;height:2px;background:currentColor;transition:transform .3s ease, opacity .3s ease;}
+.burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.burger.open span:nth-child(2){opacity:0;}
+.burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+@media (max-width:900px){
+  .nav-links{
+    position:fixed;top:0;right:-100%;width:80%;max-width:360px;height:100vh;
+    background:var(--navy-deep);flex-direction:column;justify-content:center;
+    align-items:flex-start;padding:60px var(--pad);gap:28px;
+    transition:right .4s cubic-bezier(.7,0,.2,1);
+  }
+  .nav-links.open{right:0;color:var(--white);}
+  .nav-links a{color:var(--white);font-size:24px;font-family:var(--f-display);}
+  .nav-cta{display:none;}
+  .burger{display:flex;z-index:60;}
+}
+
+/* ---------- HERO ---------- */
+.hero{
+  min-height:100vh;
+  padding:140px var(--pad) 80px;
+  position:relative;
+  display:flex;flex-direction:column;justify-content:center;
+  overflow:hidden;
+}
+.hero-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(var(--line) 1px,transparent 1px),
+    linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:80px 80px;
+  opacity:.5;
+  mask-image:radial-gradient(ellipse at 30% 50%, black 30%, transparent 75%);
+  pointer-events:none;
+  will-change:transform;
+}
+.hero-inner{position:relative;max-width:var(--maxw);margin:0 auto;width:100%;z-index:2;}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--f-mono);font-size:12px;text-transform:uppercase;
+  letter-spacing:0.18em;color:var(--navy-soft);
+  padding:8px 16px;border:1px solid var(--line-strong);border-radius:999px;
+  margin-bottom:32px;background:rgba(255,255,255,0.6);
+  opacity:0;
+}
+.hero-eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 0 4px rgba(139,195,74,0.25);animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{50%{box-shadow:0 0 0 8px rgba(139,195,74,0);}}
+
+.hero-title{
+  font-family:var(--f-display);
+  font-weight:300;
+  font-size:clamp(48px, 9.5vw, 168px);
+  line-height:0.92;
+  letter-spacing:-0.045em;
+  color:var(--navy);
+  max-width:14ch;
+}
+.hero-title em{font-style:italic;font-weight:600;color:var(--green-deep);position:relative;}
+.split-line{display:block;overflow:hidden;}
+.split-char{display:inline-block;will-change:transform,opacity;}
+
+.hero-bottom{
+  display:grid;grid-template-columns:1fr auto;gap:48px;align-items:end;
+  margin-top:64px;opacity:0;
+}
+.hero-lede{
+  max-width:42ch;font-size:clamp(16px,1.4vw,19px);line-height:1.55;
+  color:var(--navy-soft);font-weight:400;
+}
+.hero-lede strong{color:var(--navy);font-weight:700;}
+
+.hero-pricing-card{
+  background:var(--navy-deep);color:var(--white);
+  padding:28px 32px;border-radius:20px;
+  min-width:300px;position:relative;overflow:hidden;
+}
+.hero-pricing-card::before{
+  content:"";position:absolute;top:-50%;right:-20%;width:200px;height:200px;
+  background:radial-gradient(circle,var(--green) 0%,transparent 70%);
+  opacity:.25;
+}
+.hero-pricing-card .label{
+  font-family:var(--f-mono);font-size:11px;text-transform:uppercase;
+  letter-spacing:0.2em;opacity:.6;margin-bottom:12px;
+}
+.hero-pricing-card .price{
+  font-family:var(--f-display);font-weight:600;font-size:56px;line-height:1;
+  letter-spacing:-0.03em;
+}
+.hero-pricing-card .price small{font-size:18px;opacity:.7;font-weight:400;}
+.hero-pricing-card .desc{font-size:14px;opacity:.75;margin-top:8px;}
+.hero-pricing-card .cta{
+  display:inline-flex;align-items:center;gap:8px;
+  margin-top:20px;color:var(--green);font-weight:600;font-size:14px;
+  border-bottom:1px solid var(--green);padding-bottom:2px;
+}
+
+.hero-panda{
+  position:absolute;right:-2%;top:50%;transform:translateY(-50%);
+  width:min(46vw,640px);pointer-events:none;
+  z-index:1;will-change:transform;
+}
+.hero-panda svg{width:100%;height:auto;overflow:visible;}
+.panda-line{
+  fill:none;stroke:var(--navy);stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round;
+}
+.panda-fill{fill:var(--navy);opacity:0;}
+.panda-leaf{fill:var(--green);opacity:0;transform-origin:center;transform:scale(0);}
+.panda-eye{fill:var(--white);opacity:0;}
+
+@media (max-width:1100px){
+  .hero-panda{opacity:.2;width:60vw;right:-15%;}
+}
+@media (max-width:760px){
+  .hero-bottom{grid-template-columns:1fr;gap:32px;}
+  .hero-pricing-card{min-width:0;}
+}
+
+/* ---------- MARQUEE ---------- */
+.marquee{
+  background:var(--navy);color:var(--white);
+  padding:18px 0;overflow:hidden;border-block:1px solid var(--navy-deep);
+}
+.marquee-track{display:flex;gap:48px;white-space:nowrap;will-change:transform;}
+.marquee-item{
+  font-family:var(--f-display);font-weight:300;font-style:italic;
+  font-size:clamp(28px,4vw,52px);letter-spacing:-0.02em;
+  display:inline-flex;align-items:center;gap:48px;
+}
+.marquee-item .dot{width:10px;height:10px;border-radius:50%;background:var(--green);}
+
+/* ---------- SECTION SHARED ---------- */
+section{position:relative;}
+.section-pad{padding:120px var(--pad);}
+.section-inner{max-width:var(--maxw);margin:0 auto;}
+.section-label{
+  font-family:var(--f-mono);font-size:12px;text-transform:uppercase;
+  letter-spacing:0.2em;color:var(--green-deep);
+  display:flex;align-items:center;gap:14px;margin-bottom:32px;
+}
+.section-label::before{content:"";width:32px;height:1px;background:var(--green-deep);}
+.section-title{
+  font-family:var(--f-display);font-weight:300;
+  font-size:clamp(40px,6vw,96px);line-height:1;
+  letter-spacing:-0.035em;color:var(--navy);
+  max-width:18ch;
+}
+.section-title em{font-style:italic;font-weight:600;color:var(--green-deep);}
+
+/* ---------- MICRO NARRATIVE TRANSITIONS ---------- */
+.narrative{
+  height:100vh;background:var(--navy-deep);color:var(--white);
+  display:flex;align-items:center;justify-content:center;
+  padding:0 var(--pad);position:relative;overflow:hidden;
+}
+.narrative.green{background:var(--green);color:var(--navy-deep);}
+.narrative.paper{background:var(--paper);color:var(--navy);}
+.narrative-text{
+  font-family:var(--f-display);font-weight:300;font-style:italic;
+  font-size:clamp(40px,7vw,120px);line-height:1;letter-spacing:-0.04em;
+  text-align:center;max-width:18ch;
+}
+.narrative-text strong{font-weight:600;font-style:normal;}
+.narrative-text .nw{display:inline-block;will-change:transform,opacity;}
+.narrative-bg{
+  position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at center, rgba(139,195,74,0.15) 0%, transparent 60%);
+  will-change:transform;
+}
+
+/* ---------- MANIFESTO ---------- */
+.manifesto{
+  background:var(--paper);padding:160px var(--pad);
+  border-top:1px solid var(--line);
+}
+.manifesto-grid{
+  max-width:var(--maxw);margin:0 auto;
+  display:grid;grid-template-columns:1.2fr 1fr;gap:96px;align-items:start;
+}
+.manifesto-text{
+  font-family:var(--f-display);font-weight:300;
+  font-size:clamp(28px,3.8vw,56px);line-height:1.15;
+  letter-spacing:-0.025em;
+}
+.manifesto-text em{font-style:italic;font-weight:600;}
+.mc{display:inline-block;color:var(--line-strong);transition:color .15s linear;will-change:color;}
+.mc.in{color:var(--navy);}
+.mc.em{color:var(--line-strong);}
+.mc.em.in{color:var(--green-deep);}
+
+.numbers{display:flex;flex-direction:column;gap:48px;padding-top:24px;}
+.number{border-top:1px solid var(--line-strong);padding-top:20px;overflow:hidden;}
+.number .val{
+  font-family:var(--f-display);font-weight:600;
+  font-size:clamp(64px,7vw,108px);line-height:1;letter-spacing:-0.04em;
+  color:var(--navy);
+  display:flex;align-items:baseline;
+}
+.number .val .num-display{display:inline-block;}
+.number .val .suffix{color:var(--green-deep);}
+.number .lbl{
+  font-size:14px;color:var(--navy-soft);margin-top:8px;max-width:28ch;line-height:1.4;
+}
+
+@media (max-width:900px){
+  .manifesto-grid{grid-template-columns:1fr;gap:64px;}
+}
+
+/* ---------- OFFER (4 services overview) ---------- */
+.offer{
+  background:var(--paper);
+  padding:120px var(--pad) 100px;
+  position:relative;
+}
+.offer-inner{max-width:var(--maxw);margin:0 auto;}
+.offer-head{
+  display:grid;grid-template-columns:1fr 1.2fr;gap:80px;
+  margin-bottom:80px;align-items:end;
+}
+.offer-head h2{
+  font-family:var(--f-display);font-weight:900;
+  font-size:clamp(40px,5.5vw,84px);line-height:0.95;letter-spacing:-0.03em;
+  color:var(--navy-deep);
+}
+.offer-head h2 em{color:var(--green-deep);font-style:italic;}
+.offer-head p{
+  font-size:clamp(16px,1.3vw,20px);line-height:1.6;color:var(--navy-soft);
+  max-width:520px;
+}
+.offer-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:20px;
+}
+.offer-card{
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:36px 28px 32px;
+  display:flex;flex-direction:column;justify-content:space-between;
+  min-height:380px;
+  transition:transform 0.4s cubic-bezier(.7,0,.2,1), box-shadow 0.4s, border-color 0.4s;
+  position:relative;overflow:hidden;
+}
+.offer-card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 24px 48px -16px rgba(44,62,80,0.18);
+  border-color:var(--line-strong);
+}
+.offer-card.featured{
+  background:var(--navy-deep);color:var(--white);
+  border-color:var(--navy-deep);
+}
+.offer-card.featured .offer-num,
+.offer-card.featured .offer-desc{color:var(--green-soft);}
+.offer-card.featured .offer-arrow{color:var(--green);}
+.offer-card .featured-tag{
+  position:absolute;top:24px;right:24px;
+  font-family:var(--f-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--green);
+}
+.offer-num{
+  font-family:var(--f-mono);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--navy-soft);margin-bottom:auto;
+}
+.offer-card h3{
+  font-family:var(--f-display);font-weight:600;
+  font-size:clamp(24px,1.9vw,32px);line-height:1.05;letter-spacing:-0.02em;
+  margin:80px 0 14px;
+}
+.offer-desc{
+  font-size:14.5px;line-height:1.55;color:var(--navy-soft);margin-bottom:24px;
+}
+.offer-arrow{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--f-mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--navy-deep);
+}
+.offer-arrow svg{transition:transform 0.3s;}
+.offer-card:hover .offer-arrow svg{transform:translateX(6px);}
+
+.team-line{
+  margin-top:64px;padding:32px 40px;
+  background:var(--navy-deep);color:var(--white);
+  border-radius:20px;
+  display:flex;align-items:center;justify-content:space-between;gap:32px;
+  flex-wrap:wrap;
+}
+.team-line-text{
+  font-family:var(--f-display);font-weight:400;font-style:italic;
+  font-size:clamp(18px,1.6vw,24px);line-height:1.4;
+  max-width:720px;
+}
+.team-line-text strong{font-weight:600;font-style:normal;color:var(--green);}
+.team-line-cta{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:14px 28px;border-radius:999px;background:var(--green);color:var(--navy-deep);
+  font-family:var(--f-mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;
+  transition:transform 0.3s, background 0.3s;
+  white-space:nowrap;
+}
+.team-line-cta:hover{background:var(--green-deep);transform:translateY(-2px);}
+
+@media (max-width:1100px){
+  .offer-head{grid-template-columns:1fr;gap:32px;margin-bottom:48px;}
+  .offer-grid{grid-template-columns:repeat(2,1fr);}
+  .offer-card{min-height:320px;}
+}
+@media (max-width:640px){
+  .offer{padding:80px var(--pad) 80px;}
+  .offer-grid{grid-template-columns:1fr;}
+  .team-line{padding:24px 28px;flex-direction:column;align-items:flex-start;}
+}
+
+/* ---------- HORIZONTAL SERVICES ---------- */
+.h-services{
+  background:var(--navy-deep);color:var(--white);
+  position:relative;overflow:hidden;
+}
+.h-services-intro{
+  padding:120px var(--pad) 60px;max-width:var(--maxw);margin:0 auto;
+}
+.h-services-intro .section-label{color:var(--green);}
+.h-services-intro .section-label::before{background:var(--green);}
+.h-services-intro h2{color:var(--white);}
+.h-services-intro h2 em{color:var(--green);}
+.h-services-intro p{
+  margin-top:32px;max-width:50ch;font-size:18px;line-height:1.6;
+  color:rgba(255,255,255,0.7);
+}
+
+.h-pin{position:relative;height:100vh;overflow:hidden;}
+.h-track{
+  display:flex;height:100%;align-items:center;
+  padding-left:var(--pad);will-change:transform;
+}
+.h-card{
+  flex:0 0 auto;width:min(72vw,560px);height:72vh;max-height:600px;
+  margin-right:32px;
+  background:var(--navy);
+  border-radius:24px;
+  padding:48px;
+  display:flex;flex-direction:column;justify-content:space-between;
+  position:relative;overflow:hidden;
+  border:1px solid rgba(255,255,255,0.06);
+  transform:scale(0.85);opacity:0.4;
+  transition:transform .5s cubic-bezier(.7,0,.2,1), opacity .5s ease, border-color .5s ease;
+  will-change:transform,opacity;
+}
+.h-card.active{
+  transform:scale(1);opacity:1;
+  border-color:var(--green);
+  box-shadow:0 30px 80px -20px rgba(139,195,74,0.3);
+}
+.h-card::before{
+  content:"";position:absolute;top:-30%;right:-30%;width:60%;height:60%;
+  background:radial-gradient(circle,var(--green) 0%,transparent 70%);
+  opacity:.12;transition:opacity .5s ease, transform .8s ease;
+}
+.h-card.active::before{opacity:.3;transform:scale(1.3);}
+.h-card .num{
+  font-family:var(--f-mono);font-size:13px;color:var(--green);
+  letter-spacing:0.15em;
+}
+.h-card h3{
+  font-family:var(--f-display);font-weight:400;
+  font-size:clamp(32px,3.5vw,52px);line-height:1.05;letter-spacing:-0.025em;
+  color:var(--white);margin-top:20px;
+}
+.h-card .desc{
+  margin-top:24px;font-size:16px;line-height:1.6;
+  color:rgba(255,255,255,0.65);max-width:34ch;
+}
+.h-card .features{
+  list-style:none;display:flex;flex-direction:column;gap:10px;margin-top:auto;padding-top:32px;
+  border-top:1px solid rgba(255,255,255,0.1);
+}
+.h-card .features li{
+  font-size:14px;color:rgba(255,255,255,0.85);
+  display:flex;align-items:center;gap:10px;
+}
+.h-card .features li::before{
+  content:"";width:6px;height:6px;border-radius:50%;background:var(--green);flex:none;
+}
+
+.h-progress{
+  position:absolute;bottom:48px;left:var(--pad);right:var(--pad);
+  height:2px;background:rgba(255,255,255,0.1);z-index:5;
+}
+.h-progress-fill{height:100%;background:var(--green);width:0;}
+.h-counter{
+  position:absolute;bottom:64px;right:var(--pad);
+  font-family:var(--f-mono);font-size:11px;letter-spacing:0.2em;
+  color:rgba(255,255,255,0.5);text-transform:uppercase;
+}
+.h-counter strong{color:var(--green);font-weight:700;}
+
+@media (max-width:760px){
+  .h-pin{height:auto;}
+  .h-track{flex-direction:column;height:auto;padding:0 var(--pad) 80px;gap:24px;}
+  .h-card{width:100%;height:auto;min-height:480px;margin-right:0;transform:none;opacity:1;}
+  .h-progress,.h-counter{display:none;}
+}
+
+/* ---------- PRICING 3D STACK ---------- */
+.pricing{
+  background:var(--paper);position:relative;overflow:hidden;
+}
+.pricing-pin{
+  height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:0 var(--pad);position:relative;perspective:1500px;
+}
+.pricing-bg-text{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  font-family:var(--f-display);font-weight:900;font-style:italic;
+  font-size:clamp(180px,28vw,420px);color:var(--navy);
+  opacity:.04;letter-spacing:-0.06em;line-height:1;pointer-events:none;
+  white-space:nowrap;will-change:transform;
+}
+.pricing-stack{
+  position:relative;width:100%;max-width:1200px;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:24px;
+  transform-style:preserve-3d;
+}
+.tier{
+  background:var(--white);border-radius:24px;padding:40px 36px;
+  border:1px solid var(--line);
+  display:flex;flex-direction:column;
+  position:relative;
+  will-change:transform,opacity;
+  transition:box-shadow .4s ease;
+  transform-style:preserve-3d;
+}
+.tier:hover{box-shadow:0 30px 60px -20px rgba(44,62,80,0.25);}
+.tier.featured{
+  background:var(--navy-deep);color:var(--white);border-color:var(--navy-deep);
+}
+.tier .tier-label{
+  font-family:var(--f-mono);font-size:11px;text-transform:uppercase;
+  letter-spacing:0.2em;color:var(--green-deep);margin-bottom:8px;
+}
+.tier.featured .tier-label{color:var(--green);}
+.tier h3{
+  font-family:var(--f-display);font-weight:600;font-size:32px;
+  letter-spacing:-0.02em;
+}
+.tier .price{
+  font-family:var(--f-display);font-weight:300;
+  font-size:64px;line-height:1;letter-spacing:-0.04em;margin-top:24px;
+}
+.tier .price small{font-size:16px;font-weight:400;opacity:.6;}
+.tier .price-desc{font-size:13px;opacity:.6;margin-top:6px;}
+.tier ul{list-style:none;margin:32px 0;display:flex;flex-direction:column;gap:12px;flex:1;}
+.tier ul li{
+  font-size:14px;line-height:1.5;display:flex;gap:10px;align-items:flex-start;
+}
+.tier ul li svg{flex:none;margin-top:3px;}
+.tier .tier-cta{
+  background:var(--navy);color:var(--white);padding:14px 24px;
+  border-radius:999px;text-align:center;font-weight:600;font-size:14px;
+  transition:background .25s ease;
+}
+.tier .tier-cta:hover{background:var(--green);color:var(--navy-deep);}
+.tier.featured .tier-cta{background:var(--green);color:var(--navy-deep);}
+.tier.featured .tier-cta:hover{background:var(--white);}
+.tier .badge{
+  position:absolute;top:-12px;right:24px;background:var(--green);color:var(--navy-deep);
+  font-family:var(--f-mono);font-size:11px;letter-spacing:0.15em;
+  padding:6px 12px;border-radius:999px;font-weight:700;text-transform:uppercase;
+}
+
+@media (max-width:900px){
+  .pricing-pin{height:auto;padding:80px var(--pad);perspective:none;}
+  .pricing-stack{grid-template-columns:1fr;gap:20px;}
+}
+
+/* ---------- PROCESS ---------- */
+.process{
+  background:var(--white);padding:160px var(--pad);
+  border-top:1px solid var(--line);
+}
+.process-inner{max-width:var(--maxw);margin:0 auto;}
+.process-head{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:end;margin-bottom:96px;}
+.process-head p{font-size:18px;line-height:1.6;color:var(--navy-soft);max-width:42ch;}
+
+.process-steps{position:relative;}
+.process-line-svg{
+  position:absolute;left:48px;top:0;bottom:0;width:2px;height:100%;overflow:visible;
+  pointer-events:none;
+}
+.process-line-path{
+  fill:none;stroke:var(--green);stroke-width:2;
+  stroke-dasharray:1000;stroke-dashoffset:1000;
+  will-change:stroke-dashoffset;
+}
+.step{
+  display:grid;grid-template-columns:96px 1fr 1.5fr;gap:48px;align-items:start;
+  padding:48px 0;border-bottom:1px solid var(--line);
+  position:relative;
+}
+.step:last-child{border-bottom:none;}
+.step-num{
+  font-family:var(--f-display);font-style:italic;font-weight:300;
+  font-size:96px;line-height:1;color:var(--green-deep);
+  letter-spacing:-0.04em;
+  position:relative;z-index:2;
+  display:inline-block;will-change:transform;
+}
+.step-dot{
+  position:absolute;left:36px;top:60px;width:24px;height:24px;border-radius:50%;
+  background:var(--white);border:2px solid var(--line-strong);
+  z-index:3;transition:background .5s ease, border-color .5s ease, transform .5s ease;
+}
+.step.active .step-dot{
+  background:var(--green);border-color:var(--green);transform:scale(1.4);
+  box-shadow:0 0 0 8px rgba(139,195,74,0.2);
+}
+.step h3{
+  font-family:var(--f-display);font-weight:600;font-size:32px;
+  letter-spacing:-0.02em;color:var(--navy);
+}
+.step p{font-size:16px;line-height:1.6;color:var(--navy-soft);}
+
+@media (max-width:900px){
+  .process-head{grid-template-columns:1fr;}
+  .step{grid-template-columns:1fr;gap:16px;padding:40px 0;}
+  .process-line-svg,.step-dot{display:none;}
+  .step-num{font-size:64px;}
+}
+
+/* ---------- INDUSTRIES (morphing bg) ---------- */
+.industries{
+  background:var(--green);color:var(--navy-deep);position:relative;
+  transition:background 0.6s ease;
+}
+.industries.morph-1{background:#a8d56a;}
+.industries.morph-2{background:#7eb33f;}
+.industries.morph-3{background:#9ec956;}
+.industries.morph-4{background:#6fa336;}
+.industries.morph-5{background:#b5db7c;}
+.industries.morph-6{background:#88be4a;}
+.industries-pin{
+  min-height:100vh;display:flex;align-items:center;
+  padding:120px var(--pad);
+}
+.industries-grid{
+  max-width:var(--maxw);margin:0 auto;width:100%;
+  display:grid;grid-template-columns:1fr 1.5fr;gap:96px;align-items:center;
+}
+.industries-grid .section-label{color:var(--navy-deep);}
+.industries-grid .section-label::before{background:var(--navy-deep);}
+.industries-grid h2{color:var(--navy-deep);}
+.industries-grid h2 em{color:var(--white);font-style:italic;}
+
+.ind-list{display:flex;flex-direction:column;}
+.ind-item{
+  border-top:1px solid rgba(44,62,80,0.2);
+  padding:28px 0;display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;transition:padding .4s ease;
+}
+.ind-item:last-child{border-bottom:1px solid rgba(44,62,80,0.2);}
+.ind-item:hover{padding-left:24px;}
+.ind-item .name{
+  font-family:var(--f-display);font-weight:300;font-size:clamp(28px,3.5vw,52px);
+  letter-spacing:-0.02em;line-height:1;
+}
+.ind-item .arrow{
+  width:48px;height:48px;border-radius:50%;border:1px solid var(--navy-deep);
+  display:flex;align-items:center;justify-content:center;
+  transition:background .3s ease, transform .3s ease;flex:none;
+}
+.ind-item:hover .arrow{background:var(--navy-deep);color:var(--green);transform:rotate(-45deg);}
+
+@media (max-width:900px){
+  .industries-grid{grid-template-columns:1fr;gap:48px;}
+}
+
+/* ---------- AUDIT FORM ---------- */
+.audit{
+  background:var(--navy-deep);color:var(--white);padding:160px var(--pad);
+}
+.audit-inner{max-width:1100px;margin:0 auto;}
+.audit-head{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:end;margin-bottom:64px;}
+.audit-head .section-label{color:var(--green);}
+.audit-head .section-label::before{background:var(--green);}
+.audit-head h2{color:var(--white);}
+.audit-head h2 em{color:var(--green);}
+.audit-head p{font-size:17px;line-height:1.6;color:rgba(255,255,255,0.7);max-width:38ch;}
+
+.audit-form{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:24px;padding:48px;
+}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.field{display:flex;flex-direction:column;gap:8px;}
+.field.full{grid-column:1 / -1;}
+.field label{
+  font-family:var(--f-mono);font-size:11px;letter-spacing:0.18em;
+  text-transform:uppercase;color:var(--green);
+}
+.field input,.field select,.field textarea{
+  background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.2);
+  padding:12px 0;color:var(--white);font:inherit;font-size:16px;
+  transition:border-color .25s ease;
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  outline:none;border-bottom-color:var(--green);
+}
+.field select option{background:var(--navy-deep);}
+.field textarea{resize:vertical;min-height:80px;}
+
+.checkbox-field{
+  display:flex;gap:12px;align-items:flex-start;margin-top:24px;
+  font-size:13px;line-height:1.5;color:rgba(255,255,255,0.7);
+}
+.checkbox-field input{width:18px;height:18px;accent-color:var(--green);margin-top:2px;flex:none;}
+.checkbox-field a{color:var(--green);text-decoration:underline;}
+
+.submit-btn{
+  margin-top:32px;background:var(--green);color:var(--navy-deep);
+  padding:18px 36px;border-radius:999px;font-weight:700;font-size:16px;
+  display:inline-flex;align-items:center;gap:12px;
+  transition:background .25s ease, transform .25s ease;
+}
+.submit-btn:hover{background:var(--white);transform:translateY(-2px);}
+
+@media (max-width:760px){
+  .audit-head{grid-template-columns:1fr;gap:32px;}
+  .field-grid{grid-template-columns:1fr;}
+  .audit-form{padding:32px 24px;}
+}
+
+/* ---------- FAQ ---------- */
+.faq{background:var(--paper);padding:160px var(--pad);}
+.faq-inner{max-width:var(--maxw);margin:0 auto;display:grid;grid-template-columns:1fr 1.6fr;gap:96px;}
+.faq-head h2{position:sticky;top:120px;}
+.faq-list{display:flex;flex-direction:column;}
+.faq-item{border-top:1px solid var(--line-strong);}
+.faq-item:last-child{border-bottom:1px solid var(--line-strong);}
+.faq-q{
+  width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center;
+  padding:32px 0;font-family:var(--f-display);font-weight:400;
+  font-size:clamp(20px,2.2vw,28px);color:var(--navy);letter-spacing:-0.015em;
+  line-height:1.3;gap:24px;
+}
+.faq-q .plus{
+  flex:none;width:32px;height:32px;border-radius:50%;
+  border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;
+  transition:transform .35s ease, background .35s ease, border-color .35s ease;
+  font-size:18px;color:var(--navy);
+}
+.faq-item.open .faq-q .plus{transform:rotate(45deg);background:var(--green);border-color:var(--green);color:var(--navy-deep);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.7,0,.2,1);}
+.faq-a-inner{
+  padding:0 0 32px;font-size:16px;line-height:1.65;color:var(--navy-soft);max-width:60ch;
+}
+
+@media (max-width:900px){
+  .faq-inner{grid-template-columns:1fr;gap:48px;}
+  .faq-head h2{position:static;}
+}
+
+/* ---------- FINAL CTA ---------- */
+.final-cta{
+  background:var(--navy-deep);color:var(--white);
+  padding:200px var(--pad) 100px;position:relative;overflow:hidden;
+}
+.final-cta::before{
+  content:"";position:absolute;top:-40%;right:-10%;width:600px;height:600px;
+  background:radial-gradient(circle,var(--green) 0%,transparent 60%);
+  opacity:.18;
+}
+.final-cta-inner{max-width:var(--maxw);margin:0 auto;position:relative;}
+.final-cta h2{
+  font-family:var(--f-display);font-weight:300;
+  font-size:clamp(48px,9vw,140px);line-height:0.95;letter-spacing:-0.04em;
+  color:var(--white);max-width:14ch;
+}
+.final-cta h2 em{font-style:italic;font-weight:600;color:var(--green);}
+.final-cta-bottom{
+  margin-top:80px;display:flex;justify-content:space-between;align-items:flex-end;
+  gap:48px;flex-wrap:wrap;
+}
+.final-cta .big-btn{
+  display:inline-flex;align-items:center;gap:16px;
+  background:var(--green);color:var(--navy-deep);
+  padding:24px 36px;border-radius:999px;font-weight:700;font-size:18px;
+  transition:background .25s ease, transform .25s ease;
+}
+.final-cta .big-btn:hover{background:var(--white);transform:translateY(-3px);}
+.final-cta .big-btn .arrow-circle{
+  width:32px;height:32px;border-radius:50%;background:var(--navy-deep);color:var(--green);
+  display:flex;align-items:center;justify-content:center;
+}
+.final-contact{display:flex;gap:48px;flex-wrap:wrap;}
+.final-contact div span{
+  font-family:var(--f-mono);font-size:11px;letter-spacing:0.2em;
+  text-transform:uppercase;color:var(--green);display:block;margin-bottom:6px;
+}
+.final-contact div a{
+  font-family:var(--f-display);font-size:22px;color:var(--white);
+  border-bottom:1px solid transparent;transition:border-color .3s ease;
+}
+.final-contact div a:hover{border-bottom-color:var(--green);}
+
+footer{
+  background:var(--navy-deep);color:var(--white);
+  padding:48px var(--pad);
+  border-top:1px solid rgba(255,255,255,0.08);
+}
+.footer-inner{
+  max-width:var(--maxw);margin:0 auto;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;
+  font-size:13px;color:rgba(255,255,255,0.5);
+}
+.footer-inner a{color:rgba(255,255,255,0.7);}
+.footer-inner a:hover{color:var(--green);}
+
+/* ---------- SCROLL PROGRESS BAR ---------- */
+.scroll-progress{
+  position:fixed;top:0;left:0;height:3px;background:var(--green);
+  width:0;z-index:100;will-change:width;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;scroll-behavior:auto !important;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div class="loader" id="loader">
+  <div class="loader-mark">ba<span class="accent">m</span>boo<span class="accent">it</span></div>
+  <div class="loader-bar"></div>
+</div>
+
+<!-- SCROLL PROGRESS -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a href="#" class="nav-logo">ba<span class="accent">m</span>boo<span class="accent">it</span></a>
+  <div class="nav-links" id="navLinks">
+    <a href="#offer">Co robimy</a>
+    <a href="#services">Obsługa IT</a>
+    <a href="#pricing">Cennik</a>
+    <a href="#process">Jak działamy</a>
+    <a href="o-nas.html">O nas</a>
+    <a href="#audit">Audyt</a>
+    <a href="#faq">FAQ</a>
+    <a href="#audit" class="nav-cta">Bezpłatny audyt →</a>
+  </div>
+  <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-grid"></div>
+
+  <div class="hero-panda" aria-hidden="true">
+    <svg viewBox="0 0 400 400" id="pandaSvg">
+      <!-- Bamboo leaves left -->
+      <g>
+        <path class="panda-leaf" d="M50 180 Q40 170 30 175 Q35 185 50 180" data-delay="0.1"/>
+        <path class="panda-leaf" d="M55 200 Q35 195 25 205 Q40 215 55 200" data-delay="0.15"/>
+        <path class="panda-leaf" d="M60 220 Q40 220 30 230 Q45 240 60 220" data-delay="0.2"/>
+      </g>
+      <!-- Ears (filled) -->
+      <polygon class="panda-fill" points="120,120 145,100 160,135"/>
+      <polygon class="panda-fill" points="280,120 255,100 240,135"/>
+      <!-- Head outline + facets (lines that draw) -->
+      <polygon class="panda-line" points="160,135 200,115 240,135 270,180 260,240 200,290 140,240 130,180"/>
+      <line class="panda-line" x1="200" y1="115" x2="200" y2="290"/>
+      <line class="panda-line" x1="160" y1="135" x2="200" y2="200"/>
+      <line class="panda-line" x1="240" y1="135" x2="200" y2="200"/>
+      <line class="panda-line" x1="130" y1="180" x2="200" y2="200"/>
+      <line class="panda-line" x1="270" y1="180" x2="200" y2="200"/>
+      <line class="panda-line" x1="140" y1="240" x2="200" y2="200"/>
+      <line class="panda-line" x1="260" y1="240" x2="200" y2="200"/>
+      <!-- Eye patches (filled) -->
+      <polygon class="panda-fill" points="155,175 180,165 185,200 165,210"/>
+      <polygon class="panda-fill" points="245,175 220,165 215,200 235,210"/>
+      <!-- Eyes (white dots) -->
+      <circle class="panda-eye" cx="172" cy="188" r="4"/>
+      <circle class="panda-eye" cx="228" cy="188" r="4"/>
+      <!-- Nose -->
+      <polygon class="panda-fill" points="195,225 205,225 200,235"/>
+      <!-- Mouth -->
+      <path class="panda-line" d="M195 245 Q200 252 205 245"/>
+      <!-- Bamboo leaves right -->
+      <g>
+        <path class="panda-leaf" d="M350 180 Q360 170 370 175 Q365 185 350 180" data-delay="0.25"/>
+        <path class="panda-leaf" d="M345 200 Q365 195 375 205 Q360 215 345 200" data-delay="0.3"/>
+        <path class="panda-leaf" d="M340 220 Q360 220 370 230 Q355 240 340 220" data-delay="0.35"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="hero-inner">
+    <div class="hero-eyebrow" id="heroEyebrow">
+      <span class="dot"></span>
+      Outsourcing IT dla MŚP — Wrocław i okolice
+    </div>
+
+    <h1 class="hero-title" id="heroTitle">
+      <span class="split-line" data-text="Twoje IT"></span>
+      <span class="split-line" data-text="działa"></span>
+      <span class="split-line em" data-text="jak natura."></span>
+    </h1>
+
+    <div class="hero-bottom" id="heroBottom">
+      <p class="hero-lede">
+        <strong>Stała opieka IT dla małych i średnich firm.</strong>
+        Bez zaskoczeń na fakturze, bez czekania w kolejce do helpdesku, bez tłumaczenia tego samego trzy razy. Dbamy o Twoje systemy tak, żebyś mógł zająć się swoim biznesem.
+      </p>
+
+      <div class="hero-pricing-card">
+        <div class="label">Pakiety od</div>
+        <div class="price">390 zł<small>/mies.</small></div>
+        <div class="desc">Pełna opieka IT — pomoc zdalna, monitoring, backup</div>
+        <a href="#pricing" class="cta">Zobacz wszystkie pakiety →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee-track" id="marqueeTrack">
+    <span class="marquee-item">Pomoc zdalna <span class="dot"></span></span>
+    <span class="marquee-item">Monitoring 24/7 <span class="dot"></span></span>
+    <span class="marquee-item">Backup automatyczny <span class="dot"></span></span>
+    <span class="marquee-item">Bezpieczeństwo RODO <span class="dot"></span></span>
+    <span class="marquee-item">Microsoft 365 <span class="dot"></span></span>
+    <span class="marquee-item">Cyberbezpieczeństwo <span class="dot"></span></span>
+    <span class="marquee-item">Pomoc zdalna <span class="dot"></span></span>
+    <span class="marquee-item">Monitoring 24/7 <span class="dot"></span></span>
+    <span class="marquee-item">Backup automatyczny <span class="dot"></span></span>
+    <span class="marquee-item">Bezpieczeństwo RODO <span class="dot"></span></span>
+  </div>
+</div>
+
+<!-- OFFER — 4 services overview -->
+<section class="offer" id="offer">
+  <div class="offer-inner">
+    <div class="offer-head">
+      <h2>Cztery filary,<br>jeden <em>partner.</em></h2>
+      <p>Nie jesteśmy korporacją z pięciopiętrową infolinią. Jesteśmy dwuosobowym zespołem, który ogarnia całą technologię w Twojej firmie — od poczty i drukarek po custom aplikacje i automatyzacje procesów.</p>
+    </div>
+
+    <div class="offer-grid">
+      <div class="offer-card featured">
+        <span class="featured-tag">Główna usługa</span>
+        <div class="offer-num">01 / Abonament</div>
+        <h3>Obsługa<br>IT</h3>
+        <p class="offer-desc">Stała opieka nad sprzętem, siecią, pocztą, backupem i bezpieczeństwem. Jeden stały koszt zamiast nieprzewidywalnych awarii.</p>
+        <a href="#pricing" class="offer-arrow">
+          Zobacz pakiety
+          <svg width="20" height="12" viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 7h22M17 1l6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="offer-card">
+        <div class="offer-num">02 / Projekt</div>
+        <h3>Strony<br>internetowe</h3>
+        <p class="offer-desc">Strony firmowe, sklepy, landing page. Nowoczesne technologie, mobile-first, SEO. Wycena indywidualna po rozmowie.</p>
+        <a href="strony-internetowe.html" class="offer-arrow">
+          Dowiedz się więcej
+          <svg width="20" height="12" viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 7h22M17 1l6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="offer-card">
+        <div class="offer-num">03 / Projekt</div>
+        <h3>Aplikacje<br>na zamówienie</h3>
+        <p class="offer-desc">Custom software dla firm, którym nie wystarcza gotowiec. Panele klienta, CRM-y, narzędzia wewnętrzne, SaaS B2B.</p>
+        <a href="aplikacje.html" class="offer-arrow">
+          Dowiedz się więcej
+          <svg width="20" height="12" viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 7h22M17 1l6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="offer-card">
+        <div class="offer-num">04 / Optymalizacja</div>
+        <h3>Automatyzacje<br>procesów</h3>
+        <p class="offer-desc">Łączymy systemy, eliminujemy ręczną pracę, mierzymy ROI. n8n, Make, custom integracje. Audyt procesów na start.</p>
+        <a href="automatyzacje.html" class="offer-arrow">
+          Dowiedz się więcej
+          <svg width="20" height="12" viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 7h22M17 1l6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="team-line">
+      <div class="team-line-text">
+        Wszystko obsługuje <strong>2-osobowy zespół</strong> — Remigiusz (IT) i Wirgiliusz (strony, aplikacje, automatyzacje). Bez infolinii. Zawsze ten sam człowiek po drugiej stronie.
+      </div>
+      <a href="o-nas.html" class="team-line-cta">
+        Poznaj nas →
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- NARRATIVE 1 -->
+<section class="narrative" data-narrative="1">
+  <div class="narrative-bg"></div>
+  <div class="narrative-text" data-text="Najpierw spójrz na liczby."></div>
+</section>
+
+<!-- MANIFESTO -->
+<section class="manifesto">
+  <div class="manifesto-grid">
+    <div class="manifesto-text" id="manifestoText">
+Wierzymy, że IT w małej firmie powinno być <em>niewidoczne</em> — tak samo jak prąd w gniazdku. Po prostu <em>działa.</em>
+    </div>
+
+    <div class="numbers">
+      <div class="number">
+        <div class="val" data-target="98"><span class="num-display">0</span><span class="suffix">%</span></div>
+        <div class="lbl">zgłoszeń rozwiązanych zdalnie w pierwszej godzinie</div>
+      </div>
+      <div class="number">
+        <div class="val" data-target="15"><span class="num-display">0</span><span class="suffix"> min</span></div>
+        <div class="lbl">średni czas pierwszej reakcji na zgłoszenie</div>
+      </div>
+      <div class="number">
+        <div class="val" data-target="40"><span class="num-display">0</span><span class="suffix">+</span></div>
+        <div class="lbl">firm pod stałą opieką w regionie</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NARRATIVE 2 -->
+<section class="narrative green" data-narrative="2">
+  <div class="narrative-bg"></div>
+  <div class="narrative-text" data-text="A teraz zobacz, co konkretnie robimy."></div>
+</section>
+
+<!-- HORIZONTAL SERVICES -->
+<section class="h-services" id="services">
+  <div class="h-services-intro">
+    <div class="section-label">Obsługa IT — co dostajesz</div>
+    <h2 class="section-title">Sześć kompetencji,<br>jeden <em>abonament.</em></h2>
+    <p>Pakiet to nie pusta obietnica. Każda z poniższych usług jest realnie świadczona — przewiń w prawo i zobacz co konkretnie robimy każdego dnia, żeby Twoja firma działała bez przestojów.</p>
+  </div>
+
+  <div class="h-pin" id="hPin">
+    <div class="h-track" id="hTrack">
+      <div class="h-card">
+        <div>
+          <div class="num">01 / Pomoc zdalna</div>
+          <h3>Helpdesk, który<br>odbiera za pierwszym razem</h3>
+          <p class="desc">Dzwonisz, piszesz, klikasz w ikonę — łączymy się z Twoim komputerem w 5 minut. Bez ticketów, bez kolejek.</p>
+        </div>
+        <ul class="features">
+          <li>Pomoc 8-18 w dni robocze</li>
+          <li>Bezpieczne łączenie przez TeamViewer/AnyDesk</li>
+          <li>Bez limitu zgłoszeń</li>
+        </ul>
+      </div>
+
+      <div class="h-card">
+        <div>
+          <div class="num">02 / Monitoring</div>
+          <h3>Wiemy o awarii<br>zanim Ty zauważysz</h3>
+          <p class="desc">Twoje serwery, dyski, kopie zapasowe i aktualizacje są monitorowane 24/7. Zanim coś przestanie działać — już to naprawiamy.</p>
+        </div>
+        <ul class="features">
+          <li>Monitoring serwerów i stacji roboczych</li>
+          <li>Alerty proaktywne</li>
+          <li>Miesięczny raport stanu IT</li>
+        </ul>
+      </div>
+
+      <div class="h-card">
+        <div>
+          <div class="num">03 / Backup</div>
+          <h3>Twoje dane są<br>bezpieczne. Zawsze.</h3>
+          <p class="desc">Automatyczne kopie zapasowe — lokalne i w chmurze. Test przywracania raz na miesiąc. Gdy coś się stanie, masz dane sprzed godziny.</p>
+        </div>
+        <ul class="features">
+          <li>Backup zgodny z RODO</li>
+          <li>Reguła 3-2-1</li>
+          <li>Test recovery co miesiąc</li>
+        </ul>
+      </div>
+
+      <div class="h-card">
+        <div>
+          <div class="num">04 / Cyberbezpieczeństwo</div>
+          <h3>Zabezpieczamy firmę<br>jak swoją własną</h3>
+          <p class="desc">Antywirus EDR, firewall, polityka haseł, szkolenie pracowników z phishingu. Standard, którym chronią się duże korporacje.</p>
+        </div>
+        <ul class="features">
+          <li>EDR następnej generacji</li>
+          <li>Audyt zgodności RODO/NIS2</li>
+          <li>Szkolenia anty-phishingowe</li>
+        </ul>
+      </div>
+
+      <div class="h-card">
+        <div>
+          <div class="num">05 / Microsoft 365</div>
+          <h3>Pełne wdrożenie<br>i opieka nad M365</h3>
+          <p class="desc">Outlook, Teams, SharePoint, OneDrive — wdrożone, skonfigurowane i administrowane. Ty używasz, my pilnujemy żeby działało.</p>
+        </div>
+        <ul class="features">
+          <li>Migracja skrzynek bez utraty danych</li>
+          <li>Konfiguracja Teams i polityk</li>
+          <li>Wsparcie dla użytkowników</li>
+        </ul>
+      </div>
+
+      <div class="h-card">
+        <div>
+          <div class="num">06 / Sprzęt i sieć</div>
+          <h3>Doradztwo,<br>zakupy, instalacja</h3>
+          <p class="desc">Pomożemy dobrać laptopy, drukarki, switche i WiFi pod budżet i potrzeby. Zamówimy, skonfigurujemy, dostarczymy do biurka.</p>
+        </div>
+        <ul class="features">
+          <li>Niezależne doradztwo bez prowizji</li>
+          <li>Konfiguracja przed dostawą</li>
+          <li>Gwarancja i serwis</li>
+        </ul>
+      </div>
+    </div>
+    <div class="h-progress"><div class="h-progress-fill" id="hProgress"></div></div>
+    <div class="h-counter"><strong id="hCurrent">01</strong> / 06</div>
+  </div>
+</section>
+
+<!-- NARRATIVE 3 -->
+<section class="narrative paper" data-narrative="3">
+  <div class="narrative-bg"></div>
+  <div class="narrative-text" data-text="Wybierz pakiet pod swoją firmę."></div>
+</section>
+
+<!-- PRICING 3D STACK -->
+<section class="pricing" id="pricing">
+  <div class="pricing-pin">
+    <div class="pricing-bg-text" id="pricingBg">pricing.</div>
+    <div class="pricing-stack">
+      <div class="tier" data-tier="left">
+        <div class="tier-label">Dla startujących</div>
+        <h3>Start</h3>
+        <div class="price">390 zł<small>/mies.</small></div>
+        <div class="price-desc">netto, do 3 stanowisk</div>
+        <ul>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8BC34A" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg> 2h wsparcia miesięcznie</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8BC34A" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg> Pomoc zdalna 8-18</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8BC34A" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg> Konfiguracja poczty</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8BC34A" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg> Doradztwo IT i konsultacje</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8BC34A" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg> Czas reakcji do 4h</li>
+        </ul>
+        <a href="#audit" class="tier-cta">Wybierz Start</a>
+      </div>
+
+      <div class="tier featured" data-tier="center">
+        <span class="badge">Najpopularniejszy</span>
+        <div class="tier-label">Dla rozwijających się</div>
+        <h3>Firma</h3>
+        <div class="price">690 zł<small>/mies.</small></div>
+        <div class="price-desc">netto, do 7 stanowisk</div>
+        <ul>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8BC34A" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg> 5h wsparcia miesięcznie</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8BC34A" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg> Wszystko z pakietu Start</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8BC34A" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg> Pomoc na miejscu, drukarki</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8BC34A" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg> Konfiguracja nowych stanowisk</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8BC34A" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg> Czas reakcji do 1h</li>
+        </ul>
+        <a href="#audit" class="tier-cta">Wybierz Firma</a>
+      </div>
+
+      <div class="tier" data-tier="right">
+        <div class="tier-label">Dla wymagających</div>
+        <h3>Firma Plus</h3>
+        <div class="price">1190 zł<small>/mies.</small></div>
+        <div class="price-desc">netto, 8-15 stanowisk</div>
+        <ul>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8BC34A" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg> 10h wsparcia miesięcznie</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8BC34A" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg> Wszystko z pakietu Firma</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8BC34A" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg> Backup zarządzany + recovery</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8BC34A" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg> Microsoft 365 / Google Workspace</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8BC34A" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg> Czas reakcji do 30 min</li>
+        </ul>
+        <a href="#audit" class="tier-cta">Wybierz Plus</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="process" id="process">
+  <div class="process-inner">
+    <div class="process-head">
+      <div>
+        <div class="section-label">Jak działamy</div>
+        <h2 class="section-title">Cztery kroki do <em>spokoju.</em></h2>
+      </div>
+      <p>Nie zaczynamy od umowy. Najpierw słuchamy, potem patrzymy, potem proponujemy. Dopiero gdy wiemy co i jak — siadamy do podpisania.</p>
+    </div>
+
+    <div class="process-steps" id="processSteps">
+      <svg class="process-line-svg" preserveAspectRatio="none">
+        <line class="process-line-path" x1="1" y1="0" x2="1" y2="100%"/>
+      </svg>
+      <div class="step">
+        <div class="step-num">01</div>
+        <span class="step-dot"></span>
+        <div><h3>Rozmowa</h3></div>
+        <p>30-minutowa rozmowa o Twojej firmie, sprzęcie i bolączkach. Bez prezentacji, bez slajdów. Pytamy, słuchamy, notujemy.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <span class="step-dot"></span>
+        <div><h3>Audyt na miejscu</h3></div>
+        <p>Przyjeżdżamy do Twojego biura, oglądamy infrastrukturę, sprawdzamy stan zabezpieczeń i kopii zapasowych. Bezpłatnie.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <span class="step-dot"></span>
+        <div><h3>Propozycja</h3></div>
+        <p>Dostajesz raport z audytu i konkretną propozycję pakietu. Bez ukrytych kosztów, bez zobowiązań na 3 lata.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <span class="step-dot"></span>
+        <div><h3>Start opieki</h3></div>
+        <p>Konfigurujemy monitoring, backup, dostępy. W ciągu tygodnia jesteśmy w pełni operacyjni. Twoje IT zaczyna działać jak natura.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INDUSTRIES -->
+<section class="industries" id="industries">
+  <div class="industries-pin">
+    <div class="industries-grid">
+      <div>
+        <div class="section-label">Branże</div>
+        <h2 class="section-title">Znamy <em>specyfikę</em> Twojej branży.</h2>
+      </div>
+      <div class="ind-list" id="indList">
+        <div class="ind-item" data-morph="1">
+          <span class="name">Biura rachunkowe</span>
+          <span class="arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+        <div class="ind-item" data-morph="2">
+          <span class="name">Kancelarie prawne</span>
+          <span class="arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+        <div class="ind-item" data-morph="3">
+          <span class="name">Gabinety medyczne</span>
+          <span class="arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+        <div class="ind-item" data-morph="4">
+          <span class="name">Firmy produkcyjne</span>
+          <span class="arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+        <div class="ind-item" data-morph="5">
+          <span class="name">Hotele i gastronomia</span>
+          <span class="arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+        <div class="ind-item" data-morph="6">
+          <span class="name">Architektura i projektowanie</span>
+          <span class="arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NARRATIVE 4 -->
+<section class="narrative" data-narrative="4">
+  <div class="narrative-bg"></div>
+  <div class="narrative-text" data-text="Jeden krok dzieli Cię od spokoju."></div>
+</section>
+
+<!-- AUDIT FORM -->
+<section class="audit" id="audit">
+  <div class="audit-inner">
+    <div class="audit-head">
+      <div>
+        <div class="section-label">Bezpłatny audyt IT</div>
+        <h2 class="section-title">Sprawdź,<br>czy Twoje IT <em>śpi spokojnie.</em></h2>
+      </div>
+      <p>Wypełnij formularz, oddzwonimy w 24h roboczych. Audyt jest bezpłatny i bez zobowiązań — dostajesz raport, decydujesz co dalej.</p>
+    </div>
+
+    <form class="audit-form" onsubmit="event.preventDefault(); alert('Dziękujemy! Skontaktujemy się w ciągu 24h.');">
+      <div class="field-grid">
+        <div class="field"><label for="name">Imię i nazwisko</label><input type="text" id="name" required></div>
+        <div class="field"><label for="company">Nazwa firmy</label><input type="text" id="company" required></div>
+        <div class="field"><label for="email">E-mail służbowy</label><input type="email" id="email" required></div>
+        <div class="field"><label for="phone">Telefon</label><input type="tel" id="phone"></div>
+        <div class="field"><label for="size">Liczba stanowisk</label>
+          <select id="size"><option>1–5</option><option>6–15</option><option>16–30</option><option>30+</option></select>
+        </div>
+        <div class="field"><label for="branch">Branża</label>
+          <select id="branch"><option>Biuro rachunkowe</option><option>Kancelaria prawna</option><option>Gabinet medyczny</option><option>Produkcja</option><option>Hotel / gastronomia</option><option>Inna</option></select>
+        </div>
+        <div class="field full"><label for="message">Co Cię najbardziej boli? (opcjonalnie)</label>
+          <textarea id="message" placeholder="Np. wolny komputer, brak backupu, nieprzewidywalny IT..."></textarea>
+        </div>
+      </div>
+      <div class="checkbox-field">
+        <input type="checkbox" id="rodo" required>
+        <label for="rodo">Wyrażam zgodę na przetwarzanie danych osobowych w celu kontaktu zgodnie z <a href="#">Polityką prywatności</a>. Administratorem danych jest Bambooit.</label>
+      </div>
+      <button type="submit" class="submit-btn">
+        Wyślij zgłoszenie
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </form>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="faq-inner">
+    <div class="faq-head"><h2 class="section-title">Częste <em>pytania.</em></h2></div>
+    <div class="faq-list">
+      <div class="faq-item"><button class="faq-q">Czy umowa wiąże mnie na lata? <span class="plus">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Nie. Umowa jest miesięczna z miesięcznym okresem wypowiedzenia. Wierzymy, że jeśli robimy dobrą robotę, nie potrzebujemy Cię trzymać kontraktem.</div></div>
+      </div>
+      <div class="faq-item"><button class="faq-q">Co jeśli mam już informatyka na etacie? <span class="plus">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Świetnie. Możemy działać jako wsparcie drugiej linii — gdy Twój IT jest na urlopie, ma za dużo zgłoszeń, albo brakuje mu specjalistycznej wiedzy (RODO, audyty, migracje).</div></div>
+      </div>
+      <div class="faq-item"><button class="faq-q">Czy działacie tylko we Wrocławiu? <span class="plus">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Wsparcie zdalne oferujemy w całej Polsce. Wizyty stacjonarne — Wrocław i okolice (do 50 km). Dla większych odległości — wycena indywidualna.</div></div>
+      </div>
+      <div class="faq-item"><button class="faq-q">Co dokładnie obejmuje "bez limitu zgłoszeń"? <span class="plus">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Wszystkie codzienne sprawy — problemy z komputerem, drukarką, mailem, M365, VPN, dostępami, hasłami. Większe projekty (migracje, wdrożenia, zakupy sprzętu) wyceniamy osobno z góry.</div></div>
+      </div>
+      <div class="faq-item"><button class="faq-q">Jak płacicie za sprzęt który kupujemy przez was? <span class="plus">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Nie bierzemy prowizji od dostawców — to zasada. Sprzęt kupujesz na swoją firmę, my doradzamy i konfigurujemy.</div></div>
+      </div>
+      <div class="faq-item"><button class="faq-q">Co z bezpieczeństwem moich danych? <span class="plus">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Mamy podpisaną umowę powierzenia danych (RODO), wszyscy pracownicy podpisali NDA, połączenia szyfrowane, dostępy logowane. Co kwartał audyt wewnętrzny.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="final-cta-inner">
+    <h2>Pora oddać IT w <em>dobre łapy.</em></h2>
+    <div class="final-cta-bottom">
+      <a href="#audit" class="big-btn">
+        Zacznij od bezpłatnego audytu
+        <span class="arrow-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+      <div class="final-contact">
+        <div><span>Telefon</span><a href="tel:+48717771777">+48 71 777 17 77</a></div>
+        <div><span>Email</span><a href="mailto:hello@bambooit.pl">hello@bambooit.pl</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div>© 2026 Bambooit Sp. z o.o. — Ekologiczne myślenie o IT.</div>
+    <div>NIP 000-000-00-00 · <a href="o-nas.html">O nas</a> · <a href="#">Polityka prywatności</a> · <a href="#">RODO</a></div>
+  </div>
+</footer>
+
+<!-- LIBRARIES -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.3.23/dist/lenis.min.js"></script>
+
+<!-- Full GSAP/ScrollTrigger/Lenis animation logic preserved in original mockup source.
+     For Next.js port: reimplement via Framer Motion + IntersectionObserver where possible;
+     keep GSAP only for complex pinned-scroll sequences (h-services, pricing 3D, narratives).
+     Loader/scroll-progress/marquee/nav-blur are CSS-only with minor JS where needed. -->
+</body>
+</html>
