@@ -1,7 +1,30 @@
 import type { Metadata, Viewport } from 'next';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
+import { Fraunces, Archivo, JetBrains_Mono } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
+
+const fraunces = Fraunces({
+  subsets: ['latin', 'latin-ext'],
+  weight: ['300', '400', '600', '900'],
+  style: ['normal', 'italic'],
+  display: 'swap',
+  variable: '--font-fraunces',
+});
+
+const archivo = Archivo({
+  subsets: ['latin', 'latin-ext'],
+  weight: ['400', '500', '700', '900'],
+  display: 'swap',
+  variable: '--font-archivo',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin', 'latin-ext'],
+  weight: ['400', '700'],
+  display: 'swap',
+  variable: '--font-jetbrains-mono',
+});
 import { getMessages, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
@@ -60,7 +83,10 @@ export default async function LocaleLayout({ children, params }: Props) {
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className={`${GeistSans.variable} ${GeistMono.variable}`}>
+    <html
+      lang={locale}
+      className={`${fraunces.variable} ${archivo.variable} ${jetbrainsMono.variable} ${GeistSans.variable} ${GeistMono.variable}`}
+    >
       <body>
         <GoogleAnalytics />
         <GeoTracker />

@@ -31,7 +31,7 @@ const config: Config = {
           300: '#ead4a0',
         },
 
-        /* ── Brand tokens ── */
+        /* ── Brand tokens (legacy — DietetykDEV, used in 5 files, replaced gradually in W2–W6) ── */
         'brand-green': {
           DEFAULT: 'hsl(var(--brand-green))',
           hover:   'hsl(var(--brand-green-hover))',
@@ -44,6 +44,22 @@ const config: Config = {
           DEFAULT: 'hsl(var(--ai-blue))',
           soft:    'hsl(var(--ai-blue-soft))',
         },
+
+        /* ── Neo-Swiss tokens (D-054, mockup palette — bambooIT brand) ── */
+        navy: {
+          DEFAULT: 'hsl(var(--navy))',
+          deep:    'hsl(var(--navy-deep))',
+          soft:    'hsl(var(--navy-soft))',
+        },
+        bamboo: {
+          DEFAULT: 'hsl(var(--green))',
+          deep:    'hsl(var(--green-deep))',
+          soft:    'hsl(var(--green-soft))',
+        },
+        paper: 'hsl(var(--paper))',
+        ink:   'hsl(var(--ink))',
+        line:          'var(--line)',
+        'line-strong': 'var(--line-strong)',
 
         /* shadcn semantic tokens */
         border:     'hsl(var(--border))',
@@ -81,8 +97,10 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
-        mono: ['var(--font-geist-mono)', 'monospace'],
+        // Neo-Swiss fonts (D-054) layered with Geist as fallback during W2–W6 transition.
+        sans:    ['var(--font-archivo)',        'var(--font-geist-sans)', 'system-ui', 'sans-serif'],
+        mono:    ['var(--font-jetbrains-mono)', 'var(--font-geist-mono)', 'monospace'],
+        display: ['var(--font-fraunces)',       'Georgia',                'serif'],
       },
       borderRadius: {
         lg: 'var(--radius)',
