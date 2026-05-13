@@ -1,21 +1,41 @@
 'use client';
 
 import { useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 
 const FAQ_IDS = ['1', '2', '3', '4', '5', '6'] as const;
 
 /**
- * FAQ accordion per mockup §faq.
+ * A13 — FAQ section with scroll-triggered entrance stagger + smoother
+ * open/close ease. Single-open behaviour matches mockup (opening item N
+ * closes others). Each row slides in from x:-30 opacity:0 → x:0 opacity:1
+ * with 0.06s stagger the first time the list scrolls into view.
  *
- * Single-open behaviour matches mockup (opening item N closes others).
- * Animation: simple max-height + opacity transition driven by `open` state.
- * A13 in §5a swaps to GSAP scroll-triggered entrance + smoother cubic-bezier
- * in FE-10 — for now the open/close transition itself is intentional.
+ * Open/close uses CSS grid grid-rows trick (0fr → 1fr) which gives a
+ * smooth height transition with no JS measurement. ease-[cubic-bezier]
+ * matches mockup .faq-a transition curve.
+ *
+ * prefers-reduced-motion: entrance stagger collapses to instant; open/
+ * close transition duration shortened to 100ms.
  */
+const ITEM_VARIANTS = {
+  hidden: { opacity: 0, x: -30 },
+  visible: { opacity: 1, x: 0 },
+};
+
+const REDUCED_VARIANTS = {
+  hidden: { opacity: 1, x: 0 },
+  visible: { opacity: 1, x: 0 },
+};
+
 export function FAQSection() {
   const t = useTranslations('home.faq');
+  const shouldReduceMotion = useReducedMotion();
   const [openIdx, setOpenIdx] = useState<number | null>(null);
+
+  const variants = shouldReduceMotion ? REDUCED_VARIANTS : ITEM_VARIANTS;
+  const openDuration = shouldReduceMotion ? 100 : 500;
 
   return (
     <section
@@ -31,11 +51,22 @@ export function FAQSection() {
           </h2>
         </div>
 
-        <ul className="flex flex-col border-y border-line-strong">
+        <motion.ul
+          className="flex flex-col border-y border-line-strong"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ staggerChildren: shouldReduceMotion ? 0 : 0.06 }}
+        >
           {FAQ_IDS.map((id, idx) => {
             const isOpen = openIdx === idx;
             return (
-              <li key={id} className="border-b border-line-strong last:border-b-0">
+              <motion.li
+                key={id}
+                variants={variants}
+                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                className="border-b border-line-strong last:border-b-0"
+              >
                 <button
                   type="button"
                   aria-expanded={isOpen}
@@ -45,7 +76,7 @@ export function FAQSection() {
                   <span>{t(`items.${id}.q`)}</span>
                   <span
                     aria-hidden="true"
-                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-lg transition-all duration-300 ${
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-lg transition-all duration-350 ease-[cubic-bezier(0.7,0,0.2,1)] ${
                       isOpen
                         ? 'rotate-45 border-bamboo bg-bamboo text-navy-deep'
                         : 'border-line-strong text-navy'
@@ -55,9 +86,10 @@ export function FAQSection() {
                   </span>
                 </button>
                 <div
-                  className={`grid overflow-hidden transition-[grid-template-rows] duration-500 ease-out ${
+                  className={`grid overflow-hidden ease-[cubic-bezier(0.7,0,0.2,1)] ${
                     isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
                   }`}
+                  style={{ transitionProperty: 'grid-template-rows', transitionDuration: `${openDuration}ms` }}
                 >
                   <div className="overflow-hidden">
                     <p className="max-w-[60ch] pb-8 text-base leading-[1.65] text-navy-soft">
@@ -65,10 +97,10 @@ export function FAQSection() {
                     </p>
                   </div>
                 </div>
-              </li>
+              </motion.li>
             );
           })}
-        </ul>
+        </motion.ul>
       </div>
     </section>
   );
