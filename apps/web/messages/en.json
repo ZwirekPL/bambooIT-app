@@ -1010,7 +1010,15 @@
   },
   "notFound": {
     "title": "Page not found",
-    "description": "We can't find the page you're looking for.",
+    "description": "We can't find the page you're looking for. It may have moved or your link might be outdated.",
+    "backHome": "Back to homepage"
+  },
+  "error": {
+    "eyebrow": "Error 500",
+    "title": "Something went wrong",
+    "description": "Something on our side didn't work. We've reported this error automatically and will take care of it. Try refreshing the page or go back to the homepage.",
+    "errorId": "Error ID",
+    "tryAgain": "Try again",
     "backHome": "Back to homepage"
   },
   "blog": {

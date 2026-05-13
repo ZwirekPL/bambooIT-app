@@ -1010,7 +1010,15 @@
   },
   "notFound": {
     "title": "Strona nie istnieje",
-    "description": "Nie możemy znaleźć strony, której szukasz.",
+    "description": "Nie możemy znaleźć strony, której szukasz. Może została przeniesiona albo masz nieaktualny link.",
+    "backHome": "Wróć do strony głównej"
+  },
+  "error": {
+    "eyebrow": "Błąd 500",
+    "title": "Coś poszło nie tak",
+    "description": "Coś po naszej stronie nie zadziałało. Zgłosiliśmy ten błąd automatycznie i zajmiemy się tym. Spróbuj odświeżyć stronę albo wróć do startu.",
+    "errorId": "ID błędu",
+    "tryAgain": "Spróbuj ponownie",
     "backHome": "Wróć do strony głównej"
   },
   "blog": {
