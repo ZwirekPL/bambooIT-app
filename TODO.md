@@ -72,6 +72,7 @@
 - **D-067** — Remigiusz w fazie 4: sales-only (outreach, blog review, post-launch IT support), zero technical
 - **D-068** — Scope vs deadline: **scope rigid, deadline elastic** — jeśli scope nie wyrobi się w 6 tygodni, deadline się przesuwa do 7-8
 - **D-069** — **Frontend-first gate (2026-05-13):** CC nie zaczyna żadnego backendu (Lead model, Stripe, Fakturownia, admin, email, deploy) zanim cały frontend marketing-site nie jest gotowy z animacjami. Re-ordering W2–W6 → FE-N/BE-N phases (§4.0). Powód: animacje "wow" są częścią product identity, nie polish'em. Lista 14 efektów do reimplementacji w §5a Animations backlog.
+- **D-070** — **Blog: zatrzymujemy DB-driven CMS, override ADR-008 (MDX) (2026-05-13):** Po K9 cleanup pełna blog infra DietetykDEV (Post + BlogCategoryConfig modele, backend CRUD endpoints, admin UI z PostForm 580 LOC: markdown editor + image upload + scheduled publishing + per-post FAQ + view counter + PL/EN side-by-side) — ~1000 LOC działającego kodu. ADR-008 zakładał MDX w git, ale D-067 mówi Remigiusz non-technical → nie napisze MDX + git commit. Trzymamy admin UI bo: (a) Remigiusz może dodawać posty samodzielnie przez UI, (b) zero LOC do dropu/rebuildu, (c) admin UI ma feature'y których MDX nie ma (scheduled publishing, view counter, FAQ JSON, image upload, PL/EN preview). FE-6 zmienia scope: zamiast "5 MDX articles" → restyle do Neo-Swiss + rebrand categories + seed 5-10 mock posts (lorem ipsum) + `docs/blog/CONTENT_SPEC.md` jako brief dla pisarza (Remigiusz/inna osoba). FE-8 (blog 6-10) — drop, content będzie dodawany przez admin UI w produkcji przez Remigiusza, nie przez CC w preprod.
 
 ---
 
@@ -117,9 +118,9 @@ K10 to **pre-faza-4 sweep** — kończymy outstanding cleanup tasks z CLEANUP_CO
 | **FE-3** | W2.CC.2-4 — `/pakiety` + `/audyt` + `/kontakt` — static pages, form UI **bez submission backend** | |
 | **FE-4** | W3.CC.4 — `/pomoc-zdalna` — static | |
 | **FE-5** | W3.CC.5 — `/o-nas` — static, full conversion z `mockups/o-nas.html` | |
-| **FE-6** | W3.CC.6-7 — blog infra + 5 MDX articles — static content | |
+| **FE-6** | Blog: restyle public pages + admin UI defaults rebrand do bambooIT (per D-070, keep DB-driven CMS) + seed 5-10 mock posts (lorem ipsum) + `docs/blog/CONTENT_SPEC.md` brief dla pisarza | |
 | **FE-7** | W4.CC.1-5 — `/branze/biura-rachunkowe` + 4 industry pages — static | |
-| **FE-8** | W4.CC.6 — blog articles 6-10 | |
+| ~~**FE-8**~~ | ~~W4.CC.6 — blog articles 6-10~~ — dropped per D-070, content w produkcji przez admin UI | drop |
 | **FE-9** | W6.CC.5 — error pages (`not-found.tsx`, `error.tsx`, `global-error.tsx`) — static | |
 | **FE-10** | **ANIMATIONS PASS** — unified library pick (Framer Motion / GSAP / CSS+IntersectionObserver) + zaimplementowanie wszystkich 14 efektów z mockupa (lista w §4a niżej). Polish review każdej strony. | |
 | **FE-11** | W6.CC.3 — Lighthouse audit z aktywnymi animacjami (target 90+) | |
@@ -722,9 +723,9 @@ Per D-069 (§4.0 frontend-first gate) execution shifted from week-numbered to FE
 - [x] **FE-3** — `/pakiety` + `/audyt` + `/kontakt` static — 3 commits (`a54df73` → `5e7cad3`). PageHeader shared component + ComparisonTable + PricingFAQ + AuditBenefits + AuditFAQ + ContactFormSection (client UI-only stub). Sitemap updated for all 3 routes.
 - [x] **FE-4** — `/pomoc-zdalna` static — commit `1c5b680`. RemoteSupportDownloads (AnyDesk 3 platforms + RustDesk) + RemoteSupportFlow (3 steps) + RemoteSupportSecurity (3 guarantees). JSON-quoting fix mid-flight (unescaped ASCII `"` inside Polish typographic quotes broke build).
 - [x] **FE-5** — `/o-nas` static — commit `8a61201`. Full mockup o-nas.html port: AboutHero (Fraunces 900) + AboutStats (4-stat strip, brand-promise not aspirational numbers) + AboutStory (origin narrative) + AboutTeam (R + W cards with gradient-circle avatar placeholders) + AboutValues (4 brand rules) + FinalCTA reuse.
-- [ ] **FE-6** — blog infra + 5 MDX articles
+- [ ] **FE-6** — blog restyle Neo-Swiss + admin defaults bambooIT + 5-10 mock lorem ipsum posts + writer brief (per D-070, NOT MDX migration)
 - [ ] **FE-7** — `/branze/*` (5 industry pages)
-- [ ] **FE-8** — blog articles 6-10
+- ~~**FE-8**~~ — dropped per D-070 (content via admin UI in production)
 - [ ] **FE-9** — error pages
 - [ ] **FE-10** — animations unified pass (§5a backlog, 14 efektów)
 - [ ] **FE-11** — Lighthouse audit
