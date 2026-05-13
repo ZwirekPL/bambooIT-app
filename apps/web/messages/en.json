@@ -18,6 +18,20 @@
     "closeMenu": "Close menu",
     "ctaAudit": "Free audit →"
   },
+  "home": {
+    "hero": {
+      "eyebrow": "IT outsourcing for SMBs — Wrocław and beyond",
+      "titleLine1": "Your IT",
+      "titleLine2": "runs",
+      "titleLine3": "like nature.",
+      "lede": "<strong>Reliable IT support for small and medium businesses.</strong> No invoice surprises, no helpdesk queues, no explaining the same thing three times. We take care of your systems so you can focus on your business.",
+      "priceLabel": "Plans from",
+      "priceValue": "390 PLN",
+      "priceUnit": "/month",
+      "priceDesc": "Full IT support — remote help, monitoring, backup",
+      "priceCta": "See all packages →"
+    }
+  },
   "notFound": {
     "title": "Page not found",
     "description": "We can't find the page you're looking for.",

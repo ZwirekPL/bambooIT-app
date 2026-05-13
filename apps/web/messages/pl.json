@@ -18,6 +18,20 @@
     "closeMenu": "Zamknij menu",
     "ctaAudit": "Bezpłatny audyt →"
   },
+  "home": {
+    "hero": {
+      "eyebrow": "Outsourcing IT dla MŚP — Wrocław i okolice",
+      "titleLine1": "Twoje IT",
+      "titleLine2": "działa",
+      "titleLine3": "jak natura.",
+      "lede": "<strong>Stała opieka IT dla małych i średnich firm.</strong> Bez zaskoczeń na fakturze, bez czekania w kolejce do helpdesku, bez tłumaczenia tego samego trzy razy. Dbamy o Twoje systemy tak, żebyś mógł zająć się swoim biznesem.",
+      "priceLabel": "Pakiety od",
+      "priceValue": "390 zł",
+      "priceUnit": "/mies.",
+      "priceDesc": "Pełna opieka IT — pomoc zdalna, monitoring, backup",
+      "priceCta": "Zobacz wszystkie pakiety →"
+    }
+  },
   "notFound": {
     "title": "Strona nie istnieje",
     "description": "Nie możemy znaleźć strony, której szukasz.",
