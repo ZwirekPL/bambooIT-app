@@ -69,6 +69,32 @@
       },
       "teamLine": "Everything is handled by a <strong>two-person team</strong> — Remigiusz (IT) and Wirgiliusz (web, apps, automation). No call center. Always the same person on the other end.",
       "teamCta": "Meet us →"
+    },
+    "narratives": {
+      "beforeNumbers": "First, the numbers.",
+      "andNowWhat": "Now see what we actually do.",
+      "choosePackage": "Pick a package that fits your company.",
+      "oneStepAway": "One step away from peace of mind."
+    },
+    "manifesto": {
+      "text": "We believe IT in a small business should be <em>invisible</em> — like electricity in the socket. It just <em>works.</em>",
+      "stats": {
+        "remote": {
+          "value": "98",
+          "suffix": "%",
+          "label": "of tickets resolved remotely within the first hour"
+        },
+        "response": {
+          "value": "15",
+          "suffix": " min",
+          "label": "average first-response time on a ticket"
+        },
+        "firms": {
+          "value": "40",
+          "suffix": "+",
+          "label": "companies under continuous care in the region"
+        }
+      }
     }
   },
   "notFound": {

@@ -1,7 +1,9 @@
-import { setRequestLocale } from 'next-intl/server';
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { HeroSection } from '@/components/marketing/HeroSection';
 import { MarqueeBar } from '@/components/marketing/MarqueeBar';
 import { OfferSection } from '@/components/marketing/OfferSection';
+import { NarrativeSection } from '@/components/marketing/NarrativeSection';
+import { ManifestoSection } from '@/components/marketing/ManifestoSection';
 import { BRAND } from '@config/brand';
 
 type Props = {
@@ -37,6 +39,7 @@ function organizationLd() {
 export default async function HomePage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const tn = await getTranslations('home.narratives');
 
   return (
     <>
@@ -48,6 +51,9 @@ export default async function HomePage({ params }: Props) {
       <HeroSection />
       <MarqueeBar />
       <OfferSection />
+      <NarrativeSection variant="navy">{tn('beforeNumbers')}</NarrativeSection>
+      <ManifestoSection />
+      <NarrativeSection variant="bamboo">{tn('andNowWhat')}</NarrativeSection>
     </>
   );
 }
