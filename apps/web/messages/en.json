@@ -95,6 +95,150 @@
           "label": "companies under continuous care in the region"
         }
       }
+    },
+    "horizontalServices": {
+      "intro": {
+        "label": "IT support — what you get",
+        "heading": "Six capabilities,<br></br>one <em>subscription.</em>",
+        "lede": "The package is not an empty promise. Every service below is actually delivered — these are the concrete things we do every day to keep your business running without downtime."
+      },
+      "cards": {
+        "1": {
+          "number": "01 / Remote help",
+          "title": "A helpdesk that picks up first time",
+          "desc": "Call, message, or click the icon — we connect to your machine within 5 minutes. No tickets, no queues.",
+          "features": {
+            "1": "Support 8am-6pm on weekdays",
+            "2": "Secure connection via TeamViewer/AnyDesk",
+            "3": "Unlimited ticket count"
+          }
+        },
+        "2": {
+          "number": "02 / Monitoring",
+          "title": "We know about outages before you do",
+          "desc": "Your servers, drives, backups and updates are monitored 24/7. Before something breaks — we're already on it.",
+          "features": {
+            "1": "Server + workstation monitoring",
+            "2": "Proactive alerts",
+            "3": "Monthly IT health report"
+          }
+        },
+        "3": {
+          "number": "03 / Backup",
+          "title": "Your data is safe. Always.",
+          "desc": "Automated backups — local and cloud. Restore test once a month. When something happens, you have data from an hour ago.",
+          "features": {
+            "1": "GDPR-compliant backup",
+            "2": "3-2-1 rule",
+            "3": "Monthly recovery test"
+          }
+        },
+        "4": {
+          "number": "04 / Cybersecurity",
+          "title": "We protect your business like our own",
+          "desc": "EDR antivirus, firewall, password policy, anti-phishing training. The standard large corporations use.",
+          "features": {
+            "1": "Next-gen EDR",
+            "2": "GDPR/NIS2 compliance audit",
+            "3": "Anti-phishing training"
+          }
+        },
+        "5": {
+          "number": "05 / Microsoft 365",
+          "title": "Full M365 rollout and care",
+          "desc": "Outlook, Teams, SharePoint, OneDrive — deployed, configured, administered. You use it, we keep it running.",
+          "features": {
+            "1": "Mailbox migration with no data loss",
+            "2": "Teams + policy configuration",
+            "3": "End-user support"
+          }
+        },
+        "6": {
+          "number": "06 / Hardware + network",
+          "title": "Advice, procurement, installation",
+          "desc": "We help pick laptops, printers, switches and WiFi for your budget and needs. Order, configure, deliver to the desk.",
+          "features": {
+            "1": "Independent advice — no kickbacks",
+            "2": "Pre-delivery configuration",
+            "3": "Warranty and service"
+          }
+        }
+      }
+    },
+    "pricing": {
+      "badge": "Most popular",
+      "cards": {
+        "start": {
+          "label": "For starters",
+          "name": "Start",
+          "price": "390 zł",
+          "priceUnit": "/month",
+          "priceDesc": "net, up to 3 seats",
+          "cta": "Choose Start",
+          "features": {
+            "1": "2h support per month",
+            "2": "Remote help 8am-6pm",
+            "3": "Email configuration",
+            "4": "IT advice and consultations",
+            "5": "4h response time"
+          }
+        },
+        "firma": {
+          "label": "For growing teams",
+          "name": "Firma",
+          "price": "690 zł",
+          "priceUnit": "/month",
+          "priceDesc": "net, up to 7 seats",
+          "cta": "Choose Firma",
+          "features": {
+            "1": "5h support per month",
+            "2": "Everything in Start",
+            "3": "On-site help, printers",
+            "4": "New workstation setup",
+            "5": "1h response time"
+          }
+        },
+        "firmaPlus": {
+          "label": "For demanding teams",
+          "name": "Firma Plus",
+          "price": "1190 zł",
+          "priceUnit": "/month",
+          "priceDesc": "net, 8-15 seats",
+          "cta": "Choose Plus",
+          "features": {
+            "1": "10h support per month",
+            "2": "Everything in Firma",
+            "3": "Managed backup + recovery",
+            "4": "Microsoft 365 / Google Workspace",
+            "5": "30 min response time"
+          }
+        }
+      }
+    },
+    "process": {
+      "intro": {
+        "label": "How we work",
+        "heading": "Four steps to <em>peace of mind.</em>",
+        "lede": "We don't start with a contract. First we listen, then we look, then we propose. Only when we know what and how — we sit down to sign."
+      },
+      "steps": {
+        "1": {
+          "title": "Conversation",
+          "desc": "A 30-minute call about your company, hardware, and pain points. No slides, no pitch. We ask, listen, take notes."
+        },
+        "2": {
+          "title": "On-site audit",
+          "desc": "We come to your office, look at the infrastructure, check security and backup state. Free of charge."
+        },
+        "3": {
+          "title": "Proposal",
+          "desc": "You get an audit report and a concrete package proposal. No hidden costs, no 3-year lock-in."
+        },
+        "4": {
+          "title": "Care begins",
+          "desc": "We set up monitoring, backup, access. Within a week we're fully operational. Your IT starts running like nature."
+        }
+      }
     }
   },
   "notFound": {

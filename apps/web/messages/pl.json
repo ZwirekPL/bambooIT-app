@@ -95,6 +95,150 @@
           "label": "firm pod stałą opieką w regionie"
         }
       }
+    },
+    "horizontalServices": {
+      "intro": {
+        "label": "Obsługa IT — co dostajesz",
+        "heading": "Sześć kompetencji,<br></br>jeden <em>abonament.</em>",
+        "lede": "Pakiet to nie pusta obietnica. Każda z poniższych usług jest realnie świadczona — każdego dnia robimy konkretnie te rzeczy, żeby Twoja firma działała bez przestojów."
+      },
+      "cards": {
+        "1": {
+          "number": "01 / Pomoc zdalna",
+          "title": "Helpdesk, który odbiera za pierwszym razem",
+          "desc": "Dzwonisz, piszesz, klikasz w ikonę — łączymy się z Twoim komputerem w 5 minut. Bez ticketów, bez kolejek.",
+          "features": {
+            "1": "Pomoc 8-18 w dni robocze",
+            "2": "Bezpieczne łączenie przez TeamViewer/AnyDesk",
+            "3": "Bez limitu zgłoszeń"
+          }
+        },
+        "2": {
+          "number": "02 / Monitoring",
+          "title": "Wiemy o awarii zanim Ty zauważysz",
+          "desc": "Twoje serwery, dyski, kopie zapasowe i aktualizacje są monitorowane 24/7. Zanim coś przestanie działać — już to naprawiamy.",
+          "features": {
+            "1": "Monitoring serwerów i stacji roboczych",
+            "2": "Alerty proaktywne",
+            "3": "Miesięczny raport stanu IT"
+          }
+        },
+        "3": {
+          "number": "03 / Backup",
+          "title": "Twoje dane są bezpieczne. Zawsze.",
+          "desc": "Automatyczne kopie zapasowe — lokalne i w chmurze. Test przywracania raz na miesiąc. Gdy coś się stanie, masz dane sprzed godziny.",
+          "features": {
+            "1": "Backup zgodny z RODO",
+            "2": "Reguła 3-2-1",
+            "3": "Test recovery co miesiąc"
+          }
+        },
+        "4": {
+          "number": "04 / Cyberbezpieczeństwo",
+          "title": "Zabezpieczamy firmę jak swoją własną",
+          "desc": "Antywirus EDR, firewall, polityka haseł, szkolenie pracowników z phishingu. Standard, którym chronią się duże korporacje.",
+          "features": {
+            "1": "EDR następnej generacji",
+            "2": "Audyt zgodności RODO/NIS2",
+            "3": "Szkolenia anty-phishingowe"
+          }
+        },
+        "5": {
+          "number": "05 / Microsoft 365",
+          "title": "Pełne wdrożenie i opieka nad M365",
+          "desc": "Outlook, Teams, SharePoint, OneDrive — wdrożone, skonfigurowane i administrowane. Ty używasz, my pilnujemy żeby działało.",
+          "features": {
+            "1": "Migracja skrzynek bez utraty danych",
+            "2": "Konfiguracja Teams i polityk",
+            "3": "Wsparcie dla użytkowników"
+          }
+        },
+        "6": {
+          "number": "06 / Sprzęt i sieć",
+          "title": "Doradztwo, zakupy, instalacja",
+          "desc": "Pomożemy dobrać laptopy, drukarki, switche i WiFi pod budżet i potrzeby. Zamówimy, skonfigurujemy, dostarczymy do biurka.",
+          "features": {
+            "1": "Niezależne doradztwo bez prowizji",
+            "2": "Konfiguracja przed dostawą",
+            "3": "Gwarancja i serwis"
+          }
+        }
+      }
+    },
+    "pricing": {
+      "badge": "Najpopularniejszy",
+      "cards": {
+        "start": {
+          "label": "Dla startujących",
+          "name": "Start",
+          "price": "390 zł",
+          "priceUnit": "/mies.",
+          "priceDesc": "netto, do 3 stanowisk",
+          "cta": "Wybierz Start",
+          "features": {
+            "1": "2h wsparcia miesięcznie",
+            "2": "Pomoc zdalna 8-18",
+            "3": "Konfiguracja poczty",
+            "4": "Doradztwo IT i konsultacje",
+            "5": "Czas reakcji do 4h"
+          }
+        },
+        "firma": {
+          "label": "Dla rozwijających się",
+          "name": "Firma",
+          "price": "690 zł",
+          "priceUnit": "/mies.",
+          "priceDesc": "netto, do 7 stanowisk",
+          "cta": "Wybierz Firma",
+          "features": {
+            "1": "5h wsparcia miesięcznie",
+            "2": "Wszystko z pakietu Start",
+            "3": "Pomoc na miejscu, drukarki",
+            "4": "Konfiguracja nowych stanowisk",
+            "5": "Czas reakcji do 1h"
+          }
+        },
+        "firmaPlus": {
+          "label": "Dla wymagających",
+          "name": "Firma Plus",
+          "price": "1190 zł",
+          "priceUnit": "/mies.",
+          "priceDesc": "netto, 8-15 stanowisk",
+          "cta": "Wybierz Plus",
+          "features": {
+            "1": "10h wsparcia miesięcznie",
+            "2": "Wszystko z pakietu Firma",
+            "3": "Backup zarządzany + recovery",
+            "4": "Microsoft 365 / Google Workspace",
+            "5": "Czas reakcji do 30 min"
+          }
+        }
+      }
+    },
+    "process": {
+      "intro": {
+        "label": "Jak działamy",
+        "heading": "Cztery kroki do <em>spokoju.</em>",
+        "lede": "Nie zaczynamy od umowy. Najpierw słuchamy, potem patrzymy, potem proponujemy. Dopiero gdy wiemy co i jak — siadamy do podpisania."
+      },
+      "steps": {
+        "1": {
+          "title": "Rozmowa",
+          "desc": "30-minutowa rozmowa o Twojej firmie, sprzęcie i bolączkach. Bez prezentacji, bez slajdów. Pytamy, słuchamy, notujemy."
+        },
+        "2": {
+          "title": "Audyt na miejscu",
+          "desc": "Przyjeżdżamy do Twojego biura, oglądamy infrastrukturę, sprawdzamy stan zabezpieczeń i kopii zapasowych. Bezpłatnie."
+        },
+        "3": {
+          "title": "Propozycja",
+          "desc": "Dostajesz raport z audytu i konkretną propozycję pakietu. Bez ukrytych kosztów, bez zobowiązań na 3 lata."
+        },
+        "4": {
+          "title": "Start opieki",
+          "desc": "Konfigurujemy monitoring, backup, dostępy. W ciągu tygodnia jesteśmy w pełni operacyjni. Twoje IT zaczyna działać jak natura."
+        }
+      }
     }
   },
   "notFound": {

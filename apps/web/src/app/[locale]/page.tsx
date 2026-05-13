@@ -4,6 +4,9 @@ import { MarqueeBar } from '@/components/marketing/MarqueeBar';
 import { OfferSection } from '@/components/marketing/OfferSection';
 import { NarrativeSection } from '@/components/marketing/NarrativeSection';
 import { ManifestoSection } from '@/components/marketing/ManifestoSection';
+import { HorizontalServicesSection } from '@/components/marketing/HorizontalServicesSection';
+import { PricingTiersSection } from '@/components/marketing/PricingTiersSection';
+import { ProcessSection } from '@/components/marketing/ProcessSection';
 import { BRAND } from '@config/brand';
 
 type Props = {
@@ -54,6 +57,10 @@ export default async function HomePage({ params }: Props) {
       <NarrativeSection variant="navy">{tn('beforeNumbers')}</NarrativeSection>
       <ManifestoSection />
       <NarrativeSection variant="bamboo">{tn('andNowWhat')}</NarrativeSection>
+      <HorizontalServicesSection />
+      <NarrativeSection variant="paper">{tn('choosePackage')}</NarrativeSection>
+      <PricingTiersSection />
+      <ProcessSection />
     </>
   );
 }
