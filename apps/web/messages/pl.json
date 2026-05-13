@@ -239,6 +239,93 @@
           "desc": "Konfigurujemy monitoring, backup, dostępy. W ciągu tygodnia jesteśmy w pełni operacyjni. Twoje IT zaczyna działać jak natura."
         }
       }
+    },
+    "industries": {
+      "intro": {
+        "label": "Branże",
+        "heading": "Znamy <em>specyfikę</em> Twojej branży."
+      },
+      "items": {
+        "1": { "name": "Biura rachunkowe" },
+        "2": { "name": "Kancelarie prawne" },
+        "3": { "name": "Gabinety medyczne" },
+        "4": { "name": "Firmy produkcyjne" },
+        "5": { "name": "Hotele i gastronomia" },
+        "6": { "name": "Architektura i projektowanie" }
+      }
+    },
+    "auditForm": {
+      "intro": {
+        "label": "Bezpłatny audyt IT",
+        "heading": "Sprawdź,<br></br>czy Twoje IT <em>śpi spokojnie.</em>",
+        "lede": "Wypełnij formularz, oddzwonimy w 24h roboczych. Audyt jest bezpłatny i bez zobowiązań — dostajesz raport, decydujesz co dalej."
+      },
+      "fields": {
+        "name": "Imię i nazwisko",
+        "company": "Nazwa firmy",
+        "email": "E-mail służbowy",
+        "phone": "Telefon",
+        "size": "Liczba stanowisk",
+        "sizeOptions": {
+          "1": "1–5",
+          "2": "6–15",
+          "3": "16–30",
+          "4": "30+"
+        },
+        "industry": "Branża",
+        "industryOptions": {
+          "accounting": "Biuro rachunkowe",
+          "law": "Kancelaria prawna",
+          "medical": "Gabinet medyczny",
+          "production": "Produkcja",
+          "hospitality": "Hotel / gastronomia",
+          "other": "Inna"
+        },
+        "message": "Co Cię najbardziej boli? (opcjonalnie)",
+        "messagePlaceholder": "Np. wolny komputer, brak backupu, nieprzewidywalny IT...",
+        "rodo": "Wyrażam zgodę na przetwarzanie danych osobowych w celu kontaktu zgodnie z Polityką prywatności. Administratorem danych jest bambooIT."
+      },
+      "submitBtn": "Wyślij zgłoszenie",
+      "success": {
+        "title": "Dziękujemy!",
+        "message": "Skontaktujemy się z Tobą w ciągu 24 godzin roboczych. W międzyczasie możesz nas złapać na hello@bambooit.pl.",
+        "resetCta": "Wyślij kolejne zgłoszenie"
+      }
+    },
+    "faq": {
+      "heading": "Częste <em>pytania.</em>",
+      "items": {
+        "1": {
+          "q": "Czy umowa wiąże mnie na lata?",
+          "a": "Nie. Umowa jest miesięczna z miesięcznym okresem wypowiedzenia. Wierzymy, że jeśli robimy dobrą robotę, nie potrzebujemy Cię trzymać kontraktem."
+        },
+        "2": {
+          "q": "Co jeśli mam już informatyka na etacie?",
+          "a": "Świetnie. Możemy działać jako wsparcie drugiej linii — gdy Twój IT jest na urlopie, ma za dużo zgłoszeń, albo brakuje mu specjalistycznej wiedzy (RODO, audyty, migracje)."
+        },
+        "3": {
+          "q": "Czy działacie tylko we Wrocławiu?",
+          "a": "Wsparcie zdalne oferujemy w całej Polsce. Wizyty stacjonarne — Wrocław i okolice (do 50 km). Dla większych odległości — wycena indywidualna."
+        },
+        "4": {
+          "q": "Co dokładnie obejmuje „bez limitu zgłoszeń\"?",
+          "a": "Wszystkie codzienne sprawy — problemy z komputerem, drukarką, mailem, M365, VPN, dostępami, hasłami. Większe projekty (migracje, wdrożenia, zakupy sprzętu) wyceniamy osobno z góry."
+        },
+        "5": {
+          "q": "Jak płacicie za sprzęt który kupujemy przez was?",
+          "a": "Nie bierzemy prowizji od dostawców — to zasada. Sprzęt kupujesz na swoją firmę, my doradzamy i konfigurujemy."
+        },
+        "6": {
+          "q": "Co z bezpieczeństwem moich danych?",
+          "a": "Mamy podpisaną umowę powierzenia danych (RODO), wszyscy pracownicy podpisali NDA, połączenia szyfrowane, dostępy logowane. Co kwartał audyt wewnętrzny."
+        }
+      }
+    },
+    "finalCta": {
+      "heading": "Pora oddać IT w <em>dobre łapy.</em>",
+      "cta": "Zacznij od bezpłatnego audytu",
+      "phoneLabel": "Telefon",
+      "emailLabel": "Email"
     }
   },
   "notFound": {

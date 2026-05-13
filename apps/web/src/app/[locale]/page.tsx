@@ -7,6 +7,10 @@ import { ManifestoSection } from '@/components/marketing/ManifestoSection';
 import { HorizontalServicesSection } from '@/components/marketing/HorizontalServicesSection';
 import { PricingTiersSection } from '@/components/marketing/PricingTiersSection';
 import { ProcessSection } from '@/components/marketing/ProcessSection';
+import { IndustriesSection } from '@/components/marketing/IndustriesSection';
+import { AuditFormSection } from '@/components/marketing/AuditFormSection';
+import { FAQSection } from '@/components/marketing/FAQSection';
+import { FinalCTASection } from '@/components/marketing/FinalCTASection';
 import { BRAND } from '@config/brand';
 
 type Props = {
@@ -61,6 +65,11 @@ export default async function HomePage({ params }: Props) {
       <NarrativeSection variant="paper">{tn('choosePackage')}</NarrativeSection>
       <PricingTiersSection />
       <ProcessSection />
+      <IndustriesSection />
+      <NarrativeSection variant="navy">{tn('oneStepAway')}</NarrativeSection>
+      <AuditFormSection />
+      <FAQSection />
+      <FinalCTASection />
     </>
   );
 }

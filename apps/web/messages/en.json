@@ -239,6 +239,93 @@
           "desc": "We set up monitoring, backup, access. Within a week we're fully operational. Your IT starts running like nature."
         }
       }
+    },
+    "industries": {
+      "intro": {
+        "label": "Industries",
+        "heading": "We know the <em>specifics</em> of your industry."
+      },
+      "items": {
+        "1": { "name": "Accounting firms" },
+        "2": { "name": "Law offices" },
+        "3": { "name": "Medical practices" },
+        "4": { "name": "Manufacturing" },
+        "5": { "name": "Hotels and hospitality" },
+        "6": { "name": "Architecture and design" }
+      }
+    },
+    "auditForm": {
+      "intro": {
+        "label": "Free IT audit",
+        "heading": "Check<br></br>if your IT <em>sleeps soundly.</em>",
+        "lede": "Fill out the form, we'll call back within 24 business hours. The audit is free and no-strings — you get a report, you decide what's next."
+      },
+      "fields": {
+        "name": "Full name",
+        "company": "Company name",
+        "email": "Work email",
+        "phone": "Phone",
+        "size": "Seat count",
+        "sizeOptions": {
+          "1": "1–5",
+          "2": "6–15",
+          "3": "16–30",
+          "4": "30+"
+        },
+        "industry": "Industry",
+        "industryOptions": {
+          "accounting": "Accounting firm",
+          "law": "Law office",
+          "medical": "Medical practice",
+          "production": "Manufacturing",
+          "hospitality": "Hotel / hospitality",
+          "other": "Other"
+        },
+        "message": "What hurts most? (optional)",
+        "messagePlaceholder": "E.g. slow computer, no backup, unpredictable IT...",
+        "rodo": "I consent to processing of personal data for contact purposes per the Privacy Policy. Data controller: bambooIT."
+      },
+      "submitBtn": "Submit request",
+      "success": {
+        "title": "Thank you!",
+        "message": "We'll be in touch within 24 business hours. In the meantime you can reach us at hello@bambooit.pl.",
+        "resetCta": "Submit another request"
+      }
+    },
+    "faq": {
+      "heading": "Common <em>questions.</em>",
+      "items": {
+        "1": {
+          "q": "Does the contract lock me in for years?",
+          "a": "No. The contract is monthly with a one-month notice period. We believe that if we do good work, we don't need a contract to keep you."
+        },
+        "2": {
+          "q": "What if I already have an in-house IT person?",
+          "a": "Great. We can act as second-line support — when your IT is on vacation, overwhelmed with tickets, or lacks specialist expertise (GDPR, audits, migrations)."
+        },
+        "3": {
+          "q": "Do you only work in Wrocław?",
+          "a": "Remote support across all of Poland. On-site visits — Wrocław and the surrounding area (up to 50 km). For greater distances — quoted individually."
+        },
+        "4": {
+          "q": "What exactly does \"unlimited tickets\" cover?",
+          "a": "All day-to-day matters — computer, printer, email, M365, VPN, access, password issues. Larger projects (migrations, deployments, hardware purchases) are quoted upfront separately."
+        },
+        "5": {
+          "q": "How do you handle hardware you procure for us?",
+          "a": "We don't take vendor commissions — that's a rule. You buy the hardware under your company name, we advise and configure."
+        },
+        "6": {
+          "q": "What about my data security?",
+          "a": "We sign a data processing agreement (GDPR), all staff signed NDAs, connections are encrypted, access is logged. Quarterly internal audit."
+        }
+      }
+    },
+    "finalCta": {
+      "heading": "Time to hand IT over to <em>good hands.</em>",
+      "cta": "Start with a free audit",
+      "phoneLabel": "Phone",
+      "emailLabel": "Email"
     }
   },
   "notFound": {
