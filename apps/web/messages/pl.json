@@ -328,6 +328,115 @@
       "emailLabel": "Email"
     }
   },
+  "pakiety": {
+    "meta": {
+      "title": "Pakiety obsługi IT — bambooIT",
+      "description": "Trzy pakiety obsługi IT dla małych i średnich firm: Start 390 zł, Firma 690 zł, Firma Plus 1190 zł netto/mies. Stała opłata, miesięczne wypowiedzenie."
+    },
+    "header": {
+      "eyebrow": "Cennik",
+      "heading": "Trzy pakiety. <em>Jasny koszt.</em>",
+      "lede": "Stała miesięczna opłata, jasny zakres, miesięczne wypowiedzenie. Wybierz pakiet pod swoją firmę albo zacznij od bezpłatnego audytu — pokażemy, który pakiet faktycznie pasuje."
+    },
+    "comparison": {
+      "heading": "Porównanie pakietów",
+      "headers": {
+        "feature": "Funkcja",
+        "start": "Start",
+        "firma": "Firma",
+        "firmaPlus": "Firma Plus"
+      },
+      "rows": {
+        "hours": {
+          "label": "Godziny wsparcia miesięcznie",
+          "start": "2h",
+          "firma": "5h",
+          "firmaPlus": "10h"
+        },
+        "remoteHelp": {
+          "label": "Pomoc zdalna 8-18",
+          "start": "✓",
+          "firma": "✓",
+          "firmaPlus": "✓"
+        },
+        "responseTime": {
+          "label": "Gwarantowany czas reakcji",
+          "start": "do 4h",
+          "firma": "do 1h",
+          "firmaPlus": "do 30 min"
+        },
+        "monitoring": {
+          "label": "Monitoring 24/7 + alerty",
+          "start": "—",
+          "firma": "✓",
+          "firmaPlus": "✓"
+        },
+        "backup": {
+          "label": "Backup automatyczny",
+          "start": "—",
+          "firma": "podstawowy",
+          "firmaPlus": "zarządzany + recovery"
+        },
+        "onsiteVisits": {
+          "label": "Pomoc na miejscu (Wrocław +50 km)",
+          "start": "—",
+          "firma": "✓",
+          "firmaPlus": "✓"
+        },
+        "newWorkstations": {
+          "label": "Konfiguracja nowych stanowisk",
+          "start": "—",
+          "firma": "✓",
+          "firmaPlus": "✓"
+        },
+        "cyberAudit": {
+          "label": "Audyt RODO/NIS2 + szkolenia",
+          "start": "—",
+          "firma": "—",
+          "firmaPlus": "✓"
+        },
+        "m365": {
+          "label": "Microsoft 365 / Google Workspace",
+          "start": "—",
+          "firma": "—",
+          "firmaPlus": "✓"
+        },
+        "managedBackup": {
+          "label": "Test recovery co miesiąc",
+          "start": "—",
+          "firma": "—",
+          "firmaPlus": "✓"
+        },
+        "contract": {
+          "label": "Okres wypowiedzenia",
+          "start": "1 miesiąc",
+          "firma": "1 miesiąc",
+          "firmaPlus": "1 miesiąc"
+        }
+      }
+    },
+    "faq": {
+      "heading": "Pytania o <em>pakiety.</em>",
+      "items": {
+        "1": {
+          "q": "Co jeśli przekroczę godziny w pakiecie?",
+          "a": "Każda dodatkowa godzina jest rozliczana zgodnie z aktualną stawką pakietu (90 zł/h przy Start, 80 zł/h przy Firma, 70 zł/h przy Firma Plus). Powiadamiamy zanim zaczniesz przekraczać limit i proponujemy upgrade pakietu jeśli to się powtarza."
+        },
+        "2": {
+          "q": "Czy mogę w trakcie zmienić pakiet?",
+          "a": "Tak, w dowolnym momencie — w górę lub w dół. Zmiana wchodzi od kolejnego okresu rozliczeniowego. Bez kar, bez negocjacji."
+        },
+        "3": {
+          "q": "Czy oferujecie okres próbny?",
+          "a": "Tak — pierwszy miesiąc jest pełnopłatny, ale jeśli nie pasuje, wypowiadasz w ciągu 30 dni i zwracamy 100% wpłaty. Bez tłumaczeń, bez pytań."
+        },
+        "4": {
+          "q": "Czego nie obejmują pakiety?",
+          "a": "Większe projekty (migracje serwerów, wdrożenia nowych systemów, zakupy sprzętu) wyceniamy osobno z góry. Tak samo szkolenia grupowe i audyty bezpieczeństwa zlecane jednorazowo. Wszystko z transparentną wyceną przed startem."
+        }
+      }
+    }
+  },
   "notFound": {
     "title": "Strona nie istnieje",
     "description": "Nie możemy znaleźć strony, której szukasz.",

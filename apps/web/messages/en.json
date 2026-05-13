@@ -328,6 +328,115 @@
       "emailLabel": "Email"
     }
   },
+  "pakiety": {
+    "meta": {
+      "title": "IT support packages — bambooIT",
+      "description": "Three IT support packages for small and medium businesses: Start 390 PLN, Firma 690 PLN, Firma Plus 1190 PLN net/month. Fixed cost, monthly notice."
+    },
+    "header": {
+      "eyebrow": "Pricing",
+      "heading": "Three packages. <em>Clear cost.</em>",
+      "lede": "Fixed monthly fee, clear scope, monthly notice. Pick a package or start with a free audit — we'll show which package actually fits."
+    },
+    "comparison": {
+      "heading": "Package comparison",
+      "headers": {
+        "feature": "Feature",
+        "start": "Start",
+        "firma": "Firma",
+        "firmaPlus": "Firma Plus"
+      },
+      "rows": {
+        "hours": {
+          "label": "Support hours per month",
+          "start": "2h",
+          "firma": "5h",
+          "firmaPlus": "10h"
+        },
+        "remoteHelp": {
+          "label": "Remote help 8am-6pm",
+          "start": "✓",
+          "firma": "✓",
+          "firmaPlus": "✓"
+        },
+        "responseTime": {
+          "label": "Guaranteed response time",
+          "start": "≤4h",
+          "firma": "≤1h",
+          "firmaPlus": "≤30 min"
+        },
+        "monitoring": {
+          "label": "24/7 monitoring + alerts",
+          "start": "—",
+          "firma": "✓",
+          "firmaPlus": "✓"
+        },
+        "backup": {
+          "label": "Automated backup",
+          "start": "—",
+          "firma": "basic",
+          "firmaPlus": "managed + recovery"
+        },
+        "onsiteVisits": {
+          "label": "On-site help (Wrocław +50 km)",
+          "start": "—",
+          "firma": "✓",
+          "firmaPlus": "✓"
+        },
+        "newWorkstations": {
+          "label": "New workstation setup",
+          "start": "—",
+          "firma": "✓",
+          "firmaPlus": "✓"
+        },
+        "cyberAudit": {
+          "label": "GDPR/NIS2 audit + training",
+          "start": "—",
+          "firma": "—",
+          "firmaPlus": "✓"
+        },
+        "m365": {
+          "label": "Microsoft 365 / Google Workspace",
+          "start": "—",
+          "firma": "—",
+          "firmaPlus": "✓"
+        },
+        "managedBackup": {
+          "label": "Monthly recovery test",
+          "start": "—",
+          "firma": "—",
+          "firmaPlus": "✓"
+        },
+        "contract": {
+          "label": "Notice period",
+          "start": "1 month",
+          "firma": "1 month",
+          "firmaPlus": "1 month"
+        }
+      }
+    },
+    "faq": {
+      "heading": "Questions about <em>packages.</em>",
+      "items": {
+        "1": {
+          "q": "What if I exceed package hours?",
+          "a": "Each extra hour is billed at the package rate (90 PLN/h on Start, 80 PLN/h on Firma, 70 PLN/h on Firma Plus). We notify you before you cross the limit and propose an upgrade if it keeps happening."
+        },
+        "2": {
+          "q": "Can I change package mid-month?",
+          "a": "Yes, anytime — up or down. The change takes effect the next billing period. No penalties, no negotiation."
+        },
+        "3": {
+          "q": "Is there a trial period?",
+          "a": "Yes — the first month is fully paid, but if it doesn't fit, cancel within 30 days and we refund 100%. No explanations, no questions."
+        },
+        "4": {
+          "q": "What's not covered by packages?",
+          "a": "Larger projects (server migrations, new system rollouts, hardware purchases) are quoted upfront separately. Same for group training and one-off security audits. Everything with transparent pricing before we start."
+        }
+      }
+    }
+  },
   "notFound": {
     "title": "Page not found",
     "description": "We can't find the page you're looking for.",
