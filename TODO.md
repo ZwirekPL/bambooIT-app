@@ -71,6 +71,7 @@
 - **D-066** — Tempo: 4-6h dziennie Wirgiliusz, ~30-40h/tydzień, full focus
 - **D-067** — Remigiusz w fazie 4: sales-only (outreach, blog review, post-launch IT support), zero technical
 - **D-068** — Scope vs deadline: **scope rigid, deadline elastic** — jeśli scope nie wyrobi się w 6 tygodni, deadline się przesuwa do 7-8
+- **D-069** — **Frontend-first gate (2026-05-13):** CC nie zaczyna żadnego backendu (Lead model, Stripe, Fakturownia, admin, email, deploy) zanim cały frontend marketing-site nie jest gotowy z animacjami. Re-ordering W2–W6 → FE-N/BE-N phases (§4.0). Powód: animacje "wow" są częścią product identity, nie polish'em. Lista 14 efektów do reimplementacji w §5a Animations backlog.
 
 ---
 
@@ -98,6 +99,48 @@ K10 to **pre-faza-4 sweep** — kończymy outstanding cleanup tasks z CLEANUP_CO
 ## §4. Faza 4 build — 6-tygodniowy roadmap
 
 **Każdy tydzień = kilka atomic commits.** CC trzyma się per-task-type process (D-049). Tygodnie są **wzajemnie powiązane** — niektóre tasks mogą się przesuwać.
+
+---
+
+### §4.0 Frontend-first gate (decyzja 2026-05-13)
+
+**HARD RULE — D-069:** CC NIE zaczyna żadnego punktu poza frontendem (backend endpoints, Stripe Checkout, Fakturownia, admin panel, email templates, CI/CD, deploy) zanim **cały frontend marketing-site nie jest gotowy** — łącznie z animacjami.
+
+**Powód:** Wirgiliusz chce mieć "wow" wizualne pre-launch. Animacje są częścią product identity, nie polish'em. Pominięcie ich = brzydki MVP. Re-ordering W2–W6: frontend pages (static) → animations pass (unified) → DOPIERO POTEM backend integrations.
+
+**Nowa kolejność wykonania (override domyślnej kolejności W2→W6):**
+
+| Faza | Co | Status |
+|---|---|---|
+| **FE-1** | W1.CC.* — foundation (tokens, fonts, header, footer, BRAND, SEO, homepage hero) | ✅ done |
+| **FE-2** | W2.CC.1 — homepage **full static stack** (marquee + offer grid + manifesto + numbers + horizontal services + pricing tiers + process + industries + audit form UI + FAQ + final CTA) | next |
+| **FE-3** | W2.CC.2-4 — `/pakiety` + `/audyt` + `/kontakt` — static pages, form UI **bez submission backend** | |
+| **FE-4** | W3.CC.4 — `/pomoc-zdalna` — static | |
+| **FE-5** | W3.CC.5 — `/o-nas` — static, full conversion z `mockups/o-nas.html` | |
+| **FE-6** | W3.CC.6-7 — blog infra + 5 MDX articles — static content | |
+| **FE-7** | W4.CC.1-5 — `/branze/biura-rachunkowe` + 4 industry pages — static | |
+| **FE-8** | W4.CC.6 — blog articles 6-10 | |
+| **FE-9** | W6.CC.5 — error pages (`not-found.tsx`, `error.tsx`, `global-error.tsx`) — static | |
+| **FE-10** | **ANIMATIONS PASS** — unified library pick (Framer Motion / GSAP / CSS+IntersectionObserver) + zaimplementowanie wszystkich 14 efektów z mockupa (lista w §4a niżej). Polish review każdej strony. | |
+| **FE-11** | W6.CC.3 — Lighthouse audit z aktywnymi animacjami (target 90+) | |
+| **FE-12** | W6.CC.6 — cookie banner restyle do Neo-Swiss | |
+| **GATE** | Wirgiliusz visual approval całości frontendu | |
+| **BE-1** | W2.CC.7-8 — Lead model (Prisma migration 11) + backend leads endpoints + audit form/contact form submission wiring | |
+| **BE-2** | W3.CC.1-3 — Stripe Checkout integration + webhooks + success/cancel pages wired | |
+| **BE-3** | W4.CC.7-9 — Customer Portal redirect + auth flow polish + NIP validator | |
+| **BE-4** | W5.CC.* — Admin panel + email templates + Fakturownia integration + VPS deploy infra | |
+| **BE-5** | W6.CC.1-2,4,7 — CI/CD GitHub Actions + Sentry finalization + E2E tests + final smoke test | |
+| **LAUNCH** | bambooit.pl live | |
+
+Konsekwencje:
+- Cały W2.CC.7-8 (Lead model + endpoints) **przesunięty** do BE-1, AFTER frontend done
+- Stripe Checkout (W3) przesunięty do BE-2
+- Fakturownia/admin/email (W5) przesunięty do BE-4
+- Twoje external accounts (Stripe, Fakturownia, Resend, Sentry per §10) — nadal zakładasz tygodnia 1 jak planowano, czekają w `.env` aż BE phase ich potrzebuje
+- W1.8 (VPS prep) — może zostać przesunięte na BE-4 jeśli wygodniej; deploy nie potrzebny do końca FE work
+- Deadline 6-7 tygodni z D-041 może się rozszerzyć — pre-rozmowa: jeśli FE z animacjami zajmie 4 tygodnie, BE jeszcze 3-4 = total 7-8 tygodni. Akceptowalne per D-068 (scope rigid, deadline elastic).
+
+---
 
 ### Tydzień 1 — Foundation setup (parallel: Ty + CC)
 
@@ -305,6 +348,49 @@ Mockup HTML masz lokalnie. Workflow:
 4. **Reference w trakcie pracy:** CC może w każdej chwili otworzyć mockup do verify "wygląda tak samo".
 
 **Mockup NIE jest kopiowany 1:1** — jest **wizualnym brief'em**. CC implementuje **lepszą wersję** (responsive, accessible, semantic HTML, performance optimized) zachowując wizualną tożsamość.
+
+---
+
+## §5a. Animations backlog (FE-10 — unified pass)
+
+Wszystkie efekty z `mockups/bambooit-netguru-v3.html` świadomie odłożone do jednego unified pass'u po zbudowaniu statycznych sekcji. Per D-069 frontend nie jest "gotowy" bez animacji.
+
+**Library decision (do podjęcia w FE-10 przed implementacją):**
+
+| Option | Plus | Minus |
+|---|---|---|
+| **Framer Motion** | Idiomatic React, deklaratywne `whileInView`, dobra DX, gesture support, SSR-friendly | Bundle ~50KB gzip, complex scroll choreography wymaga `useScroll` hook'ów |
+| **GSAP + ScrollTrigger + Lenis** | Mockup 1:1 fidelity (mockup już jest w GSAP), najbardziej zaawansowane scroll choreography, performance | Imperative, paid license dla SplitText plugin, ~70KB gzip, mniej idiomatic React |
+| **CSS + IntersectionObserver + vanilla JS** | Najlżejszy (0KB lib), browser-native, no React hydration overhead | Pinned scroll trudniejszy, więcej manual code, mniej polish na complex sequences |
+
+**Rekomendacja default:** Framer Motion dla 80% efektów (entrance, hover, simple parallax) + GSAP only dla pinned-scroll/3D-pricing/horizontal-services (3-4 sekcje gdzie naprawdę potrzebne). Hybrid pragmatic. Decyzja w FE-10 kickoff.
+
+### Lista 14 efektów do reimplementacji
+
+Każdy z numerem sekcji + krótki opis + estymowany effort. Wszystkie istnieją w `mockups/bambooit-netguru-v3.html` jako referencja.
+
+| # | Sekcja | Efekt | Effort |
+|---|---|---|---|
+| **A1** | Loader screen | Full-screen bambooIT mark + green bar fill 1.2s, fade-out po 1.8s. **Decyzja: SKIP w MVP** (UX anti-pattern dla marketingowego site, zwiększa TTI). Lub zastąpić Next.js `<Suspense>` boundaries. | — (skip) |
+| **A2** | Hero entrance | Split-text chars stagger (yPercent 110→0, opacity 0→1, rotation 8→0, stagger 0.025s) + eyebrow fade-up + heroBottom fade-up | 2h |
+| **A3** | Panda SVG entrance | `stroke-dashoffset` line-draw (1.6s ease-in-out, stagger 0.04s) + panda-fill fade-in (0.5s) + panda-leaf scale-in stagger random (back.out(2)) + eyes fade | 2h |
+| **A4** | Hero parallax | Panda yPercent 30 + grid yPercent -20 + title yPercent -15 + opacity 1→0.3 — scrub na scroll | 1h |
+| **A5** | Marquee | Infinite horizontal scroll (x: -marqueeWidth, duration 30s, ease none, repeat -1) | 30 min |
+| **A6** | Narrative pinned-scroll (×4) | ScrollTrigger pin 100vh + word-by-word reveal (0→0.4 fade in, 0.4→0.6 hold, 0.6→1 fade out) z bg radial gradient parallax | 3h |
+| **A7** | Manifesto char-by-char | Char-level color reveal scrubbed by ScrollTrigger (grey → navy, em-marked → green-deep). 200+ chars. | 2h |
+| **A8** | Numbers counter | 0 → target (98%, 15min, 40+) duration 1.8s ease-out, trigger 80% viewport | 1h |
+| **A9** | Horizontal services pinned scroll | 6 cards horizontal, ScrollTrigger pin viewport, x:-distance scrub, active card detection (closest to viewport center) z scale 0.85→1 + green shadow + progress bar + counter | 4h |
+| **A10** | Pricing 3D stack assembly | 3 tiery z różnych pozycji 3D (left -300/-30deg, center y400/30deg, right 300/30deg) → ease-out do center w 0-60% scroll, featured tier rises -20px w 60-100% | 4h |
+| **A11** | Process line draw | SVG `stroke-dashoffset` 1000→0 scrubbed by ScrollTrigger + steps `.active` toggle progressively + step-num rotate/scale entrance per step | 2h |
+| **A12** | Industries morphing bg | 6 background classes (`morph-1`...`morph-6`) z różnymi green hue/lightness, scrubbed by scroll OR hover-triggered | 2h |
+| **A13** | FAQ accordion open | Smooth max-height transition (0.5s cubic-bezier) + plus icon rotate 45deg + bg-green/border-green on open | 1h |
+| **A14** | Final CTA word stagger | H2 word-level split + y80→0 stagger 0.06s, ease power3.out | 1h |
+
+**Total estimate FE-10:** 24-30h CC pracy + Twoje review/iteration. Plus library research + decision (~2h).
+
+**Polish review po FE-10:** Wirgiliusz robi visual walkthrough każdej strony, flag'uje co jeszcze nie "wow". CC iteruje. Cel: każda sekcja ma jakiś moment delight'u, nie tylko fade-in-up.
+
+**Constraint:** wszystkie animacje muszą respektować `prefers-reduced-motion: reduce` — mockup ma to w CSS, w React port musi być wired przez `useReducedMotion()` (Framer Motion built-in) lub manual media query check.
 
 ---
 
@@ -628,12 +714,38 @@ Ta sekcja **żyje** — Ty + CC updateujemy w trakcie.
 
 ### Faza 4 progress
 
-- [ ] **Tydzień 1** — Foundation setup
-- [ ] **Tydzień 2** — Marketing site core
-- [ ] **Tydzień 3** — Stripe + sekcje pomocnicze
-- [ ] **Tydzień 4** — Branże + blog + Customer Portal
-- [ ] **Tydzień 5** — Admin panel + email + Fakturownia
-- [ ] **Tydzień 6** — CI/CD + monitoring + LAUNCH
+Per D-069 (§4.0 frontend-first gate) execution shifted from week-numbered to FE-N/BE-N phases. Original week tracking kept below for reference but execution follows §4.0 ordering.
+
+**Frontend track:**
+- [x] **FE-1** — W1.CC.* foundation (tokens, fonts, header, footer, BRAND, SEO, homepage hero) — 7 commits in session 2026-05-13 (`0cfcb8a` → `7d27f08`)
+- [ ] **FE-2** — W2.CC.1 homepage full static stack — next
+- [ ] **FE-3** — `/pakiety` + `/audyt` + `/kontakt` static
+- [ ] **FE-4** — `/pomoc-zdalna` static
+- [ ] **FE-5** — `/o-nas` static
+- [ ] **FE-6** — blog infra + 5 MDX articles
+- [ ] **FE-7** — `/branze/*` (5 industry pages)
+- [ ] **FE-8** — blog articles 6-10
+- [ ] **FE-9** — error pages
+- [ ] **FE-10** — animations unified pass (§5a backlog, 14 efektów)
+- [ ] **FE-11** — Lighthouse audit
+- [ ] **FE-12** — cookie banner Neo-Swiss
+- [ ] **GATE** — Wirgiliusz visual approval
+
+**Backend track (blocked until GATE):**
+- [ ] **BE-1** — Lead model + leads endpoints + form submissions
+- [ ] **BE-2** — Stripe Checkout + webhooks + success/cancel
+- [ ] **BE-3** — Customer Portal + auth polish + NIP validator
+- [ ] **BE-4** — Admin + email + Fakturownia + VPS deploy
+- [ ] **BE-5** — CI/CD + Sentry + E2E + smoke test
+- [ ] **LAUNCH**
+
+**Twoje (Wirgiliusz) — niezależne, robi się równolegle:**
+- [ ] W1.1-W1.6 external accounts (Stripe, Fakturownia, Resend, Sentry, Anthropic, DNS)
+- [ ] W1.7 mockups — ✅ done (zrobione za Ciebie 2026-05-13)
+- [ ] W1.8 VPS prep — może czekać do BE-4
+
+**Original week-based tracking (deprecated, kept for context):**
+- ~~Tydzień 1-6 sequence~~ — zastąpione FE/BE phases per D-069
 
 ### Blockers (live update)
 
@@ -641,7 +753,7 @@ Ta sekcja **żyje** — Ty + CC updateujemy w trakcie.
 
 ### Decisions pending (live)
 
-*(empty — wszystkie 28 decyzji z TODO.md session zalockowane jako D-041 → D-068)*
+*(empty — wszystkie decyzje D-041 → D-069 zalockowane)*
 
 ### Open questions (live)
 
