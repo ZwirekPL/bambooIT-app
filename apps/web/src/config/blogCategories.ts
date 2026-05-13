@@ -5,21 +5,42 @@ export interface BlogCategoryDef {
   slug: string;
 }
 
+/**
+ * bambooIT blog categories. 8 buckets that cover the IT support business
+ * (Obsługa IT, Cyberbezpieczeństwo, Backup, Microsoft 365, Sprzęt i sieci),
+ * Wirgiliusz's adjacent specialties (Automatyzacje, Strony i aplikacje),
+ * and industry-specific deep dives (Branże).
+ *
+ * If you add or rename categories, update both this list and
+ * `apps/web/src/components/blog/category-styles.ts` with a matching colour.
+ */
 export const BLOG_CATEGORY_LIST: BlogCategoryDef[] = [
-  { name: 'Porady dietetyczne', slug: 'porady-dietetyczne' },
-  { name: 'Odchudzanie',        slug: 'odchudzanie' },
-  { name: 'Zdrowie i choroby',  slug: 'zdrowie-i-choroby' },
-  { name: 'Przepisy',           slug: 'przepisy' },
-  { name: 'AI i dietetyka',     slug: 'ai-i-dietetyka' },
-  { name: 'Motywacja',          slug: 'motywacja' },
-  { name: 'Subskrypcja',        slug: 'subskrypcja' },
-  { name: 'Thermomix & Airfryer', slug: 'thermomix-airfryer' },
+  { name: 'Obsługa IT',           slug: 'obsluga-it' },
+  { name: 'Cyberbezpieczeństwo',  slug: 'cyberbezpieczenstwo' },
+  { name: 'Backup',               slug: 'backup' },
+  { name: 'Microsoft 365',        slug: 'microsoft-365' },
+  { name: 'Sprzęt i sieci',       slug: 'sprzet-i-sieci' },
+  { name: 'Automatyzacje',        slug: 'automatyzacje' },
+  { name: 'Strony i aplikacje',   slug: 'strony-i-aplikacje' },
+  { name: 'Branże',               slug: 'branze' },
 ];
 
-/** Legacy category names stored in older DB records → canonical name mapping. */
+/**
+ * Legacy DietetykDEV category names → bambooIT mapping.
+ * Catches old DB rows seeded before D-070 rename so they still render with
+ * a known canonical name. Drop after a one-time DB migration in BE-1.
+ */
 const LEGACY_ALIASES: Record<string, string> = {
-  Porady:  'Porady dietetyczne',
-  Zdrowie: 'Zdrowie i choroby',
+  'Porady dietetyczne': 'Obsługa IT',
+  'Porady':             'Obsługa IT',
+  'Odchudzanie':        'Obsługa IT',
+  'Zdrowie i choroby':  'Cyberbezpieczeństwo',
+  'Zdrowie':            'Cyberbezpieczeństwo',
+  'Przepisy':           'Obsługa IT',
+  'AI i dietetyka':     'Automatyzacje',
+  'Motywacja':          'Obsługa IT',
+  'Subskrypcja':        'Obsługa IT',
+  'Thermomix & Airfryer': 'Sprzęt i sieci',
 };
 
 /**

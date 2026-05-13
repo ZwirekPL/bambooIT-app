@@ -12,8 +12,11 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { cn } from '@/lib/utils';
 import type { BlogPost } from '@/types/api';
 import { BLOG_CATEGORY_LIST } from '@/config/blogCategories';
+import { BRAND } from '@config/brand';
 
 const FALLBACK_CATEGORIES = BLOG_CATEGORY_LIST.map((c) => c.name);
+const DEFAULT_CATEGORY = BLOG_CATEGORY_LIST[0]?.name ?? 'Obsługa IT';
+const DEFAULT_AUTHOR = BRAND.author.name;
 
 interface PostFormProps {
   post?: BlogPost;
@@ -53,8 +56,8 @@ export function PostForm({ post, token }: PostFormProps) {
     excerptEn: post?.excerptEn ?? '',
     content: post?.content ?? '',
     contentEn: post?.contentEn ?? '',
-    category: post?.category ?? 'Porady dietetyczne',
-    author: post?.author ?? 'dr Anna Kowalska',
+    category: post?.category ?? DEFAULT_CATEGORY,
+    author: post?.author ?? DEFAULT_AUTHOR,
     imageSrc: post?.imageSrc ?? '',
     imageAlt: post?.imageAlt ?? '',
     imageAltEn: post?.imageAltEn ?? '',
