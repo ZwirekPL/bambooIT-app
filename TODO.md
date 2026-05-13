@@ -726,10 +726,10 @@ Per D-069 (§4.0 frontend-first gate) execution shifted from week-numbered to FE
 - [x] **FE-6** — blog restyle Neo-Swiss + admin defaults bambooIT + 8 mock lorem ipsum posts + writer brief — 4 commits (`102071c` → `2ac7f3e`). Categories rebrand (Obsługa IT / Cyberbezpieczeństwo / Backup / M365 / Sprzęt i sieci / Automatyzacje / Strony i aplikacje / Branże), 12 blog components restyled (BlogHero z grid bg + bamboo CTA → /audyt, BlogCard z paper-to-bamboo gradient, etc.), `seed-bamboo-blog-mock.ts` (8 posts × 1 per category, lorem ipsum + Polish titles, FAQ entries, idempotent upsert), `docs/blog/CONTENT_SPEC.md` (361-line writer brief covering: persona, voice, structure, SEO, 60 topic ideas across 8 categories, admin UI walkthrough, images, FAQ, common mistakes, review workflow).
 - [x] **FE-7** — `/branze/*` 5 industry pages — 2 commits (`fe196cb` + `27f7b24`). Final 5 per Wirgiliusz option B: biura-rachunkowe + kancelarie + gabinety + produkcja + hotele (dropped architektura + salony). Shared `IndustryLanding.tsx` template (PageHeader → painPoints 4 cards → valueProp 4 items dark + bamboo border → caseStudy placeholder → FinalCTA reuse) — adding industry #6 later is just an i18n bundle + 22-line page.tsx wrapper. Industry-specific real content (not lorem ipsum): pain points + value props grounded in actual industry needs (RODO Art. 9 for medical, OT/IT segmentation for produkcja, channel manager sync for hotele, etc.).
 - ~~**FE-8**~~ — dropped per D-070 (content via admin UI in production)
-- [ ] **FE-9** — error pages
-- [ ] **FE-10** — animations unified pass (§5a backlog, 14 efektów)
+- [x] **FE-9** — error pages — commit `1cfefe8`. Neo-Swiss restyle not-found.tsx (404 z Fraunces black bamboo-deep) + new locale-scoped error.tsx (z Sentry capture + error.digest dla bug report) + global-error.tsx (inline-style fallback, OUTSIDE next-intl provider, Polish hardcoded).
+- [ ] **FE-10** — animations unified pass (§5a backlog, 14 efektów) — next biggest task
 - [ ] **FE-11** — Lighthouse audit
-- [ ] **FE-12** — cookie banner Neo-Swiss
+- [x] **FE-12** — cookie banner Neo-Swiss — commit `2800540`. CookieBanner.tsx + CookieSettings.tsx restyled (bamboo pills, navy-deep backdrop, paper modal frame, no shadcn Button variant dependencies).
 - [ ] **GATE** — Wirgiliusz visual approval
 
 **Backend track (blocked until GATE):**
