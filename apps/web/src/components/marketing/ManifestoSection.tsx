@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server';
+import { AnimatedStat } from './AnimatedStat';
 
 export async function ManifestoSection() {
   const t = await getTranslations('home.manifesto');
@@ -37,18 +38,15 @@ export async function ManifestoSection() {
           })}
         </p>
 
-        {/* Numbers stack — static values for now; A8 counter animation in FE-10 */}
+        {/* Numbers stack — A8 counter animation triggers when row scrolls into view */}
         <ul className="flex flex-col gap-12 pt-6">
           {stats.map((stat) => (
-            <li key={stat.label} className="border-t border-line-strong pt-5">
-              <div className="flex items-baseline font-display text-5xl font-semibold leading-none tracking-[-0.04em] text-navy md:text-6xl lg:text-7xl xl:text-[6.75rem]">
-                <span>{stat.value}</span>
-                <span className="text-bamboo-deep">{stat.suffix}</span>
-              </div>
-              <p className="mt-2 max-w-[28ch] text-sm leading-[1.4] text-navy-soft">
-                {stat.label}
-              </p>
-            </li>
+            <AnimatedStat
+              key={stat.label}
+              value={stat.value}
+              suffix={stat.suffix}
+              label={stat.label}
+            />
           ))}
         </ul>
       </div>

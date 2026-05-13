@@ -321,7 +321,8 @@
       }
     },
     "finalCta": {
-      "heading": "Pora oddać IT w <em>dobre łapy.</em>",
+      "headingPlain": "Pora oddać IT w",
+      "headingEm": "dobre łapy.",
       "cta": "Zacznij od bezpłatnego audytu",
       "phoneLabel": "Telefon",
       "emailLabel": "Email"

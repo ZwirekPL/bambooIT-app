@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { BRAND } from '@config/brand';
+import { AnimatedCTAHeading } from './AnimatedCTAHeading';
 
 export async function FinalCTASection() {
   const t = await getTranslations('home.finalCta');
@@ -14,11 +15,7 @@ export async function FinalCTASection() {
       />
 
       <div className="relative mx-auto w-full max-w-[1440px]">
-        <h2 className="max-w-[14ch] font-display text-5xl font-light leading-[0.95] tracking-[-0.04em] text-white md:text-7xl lg:text-8xl xl:text-9xl">
-          {t.rich('heading', {
-            em: (chunks) => <em className="font-semibold italic text-bamboo">{chunks}</em>,
-          })}
-        </h2>
+        <AnimatedCTAHeading plain={t('headingPlain')} em={t('headingEm')} />
 
         <div className="mt-16 flex flex-col items-start justify-between gap-12 md:flex-row md:items-end md:gap-16">
           <Link

@@ -321,7 +321,8 @@
       }
     },
     "finalCta": {
-      "heading": "Time to hand IT over to <em>good hands.</em>",
+      "headingPlain": "Time to hand IT over to",
+      "headingEm": "good hands.",
       "cta": "Start with a free audit",
       "phoneLabel": "Phone",
       "emailLabel": "Email"
