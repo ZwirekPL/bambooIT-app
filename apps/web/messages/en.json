@@ -30,6 +30,45 @@
       "priceUnit": "/month",
       "priceDesc": "Full IT support — remote help, monitoring, backup",
       "priceCta": "See all packages →"
+    },
+    "marquee": {
+      "remoteHelp": "Remote help",
+      "monitoring": "24/7 monitoring",
+      "backup": "Automated backup",
+      "rodo": "GDPR-compliant security",
+      "m365": "Microsoft 365",
+      "cybersec": "Cybersecurity"
+    },
+    "offer": {
+      "heading": "Four pillars,<br></br>one <em>partner.</em>",
+      "lede": "We're not a corporation with a five-floor call center. We're a two-person team handling all the technology in your company — from email and printers to custom apps and process automation.",
+      "cards": {
+        "cta": "Learn more",
+        "itSupport": {
+          "number": "01 / Subscription",
+          "tag": "Core service",
+          "title": "IT support",
+          "desc": "Continuous care for hardware, network, email, backup, and security. One fixed cost instead of unpredictable outages.",
+          "cta": "See packages"
+        },
+        "websites": {
+          "number": "02 / Project",
+          "title": "Websites",
+          "desc": "Company sites, shops, landing pages. Modern stack, mobile-first, SEO. Quoted individually after a call."
+        },
+        "apps": {
+          "number": "03 / Project",
+          "title": "Custom apps",
+          "desc": "Bespoke software for companies that outgrow off-the-shelf. Client panels, CRMs, internal tools, B2B SaaS."
+        },
+        "automation": {
+          "number": "04 / Optimization",
+          "title": "Process automation",
+          "desc": "We connect systems, eliminate manual work, measure ROI. n8n, Make, custom integrations. Process audit upfront."
+        }
+      },
+      "teamLine": "Everything is handled by a <strong>two-person team</strong> — Remigiusz (IT) and Wirgiliusz (web, apps, automation). No call center. Always the same person on the other end.",
+      "teamCta": "Meet us →"
     }
   },
   "notFound": {

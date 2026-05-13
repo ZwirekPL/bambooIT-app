@@ -1,5 +1,7 @@
 import { setRequestLocale } from 'next-intl/server';
 import { HeroSection } from '@/components/marketing/HeroSection';
+import { MarqueeBar } from '@/components/marketing/MarqueeBar';
+import { OfferSection } from '@/components/marketing/OfferSection';
 import { BRAND } from '@config/brand';
 
 type Props = {
@@ -44,6 +46,8 @@ export default async function HomePage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationLd()) }}
       />
       <HeroSection />
+      <MarqueeBar />
+      <OfferSection />
     </>
   );
 }

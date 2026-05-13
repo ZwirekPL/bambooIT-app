@@ -30,6 +30,45 @@
       "priceUnit": "/mies.",
       "priceDesc": "Pełna opieka IT — pomoc zdalna, monitoring, backup",
       "priceCta": "Zobacz wszystkie pakiety →"
+    },
+    "marquee": {
+      "remoteHelp": "Pomoc zdalna",
+      "monitoring": "Monitoring 24/7",
+      "backup": "Backup automatyczny",
+      "rodo": "Bezpieczeństwo RODO",
+      "m365": "Microsoft 365",
+      "cybersec": "Cyberbezpieczeństwo"
+    },
+    "offer": {
+      "heading": "Cztery filary,<br></br>jeden <em>partner.</em>",
+      "lede": "Nie jesteśmy korporacją z pięciopiętrową infolinią. Jesteśmy dwuosobowym zespołem, który ogarnia całą technologię w Twojej firmie — od poczty i drukarek po custom aplikacje i automatyzacje procesów.",
+      "cards": {
+        "cta": "Dowiedz się więcej",
+        "itSupport": {
+          "number": "01 / Abonament",
+          "tag": "Główna usługa",
+          "title": "Obsługa IT",
+          "desc": "Stała opieka nad sprzętem, siecią, pocztą, backupem i bezpieczeństwem. Jeden stały koszt zamiast nieprzewidywalnych awarii.",
+          "cta": "Zobacz pakiety"
+        },
+        "websites": {
+          "number": "02 / Projekt",
+          "title": "Strony internetowe",
+          "desc": "Strony firmowe, sklepy, landing page. Nowoczesne technologie, mobile-first, SEO. Wycena indywidualna po rozmowie."
+        },
+        "apps": {
+          "number": "03 / Projekt",
+          "title": "Aplikacje na zamówienie",
+          "desc": "Custom software dla firm, którym nie wystarcza gotowiec. Panele klienta, CRM-y, narzędzia wewnętrzne, SaaS B2B."
+        },
+        "automation": {
+          "number": "04 / Optymalizacja",
+          "title": "Automatyzacje procesów",
+          "desc": "Łączymy systemy, eliminujemy ręczną pracę, mierzymy ROI. n8n, Make, custom integracje. Audyt procesów na start."
+        }
+      },
+      "teamLine": "Wszystko obsługuje <strong>2-osobowy zespół</strong> — Remigiusz (IT) i Wirgiliusz (strony, aplikacje, automatyzacje). Bez infolinii. Zawsze ten sam człowiek po drugiej stronie.",
+      "teamCta": "Poznaj nas →"
     }
   },
   "notFound": {
