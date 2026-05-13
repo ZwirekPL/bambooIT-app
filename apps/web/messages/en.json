@@ -750,6 +750,262 @@
         "body": "We work with accounting firms in the Wrocław region. A specific case study (numbers, savings, time to recover data after an incident) will be published once we get client consent. In the meantime — start with a free audit and see for yourself what 'specialised IT for accounting firms' means.",
         "cta": "Book a free audit"
       }
+    },
+    "kancelarie": {
+      "meta": {
+        "title": "IT for law offices — bambooIT",
+        "description": "IT for law offices. Client file encryption, secure archives, mobile access from court, GDPR. Because confidentiality doesn't forgive."
+      },
+      "header": {
+        "eyebrow": "Industry: law offices",
+        "heading": "IT for law offices — because professional secrecy <em>has no second chance.</em>",
+        "lede": "Client files, court correspondence, legal opinions — all must be encrypted, accessible only to the authorised, and archived in line with the law (10 years for civil files, 20 for criminal). One security gap and you lose client trust and professional reputation."
+      },
+      "painPoints": {
+        "heading": "What most often <em>hurts</em> in a law office",
+        "items": {
+          "1": {
+            "tag": "Confidentiality",
+            "title": "Professional secrecy",
+            "desc": "Client communication, working documents, legal opinions — all subject to advocate/legal advisor privilege. A leak = disciplinary proceedings + client loss + criminal liability."
+          },
+          "2": {
+            "tag": "Mobility",
+            "title": "Work from court and at clients'",
+            "desc": "Court, detention center, client meeting — lawyers work everywhere. They need access to files from anywhere, but securely. Court WiFi is not an option."
+          },
+          "3": {
+            "tag": "Archiving",
+            "title": "Files after the case — 10-20 years",
+            "desc": "After a case ends, files must be stored for years. Drives fail, media age. Without proper archiving, at some point you won't recover documents from 2018."
+          },
+          "4": {
+            "tag": "Communication",
+            "title": "Email to client — is it encrypted?",
+            "desc": "Standard email is a postcard. You send a legal opinion to the client's normal email — every administrator on the path can read it. Clients increasingly expect this."
+          }
+        }
+      },
+      "valueProp": {
+        "label": "What we do specifically",
+        "heading": "IT tailored to <em>law office specifics</em>",
+        "items": {
+          "1": {
+            "title": "End-to-end encryption",
+            "desc": "Encrypted drives (BitLocker/FileVault), email with S/MIME encryption or Microsoft 365 Message Encryption, secure file sharing to clients (instead of WeTransfer)."
+          },
+          "2": {
+            "title": "VPN + 2FA + access audit",
+            "desc": "Secure access to files from anywhere. We log every file access — if an employee copies files, you know about it. In case of a Bar Association inspection, you have full logs."
+          },
+          "3": {
+            "title": "Legally compliant archive",
+            "desc": "3-2-1 strategy for files (local copy + cloud + offline), retention compliant with industry regulations, automatic anonymisation after the limitation period."
+          },
+          "4": {
+            "title": "Microsoft 365 with DLP",
+            "desc": "M365 Business Premium with Data Loss Prevention — the system blocks the sending of documents with a PESEL number, case signature, or secrecy clause outside the organisation."
+          }
+        }
+      },
+      "caseStudy": {
+        "tag": "Case study (coming)",
+        "heading": "A real example — <em>once we get</em> client consent",
+        "body": "We work with law offices in Wrocław. The industry requires extra caution when publishing case studies — we'll publish a specific example once a client consents. In the meantime, start with a free audit — we'll show where the holes are in the current setup and what specifically can be done.",
+        "cta": "Book a free audit"
+      }
+    },
+    "gabinety": {
+      "meta": {
+        "title": "IT for medical practices — bambooIT",
+        "description": "IT for medical practices. GDPR Article 9 compliance (special categories), eHealth integrations, e-prescriptions, registration system availability."
+      },
+      "header": {
+        "eyebrow": "Industry: medical practices",
+        "heading": "IT for a medical practice — <em>GDPR without compromise.</em>",
+        "lede": "Medical data is GDPR Article 9 — special category. Higher requirements, higher penalties, greater responsibility. Plus integrations with e-Prescription, e-Referral, laboratories, registration systems. All of this must work reliably — a patient with a fever won't wait while you fix the computer."
+      },
+      "painPoints": {
+        "heading": "What most often <em>hurts</em> in a medical practice",
+        "items": {
+          "1": {
+            "tag": "GDPR Art. 9",
+            "title": "Medical data = special category",
+            "desc": "GDPR requirements are much stricter than for a regular business. UODO inspects medical facilities more actively. No DPIA, no processing register, no proper safeguards = fines of up to 20 million euros."
+          },
+          "2": {
+            "tag": "Availability",
+            "title": "Registration must run 100% of the time",
+            "desc": "Crashed registration = patients standing in queue. Doctor has no schedule. NFZ inspection asking for documents. A 2-hour outage realistically costs 5-10k PLN and patients who won't return."
+          },
+          "3": {
+            "tag": "Integrations",
+            "title": "eHealth, laboratories, NFZ",
+            "desc": "Patients expect e-Prescription, e-Referral, e-Sick-leave. Laboratories send results via their own API. NFZ requires reporting in sJWMS. Configuring and maintaining these integrations is a job for a specialised IT company."
+          },
+          "4": {
+            "tag": "Archive",
+            "title": "Medical records — 20 years",
+            "desc": "The law requires medical records to be kept for 20 years (30 for patient death). After the practice closes — who keeps them? Cloud backup is not always enough due to data localisation requirements."
+          }
+        }
+      },
+      "valueProp": {
+        "label": "What we do specifically",
+        "heading": "GDPR Art. 9 compliance + practice <em>continuity</em>",
+        "items": {
+          "1": {
+            "title": "DPIA + processing register",
+            "desc": "We draft a Data Protection Impact Assessment (DPIA) for each medical process, maintain the processing register in line with GDPR Article 30. Ready to present to UODO during an inspection."
+          },
+          "2": {
+            "title": "Registration system redundancy",
+            "desc": "A second server/computer with a hot copy of registration data. The primary goes down — we switch over in 5 minutes. Plus emergency power (UPS) because clinic power can also drop."
+          },
+          "3": {
+            "title": "eHealth integrations",
+            "desc": "We configure and maintain the qualified electronic signature for e-Prescriptions, integration with the P1 platform, links to regional laboratories. NFZ-side updates — we track them for you."
+          },
+          "4": {
+            "title": "Medical records archive",
+            "desc": "Encrypted backup, in Poland (localisation requirements), retention 20+ years, auditable access. Plus a plan for practice closure — to whom you hand over the records."
+          }
+        }
+      },
+      "caseStudy": {
+        "tag": "Case study (coming)",
+        "heading": "A real example — <em>from a clinic</em> in Wrocław",
+        "body": "We service dental, orthopaedic, and general medical clinics. Each has different requirements (different registration systems, different integrations). A specific example of what specialised IT meant for a given practice — we'll publish once a client consents. In the meantime, a free audit — we'll show where you're currently out of compliance with GDPR and what that means in case of inspection.",
+        "cta": "Book a free audit"
+      }
+    },
+    "produkcja": {
+      "meta": {
+        "title": "IT for manufacturing companies — bambooIT",
+        "description": "IT for small manufacturing companies. OT/IT networks, production line monitoring, disaster recovery, network segmentation, NIS2 compliance."
+      },
+      "header": {
+        "eyebrow": "Industry: manufacturing",
+        "heading": "IT in manufacturing — because every <em>hour of downtime costs.</em>",
+        "lede": "Manufacturing is not an office. You have an IT network (accounting computers, email, ERP) and an OT network (PLC controllers, automation, MES). A failure on the latter stops the line — hourly cost counted in thousands. Plus NIS2 for companies over 50 people. A standard IT firm will handle email — but not industrial networks."
+      },
+      "painPoints": {
+        "heading": "What most often <em>hurts</em> in manufacturing",
+        "items": {
+          "1": {
+            "tag": "OT vs IT",
+            "title": "Industrial networks are a different world",
+            "desc": "PLC controllers, HMI panels, sensors, MES — these are not Windows laptops. Different protocols (Modbus, Profinet), different threats (ransomware on a PLC = line stop). The standard IT person doesn't deal with this."
+          },
+          "2": {
+            "tag": "Downtime",
+            "title": "An hour of downtime = real cost",
+            "desc": "Line down 4 hours = no production worth tens of thousands of PLN. Plus delayed deliveries to clients, contractual penalties. Without a disaster recovery plan, one incident eats the annual IT budget."
+          },
+          "3": {
+            "tag": "Security",
+            "title": "Manufacturing attacks are growing",
+            "desc": "Attacks on manufacturing companies grew 5x in the last 3 years. Ransomware blocks MES, attackers hijack PLCs, suppliers are an attack vector. No network segmentation = an attack spreads from office to production."
+          },
+          "4": {
+            "tag": "Compliance",
+            "title": "NIS2 — new requirements",
+            "desc": "The NIS2 directive (implementation 2024-2025) covers medium manufacturing companies. Requires cyber risk management, incident reporting, audits. No preparation = fines + board personal liability."
+          }
+        }
+      },
+      "valueProp": {
+        "label": "What we do specifically",
+        "heading": "IT + OT under one <em>care</em>",
+        "items": {
+          "1": {
+            "title": "OT/IT network segmentation",
+            "desc": "Firewall between the office network and the production network. An office employee doesn't see the PLCs, a ransomware attack won't pass from a laptop to the production line. VLAN configuration + traffic monitoring between segments."
+          },
+          "2": {
+            "title": "Line monitoring 24/7",
+            "desc": "Sensors on key elements (power, server room temperature, controller status). Proactive alert before something stops working. Phone call to the on-duty engineer, not an email no one reads."
+          },
+          "3": {
+            "title": "Disaster recovery plan",
+            "desc": "What do we do when the ERP server goes down? When PLC line A goes down? When the internet goes down? Each scenario has a procedure and response time. Scenario testing once a quarter — so you don't discover in a crisis that the paper plan doesn't work."
+          },
+          "4": {
+            "title": "Audit + NIS2 preparation",
+            "desc": "Identification of whether the company falls under NIS2, audit of the current state against requirements, adaptation plan, policies + procedures, training. In case of inspection — a ready dossier."
+          }
+        }
+      },
+      "caseStudy": {
+        "tag": "Case study (coming)",
+        "heading": "A real example — <em>from the shop floor</em>",
+        "body": "We work with small and medium manufacturing companies (metal, food, packaging) in the Wrocław and Wałbrzych region. Each has different specifics and different pitfalls. A specific implementation example — we'll publish once a client consents. In the meantime — a free audit — we'll show where you currently have gaps in the OT network and what to do before an attack hits.",
+        "cta": "Book a free audit"
+      }
+    },
+    "hotele": {
+      "meta": {
+        "title": "IT for hotels and hospitality — bambooIT",
+        "description": "IT for hotels, restaurants, guesthouses. Guest WiFi, POS, booking.com/Airbnb integrations, payment security, seasonal scaling."
+      },
+      "header": {
+        "eyebrow": "Industry: hotels and hospitality",
+        "heading": "IT in a hotel — because a guest <em>won't forgive weak WiFi.</em>",
+        "lede": "A hotel is a service business where technology is the foundation of the guest experience. WiFi must work, the cash register must work, booking must work. Plus PCI DSS for card payments, GDPR for reservations, seasonal budget. Few IT companies understand this."
+      },
+      "painPoints": {
+        "heading": "What most often <em>hurts</em> in a hotel and restaurant",
+        "items": {
+          "1": {
+            "tag": "Guest WiFi",
+            "title": "WiFi is the basis of a stay today",
+            "desc": "Guest arrives, wants to log in, wants to stream. Weak WiFi = one star less in the Booking review. Plus separation of guests from the hotel network — because you don't want a guest with a laptop to see the cash register and reservations."
+          },
+          "2": {
+            "tag": "POS",
+            "title": "The cash register can't go down",
+            "desc": "Evening, restaurant full, the register hangs — nightmare. Plus POS integrations with the reservation system (room added to the bill), kitchen printers, card terminal. Everything has to play together."
+          },
+          "3": {
+            "tag": "Integrations",
+            "title": "Channel manager + Booking + Airbnb",
+            "desc": "You sell through Booking, Airbnb, your own site, phone. The channel manager has to synchronise all of this — otherwise overbooking happens. Plus integrations with the PMS (Property Management System) — this is not trivial."
+          },
+          "4": {
+            "tag": "Seasonality",
+            "title": "Scaling for the season",
+            "desc": "Summer vs winter — often a 5x difference in occupancy. The network must handle 200 devices in July and not waste resources in February. Plus additional seasonal staff = additional accounts + access + training."
+          }
+        }
+      },
+      "valueProp": {
+        "label": "What we do specifically",
+        "heading": "IT tailored to <em>season and specifics</em>",
+        "items": {
+          "1": {
+            "title": "WiFi in 3 separated networks",
+            "desc": "Guest network (public, limited bandwidth), hotel network (laptops, printers, TVs), payment network (POS, terminal — PCI DSS). Each separate, an attack on one doesn't touch the others."
+          },
+          "2": {
+            "title": "POS + PMS integration",
+            "desc": "Configuration and maintenance of cash registers (POSnet, Elzab, Posnet) integrated with the reservation system (Profit Center, KORS, Microsphera, RKeeper). Failure = phone call, we're there in 1h."
+          },
+          "3": {
+            "title": "Channel manager + sync",
+            "desc": "Configuration of Booking.com Connect, Airbnb API, Channex/RateBoard. Synchronisation monitoring — alert when one of the channels stops updating availability. No overbookings."
+          },
+          "4": {
+            "title": "Seasonal scaling",
+            "desc": "Network with headroom for the season (40-60% buffer), flexible configuration of seasonal accounts (auto-create + auto-expire after the season), temporary WiFi access points for banquet halls."
+          }
+        }
+      },
+      "caseStudy": {
+        "tag": "Case study (coming)",
+        "heading": "A real example — <em>from a hotel</em> in the region",
+        "body": "We service small and medium hotels and restaurants in the Wrocław and Karkonosze region. Each property has different requirements (3-star vs boutique, restaurant vs catering, summer vs winter season). A specific implementation example will be published once a client consents. In the meantime, start with a free audit — we'll show the current state of WiFi and network, what works, what needs improvement before the season starts.",
+        "cta": "Book a free audit"
+      }
     }
   },
   "notFound": {

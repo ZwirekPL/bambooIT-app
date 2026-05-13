@@ -750,6 +750,262 @@
         "body": "Pracujemy z biurami rachunkowymi w regionie Wrocław. Konkretny case study (liczby, oszczędności, czas odzyskania danych po incydencie) opublikujemy gdy uzyskamy zgodę klienta na publikację. Tymczasem — zacznij od bezpłatnego audytu, zobaczysz sam co dla Ciebie znaczy „wyspecjalizowane IT pod biuro rachunkowe\".",
         "cta": "Umów bezpłatny audyt"
       }
+    },
+    "kancelarie": {
+      "meta": {
+        "title": "Obsługa IT dla kancelarii prawnych — bambooIT",
+        "description": "IT dla kancelarii prawnych. Szyfrowanie akt klientów, bezpieczne archiwum, dostęp mobilny z sądu, RODO. Bo poufność nie wybacza."
+      },
+      "header": {
+        "eyebrow": "Branża: kancelarie prawne",
+        "heading": "IT dla kancelarii — bo tajemnica zawodowa <em>nie ma drugiej szansy.</em>",
+        "lede": "Akta klientów, korespondencja sądowa, opinia prawna — wszystko musi być szyfrowane, dostępne tylko dla uprawnionych i archiwizowane zgodnie z prawem (10 lat dla akt cywilnych, 20 dla karnych). Jedna luka w bezpieczeństwie i tracisz zaufanie klienta i reputację zawodową."
+      },
+      "painPoints": {
+        "heading": "Co najczęściej <em>boli</em> w kancelarii prawnej",
+        "items": {
+          "1": {
+            "tag": "Poufność",
+            "title": "Tajemnica zawodowa",
+            "desc": "Komunikacja z klientem, dokumenty robocze, opinie prawne — wszystko podlega tajemnicy adwokackiej/radcowskiej. Wyciek = postępowanie dyscyplinarne + utrata klienta + odpowiedzialność karna."
+          },
+          "2": {
+            "tag": "Mobilność",
+            "title": "Praca z sądu i u klienta",
+            "desc": "Sąd, areszt, spotkanie u klienta — prawnicy pracują wszędzie. Potrzebują dostępu do akt z dowolnego miejsca, ale bezpiecznie. WiFi w sądzie nie jest opcją."
+          },
+          "3": {
+            "tag": "Archiwizacja",
+            "title": "Akta po sprawie — 10-20 lat",
+            "desc": "Po zakończeniu sprawy akta trzeba przechowywać latami. Dyski padają, nośniki się starzeją. Bez właściwego archiwum w pewnym momencie nie odzyskasz dokumentów z 2018 roku."
+          },
+          "4": {
+            "tag": "Komunikacja",
+            "title": "Email do klienta — czy szyfrowany?",
+            "desc": "Standardowy email to widokówka. Wysyłasz opinię prawną na zwykły mail klienta — każdy administrator po drodze może ją przeczytać. Klienci coraz częściej tego oczekują."
+          }
+        }
+      },
+      "valueProp": {
+        "label": "Co robimy konkretnie",
+        "heading": "IT dopasowane do <em>specyfiki kancelarii</em>",
+        "items": {
+          "1": {
+            "title": "Szyfrowanie end-to-end",
+            "desc": "Dyski zaszyfrowane (BitLocker/FileVault), email z szyfrowaniem S/MIME lub Microsoft 365 Message Encryption, bezpieczne udostępnianie plików klientom (zamiast WeTransfer)."
+          },
+          "2": {
+            "title": "VPN + 2FA + audyt dostępu",
+            "desc": "Bezpieczny dostęp do akt z dowolnego miejsca. Logujemy każdy dostęp do pliku — jeśli pracownik kopiuje akta, wiesz o tym. W razie kontroli ORA masz pełen log."
+          },
+          "3": {
+            "title": "Archiwum zgodne z prawem",
+            "desc": "Strategia 3-2-1 dla akt (lokalna kopia + chmura + offline), retencja zgodna z przepisami branżowymi, automatyczna anonimizacja po terminie przedawnienia."
+          },
+          "4": {
+            "title": "Microsoft 365 z DLP",
+            "desc": "M365 Business Premium z Data Loss Prevention — system blokuje wysyłkę dokumentów z numerem PESEL, sygnaturą sprawy lub klauzulą tajności na zewnątrz organizacji."
+          }
+        }
+      },
+      "caseStudy": {
+        "tag": "Case study (wkrótce)",
+        "heading": "Realny przykład — <em>kiedy uzyskamy zgodę</em> klienta",
+        "body": "Współpracujemy z kancelariami we Wrocławiu. Specyfika branży wymaga szczególnej ostrożności przy publikacji case study — opublikujemy konkretny przykład gdy klient wyrazi zgodę. Tymczasem zacznij od bezpłatnego audytu — pokażemy gdzie są dziury w obecnym setupie i co konkretnie można zrobić.",
+        "cta": "Umów bezpłatny audyt"
+      }
+    },
+    "gabinety": {
+      "meta": {
+        "title": "Obsługa IT dla gabinetów medycznych — bambooIT",
+        "description": "IT dla gabinetów medycznych. Zgodność z RODO art. 9 (dane szczególne), integracje z eZdrowie, recepty elektroniczne, dostępność systemu rejestracji."
+      },
+      "header": {
+        "eyebrow": "Branża: gabinety medyczne",
+        "heading": "IT dla gabinetu medycznego — <em>RODO bez kompromisów.</em>",
+        "lede": "Dane medyczne to RODO art. 9 — kategoria szczególna. Wyższe wymagania, wyższe kary, większa odpowiedzialność. Plus integracje z e-Recepta, e-Skierowanie, laboratoriami, systemami rejestracji. To wszystko musi działać niezawodnie — pacjent z gorączką nie poczeka aż naprawisz komputer."
+      },
+      "painPoints": {
+        "heading": "Co najczęściej <em>boli</em> w gabinecie medycznym",
+        "items": {
+          "1": {
+            "tag": "RODO art. 9",
+            "title": "Dane medyczne = kategoria szczególna",
+            "desc": "Wymagania RODO są dużo bardziej restrykcyjne niż dla zwykłej firmy. UODO kontroluje placówki medyczne aktywniej. Brak DPIA, brak rejestru czynności, brak właściwych zabezpieczeń = kara nawet do 20 mln euro."
+          },
+          "2": {
+            "tag": "Dostępność",
+            "title": "Rejestracja musi działać 100% czasu",
+            "desc": "Padnięta rejestracja = pacjenci stoją w kolejce. Lekarz nie ma harmonogramu. Kontrola NFZ pyta o dokumenty. Awaria 2-godzinna realnie kosztuje 5-10 tys. zł i pacjentów którzy nie wrócą."
+          },
+          "3": {
+            "tag": "Integracje",
+            "title": "eZdrowie, laboratoria, NFZ",
+            "desc": "Pacjenci oczekują e-Recepty, e-Skierowania, e-Zwolnienia. Laboratoria wysyłają wyniki przez własne API. NFZ wymaga sprawozdań w sJWMS. Konfiguracja i utrzymanie tych integracji to robota dla wyspecjalizowanej firmy IT."
+          },
+          "4": {
+            "tag": "Archiwum",
+            "title": "Dokumentacja medyczna — 20 lat",
+            "desc": "Ustawa nakazuje przechowywać dokumentację medyczną 20 lat (30 dla śmierci pacjenta). Po wycofaniu się gabinetu — kto przechowuje? Backup w chmurze nie zawsze wystarczy ze względu na lokalizację danych."
+          }
+        }
+      },
+      "valueProp": {
+        "label": "Co robimy konkretnie",
+        "heading": "Zgodność RODO art. 9 + ciągłość działania <em>gabinetu</em>",
+        "items": {
+          "1": {
+            "title": "DPIA + rejestr czynności",
+            "desc": "Sporządzamy ocenę skutków dla ochrony danych (DPIA) dla każdego procesu medycznego, prowadzimy rejestr czynności przetwarzania zgodnie z art. 30 RODO. Gotowe do okazania UODO w razie kontroli."
+          },
+          "2": {
+            "title": "Redundancja systemu rejestracji",
+            "desc": "Drugi serwer/komputer z gorącą kopią danych rejestracji. Padnie podstawowy — przełączamy się w 5 minut. Plus zasilanie awaryjne (UPS) bo prąd w przychodni też potrafi siadać."
+          },
+          "3": {
+            "title": "Integracje z eZdrowie",
+            "desc": "Konfigurujemy i utrzymujemy podpis kwalifikowany lekarza dla e-Recept, integrację z platformą P1, łącza do laboratoriów regionalnych. Aktualizacje po stronie NFZ — śledzimy je za Ciebie."
+          },
+          "4": {
+            "title": "Archiwum dokumentacji medycznej",
+            "desc": "Backup zaszyfrowany, w Polsce (wymagania lokalizacyjne), retencja 20+ lat, audytowalny dostęp. Plus plan na wypadek zamknięcia praktyki — komu przekazujesz dokumentację."
+          }
+        }
+      },
+      "caseStudy": {
+        "tag": "Case study (wkrótce)",
+        "heading": "Realny przykład — <em>z gabinetu</em> we Wrocławiu",
+        "body": "Obsługujemy gabinety stomatologiczne, ortopedyczne i ogólnomedyczne. Każdy ma inne wymagania (różne systemy rejestracji, różne integracje). Konkretny przykład co dla danego gabinetu znaczyło wdrożenie wyspecjalizowanego IT — opublikujemy gdy klient wyrazi zgodę. Tymczasem audyt bezpłatny — pokażemy gdzie obecnie jesteś niezgodny z RODO i co to oznacza w razie kontroli.",
+        "cta": "Umów bezpłatny audyt"
+      }
+    },
+    "produkcja": {
+      "meta": {
+        "title": "Obsługa IT dla firm produkcyjnych — bambooIT",
+        "description": "IT dla małych firm produkcyjnych. Sieć OT/IT, monitoring linii produkcyjnej, disaster recovery, segmentacja sieci, zgodność z NIS2."
+      },
+      "header": {
+        "eyebrow": "Branża: firmy produkcyjne",
+        "heading": "IT w produkcji — bo każda <em>godzina przestoju kosztuje.</em>",
+        "lede": "Produkcja to nie biuro. Masz sieć IT (komputery księgowe, email, ERP) i sieć OT (sterowniki PLC, automatyka, MES). Awaria na drugiej zatrzymuje linię — koszt godzinny liczony w tysiącach. Plus NIS2 dla firm powyżej 50 osób. Standardowa firma IT obsłuży Ci email — ale nie sieć przemysłową."
+      },
+      "painPoints": {
+        "heading": "Co najczęściej <em>boli</em> w produkcji",
+        "items": {
+          "1": {
+            "tag": "OT vs IT",
+            "title": "Sieć przemysłowa to inny świat",
+            "desc": "Sterowniki PLC, panele HMI, czujniki, MES — to nie laptopy z Windowsem. Inne protokoły (Modbus, Profinet), inne zagrożenia (ransomware na PLC = stop linii). Standardowy informatyk się tym nie zajmuje."
+          },
+          "2": {
+            "tag": "Przestoje",
+            "title": "Godzina przestoju = realny koszt",
+            "desc": "Linia stoi 4 godziny = brak produkcji za kilka-kilkanaście tysięcy złotych. Plus opóźnione dostawy do klientów, kary umowne. Bez planu disaster recovery jeden incydent zżera roczny budżet IT."
+          },
+          "3": {
+            "tag": "Bezpieczeństwo",
+            "title": "Atak na produkcję rośnie",
+            "desc": "Ataki na firmy produkcyjne wzrosły 5× w ostatnich 3 latach. Ransomware blokuje MES, hakerzy przejmują PLC, dostawcy są wektorem ataku. Brak segmentacji sieci = atak rozlewa się z biura na produkcję."
+          },
+          "4": {
+            "tag": "Compliance",
+            "title": "NIS2 — nowe wymagania",
+            "desc": "Dyrektywa NIS2 (wdrożenie 2024-2025) obejmuje średnie firmy produkcyjne. Wymaga zarządzania ryzykiem cyber, zgłaszania incydentów, audytów. Brak przygotowania = grzywny + zarząd osobiście odpowiada."
+          }
+        }
+      },
+      "valueProp": {
+        "label": "Co robimy konkretnie",
+        "heading": "IT + OT pod jedną <em>opieką</em>",
+        "items": {
+          "1": {
+            "title": "Segmentacja sieci OT/IT",
+            "desc": "Firewall między siecią biurową a produkcyjną. Pracownik biurowy nie widzi PLC, atak ransomware nie przejdzie z laptopa na linię produkcyjną. Konfiguracja VLAN-ów + monitoring ruchu między segmentami."
+          },
+          "2": {
+            "title": "Monitoring linii 24/7",
+            "desc": "Czujniki na kluczowych elementach (zasilanie, temperatura serwerowni, status sterowników). Alert proaktywny zanim coś przestanie działać. Telefon do dyżurnego, nie email który nikt nie czyta."
+          },
+          "3": {
+            "title": "Plan disaster recovery",
+            "desc": "Co robimy gdy padnie serwer ERP? Padnie PLC linii A? Padnie internet? Każdy scenariusz ma procedurę i czas reakcji. Test scenariuszy raz na kwartał — żeby nie odkryć w kryzysie że plan z papieru nie działa."
+          },
+          "4": {
+            "title": "Audyt + przygotowanie do NIS2",
+            "desc": "Identyfikacja czy firma podpada pod NIS2, audyt obecnego stanu wobec wymagań, plan dostosowania, polityki + procedury, szkolenia. W razie kontroli — gotowy dossier."
+          }
+        }
+      },
+      "caseStudy": {
+        "tag": "Case study (wkrótce)",
+        "heading": "Realny przykład — <em>z hali produkcyjnej</em>",
+        "body": "Pracujemy z małymi i średnimi firmami produkcyjnymi (metalowymi, spożywczymi, opakowaniowymi) w regionie Wrocławia i Wałbrzycha. Każda ma inną specyfikę i inne pułapki. Konkretny przykład wdrożenia — opublikujemy gdy klient wyrazi zgodę. Tymczasem — audyt bezpłatny — pokażemy gdzie obecnie macie luki w sieci OT i co zrobić zanim padnie atak.",
+        "cta": "Umów bezpłatny audyt"
+      }
+    },
+    "hotele": {
+      "meta": {
+        "title": "Obsługa IT dla hoteli i gastronomii — bambooIT",
+        "description": "IT dla hoteli, restauracji, pensjonatów. WiFi gościnne, POS, integracje booking.com/Airbnb, bezpieczeństwo płatności, skalowanie sezonowe."
+      },
+      "header": {
+        "eyebrow": "Branża: hotele i gastronomia",
+        "heading": "IT w hotelu — bo gość <em>nie wybaczy słabego WiFi.</em>",
+        "lede": "Hotel to firma usługowa gdzie technologia jest fundamentem doświadczenia gościa. WiFi musi działać, kasa fiskalna musi działać, booking musi działać. Plus PCI DSS przy płatnościach kartą, RODO przy rezerwacjach, sezonowość budżetu. Mało firm IT to rozumie."
+      },
+      "painPoints": {
+        "heading": "Co najczęściej <em>boli</em> w hotelu i restauracji",
+        "items": {
+          "1": {
+            "tag": "WiFi gościnne",
+            "title": "WiFi to dziś podstawa pobytu",
+            "desc": "Gość przyjeżdża, chce się zalogować, chce streamować. Słabe WiFi = jedna gwiazdka mniej w opinii na Booking. Plus separacja gości od sieci hotelowej — bo nie chcesz żeby gość z laptopem widział kasę fiskalną i rezerwacje."
+          },
+          "2": {
+            "tag": "POS",
+            "title": "Kasa fiskalna nie może paść",
+            "desc": "Wieczór, restauracja pełna, kasa się zawiesza — koszmar. Plus integracje POS z systemem rezerwacji (pokój doliczany do rachunku), drukarki kuchenne, terminal kartowy. Wszystko musi grać razem."
+          },
+          "3": {
+            "tag": "Integracje",
+            "title": "Channel manager + Booking + Airbnb",
+            "desc": "Sprzedajesz przez Booking, Airbnb, własną stronę, telefon. Channel manager musi to wszystko synchronizować — inaczej dochodzi do overbookingu. Plus integracje z PMS (Property Management System) — to nie jest trywialne."
+          },
+          "4": {
+            "tag": "Sezonowość",
+            "title": "Skalowanie pod sezon",
+            "desc": "Lato vs zima — często 5× różnica w obłożeniu. Sieć musi obsłużyć 200 urządzeń w lipcu i nie marnować zasobów w lutym. Plus dodatkowy personel sezonowy = dodatkowe konta + dostępy + szkolenia."
+          }
+        }
+      },
+      "valueProp": {
+        "label": "Co robimy konkretnie",
+        "heading": "IT dopasowane do <em>sezonu i specyfiki</em>",
+        "items": {
+          "1": {
+            "title": "WiFi w 3 separowanych sieciach",
+            "desc": "Sieć gości (publiczna, ograniczone pasmo), sieć hotelowa (laptopy, drukarki, telewizory), sieć płatności (POS, terminal — PCI DSS). Każda osobno, atak na jedną nie dotyka pozostałych."
+          },
+          "2": {
+            "title": "POS + integracja z PMS",
+            "desc": "Konfiguracja i utrzymanie kas fiskalnych (POSnet, Elzab, Posnet) zintegrowanych z systemem rezerwacji (Profit Center, KORS, Microsfera, RKeeper). Awaria = telefon, my w 1h."
+          },
+          "3": {
+            "title": "Channel manager + sync",
+            "desc": "Konfiguracja Booking.com Connect, Airbnb API, Channex/RateBoard. Monitoring synchronizacji — alert gdy któryś kanał przestaje aktualizować dostępność. Brak overbookingów."
+          },
+          "4": {
+            "title": "Skalowanie sezonowe",
+            "desc": "Sieć z headroom na sezon (40-60% buforu), elastyczna konfiguracja sezonowych kont (auto-utworzenie + auto-wygaszenie po sezonie), tymczasowe access pointy WiFi na bankietowe sale."
+          }
+        }
+      },
+      "caseStudy": {
+        "tag": "Case study (wkrótce)",
+        "heading": "Realny przykład — <em>z hotelu</em> w regionie",
+        "body": "Obsługujemy małe i średnie hotele oraz restauracje w regionie Wrocławia i Karkonoszy. Każdy obiekt ma inne wymagania (3-gwiazdkowy vs butikowy, restauracja vs catering, sezon letni vs zimowy). Konkretny przykład wdrożenia opublikujemy gdy klient wyrazi zgodę. Tymczasem zacznij od bezpłatnego audytu — pokażemy stan obecny WiFi i sieci, co działa, co trzeba poprawić zanim ruszy sezon.",
+        "cta": "Umów bezpłatny audyt"
+      }
     }
   },
   "notFound": {

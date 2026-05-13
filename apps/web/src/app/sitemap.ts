@@ -66,6 +66,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...bilingualEntry('/kontakt',                    'monthly', 0.7),
     ...bilingualEntry('/pomoc-zdalna',               'monthly', 0.6),
     ...bilingualEntry('/branze/biura-rachunkowe',    'monthly', 0.7),
+    ...bilingualEntry('/branze/kancelarie',          'monthly', 0.7),
+    ...bilingualEntry('/branze/gabinety',            'monthly', 0.7),
+    ...bilingualEntry('/branze/produkcja',           'monthly', 0.7),
+    ...bilingualEntry('/branze/hotele',              'monthly', 0.7),
     ...bilingualEntry('/blog',                       'daily',   0.8),
     ...bilingualEntry('/dokumenty-prawne',           'monthly', 0.3),
   ];
