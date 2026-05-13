@@ -4,9 +4,9 @@ import { notFound } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { ArrowLeft, Clock, User } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { api, ApiError } from '@/lib/api';
 import { CATEGORY_T_KEY } from '@/components/blog/category-t-key';
+import { getCategoryStyle } from '@/components/blog/category-styles';
 import { BRAND } from '@config/brand';
 import { localeAlternates } from '@/lib/seo';
 import type { BlogCategory, BlogFaqItem } from '@/types/blog';
@@ -76,6 +76,7 @@ export default async function BlogPostPage({ params }: Props) {
   const category = post.category as BlogCategory;
   const content = locale === 'en' && post.contentEn ? post.contentEn : post.content;
   const faq = Array.isArray(post.faq) && post.faq.length > 0 ? (post.faq as BlogFaqItem[]) : null;
+  const categoryBadge = getCategoryStyle(category);
 
   const paragraphs = content.split('\n\n');
 
@@ -83,7 +84,7 @@ export default async function BlogPostPage({ params }: Props) {
     return text
       .toLowerCase()
       .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[̀-ͯ]/g, '')
       .replace(/ł/g, 'l')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
@@ -126,7 +127,7 @@ export default async function BlogPostPage({ params }: Props) {
       name: BRAND.name,
       logo: {
         '@type': 'ImageObject',
-        url: `${siteUrl}/images/logo.png`,
+        url: `${siteUrl}/logo.png`,
       },
     },
     datePublished: post.publishedAt,
@@ -135,13 +136,11 @@ export default async function BlogPostPage({ params }: Props) {
       '@type': 'WebPage',
       '@id': postUrl,
     },
-    ...(post.imageSrc
-      ? { image: `${siteUrl}${post.imageSrc}` }
-      : {}),
+    ...(post.imageSrc ? { image: `${siteUrl}${post.imageSrc}` } : {}),
   };
 
   return (
-    <article className="py-16">
+    <article className="bg-paper pb-24 pt-32 md:pt-40 lg:pt-48">
       <BreadcrumbSchema
         locale={locale}
         items={[
@@ -151,38 +150,44 @@ export default async function BlogPostPage({ params }: Props) {
       />
       <script
         type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
       />
       {faqJsonLd && (
         <script
           type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
       )}
 
-      {/* Hero + Content */}
-      <div className="container mx-auto px-4 md:px-6 max-w-3xl">
+      {/* Hero + content column */}
+      <div className="mx-auto w-full max-w-3xl px-5 md:px-8">
         {/* Back link */}
         <Link
           href="/blog"
-          className="mb-8 flex items-center gap-1.5 text-sm text-muted-foreground hover:text-sage-600 transition-colors"
+          className="mb-8 inline-flex items-center gap-1.5 font-mono text-xs font-medium uppercase tracking-[0.15em] text-navy-soft transition-colors hover:text-bamboo-deep"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           {t('backToBlog')}
         </Link>
 
-        {/* Meta */}
-        <div className="mb-5 flex flex-wrap items-center gap-3">
-          <Badge variant="sage">{t(CATEGORY_T_KEY[category] ?? 'catPoradyDietetyczne')}</Badge>
-          <span className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Clock className="h-3 w-3" />
+        {/* Meta row */}
+        <div className="mb-6 flex flex-wrap items-center gap-3">
+          <span
+            className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${categoryBadge.bg} ${categoryBadge.text}`}
+          >
+            {t(CATEGORY_T_KEY[category] ?? 'catObslugaIt')}
+          </span>
+          <span className="inline-flex items-center gap-1 font-mono text-xs text-navy-soft">
+            <Clock className="h-3 w-3" aria-hidden="true" />
             {t('readTime', { minutes: post.readTime })}
           </span>
-          <span className="flex items-center gap-1 text-xs text-muted-foreground">
-            <User className="h-3 w-3" />
+          <span className="inline-flex items-center gap-1 font-mono text-xs text-navy-soft">
+            <User className="h-3 w-3" aria-hidden="true" />
             {post.author}
           </span>
-          <span className="text-xs text-muted-foreground">
+          <span className="font-mono text-xs text-navy-soft">
             {new Date(post.publishedAt).toLocaleDateString(locale, {
               year: 'numeric',
               month: 'long',
@@ -191,14 +196,14 @@ export default async function BlogPostPage({ params }: Props) {
           </span>
         </div>
 
-        <h1 className="mb-8 text-3xl font-extrabold leading-snug tracking-tight sm:text-4xl">
+        <h1 className="mb-6 font-display text-4xl font-light leading-[1] tracking-[-0.035em] text-navy md:text-5xl lg:text-6xl">
           {title}
         </h1>
 
-        <p className="mb-8 text-lg text-muted-foreground">{excerpt}</p>
+        <p className="mb-10 text-lg leading-[1.55] text-navy-soft md:text-xl">{excerpt}</p>
 
         {/* Cover image */}
-        <div className="mb-10 relative h-64 sm:h-80 rounded-3xl overflow-hidden bg-gradient-to-br from-sage-100 to-sage-300">
+        <div className="relative mb-12 h-64 overflow-hidden rounded-3xl bg-gradient-to-br from-paper to-bamboo-soft/60 sm:h-80">
           {post.imageSrc ? (
             <Image
               src={post.imageSrc}
@@ -210,7 +215,7 @@ export default async function BlogPostPage({ params }: Props) {
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-sage-500 text-7xl font-black opacity-20">{category[0]}</span>
+              <span className="font-display text-8xl font-black text-navy/10">{category[0]}</span>
             </div>
           )}
         </div>
@@ -218,13 +223,17 @@ export default async function BlogPostPage({ params }: Props) {
         {/* Table of Contents */}
         <TableOfContents items={tocItems} title={t('tocTitle')} />
 
-        {/* Content */}
-        <div className="prose prose-lg prose-sage max-w-none">
+        {/* Markdown content */}
+        <div className="prose prose-lg max-w-none">
           {paragraphs.map((block, idx) => {
             if (block.startsWith('### ')) {
               const text = block.replace('### ', '');
               return (
-                <h3 key={idx} id={slugify(text)} className="text-xl font-semibold text-foreground mt-6 mb-3">
+                <h3
+                  key={idx}
+                  id={slugify(text)}
+                  className="mb-3 mt-8 font-display text-xl font-semibold tracking-[-0.02em] text-navy md:text-2xl"
+                >
                   {text}
                 </h3>
               );
@@ -232,13 +241,17 @@ export default async function BlogPostPage({ params }: Props) {
             if (block.startsWith('## ')) {
               const text = block.replace('## ', '');
               return (
-                <h2 key={idx} id={slugify(text)} className="text-2xl font-bold text-foreground mt-8 mb-4">
+                <h2
+                  key={idx}
+                  id={slugify(text)}
+                  className="mb-4 mt-10 font-display text-2xl font-semibold tracking-[-0.02em] text-navy md:text-3xl"
+                >
                   {text}
                 </h2>
               );
             }
             return (
-              <p key={idx} className="text-muted-foreground leading-relaxed mb-5">
+              <p key={idx} className="mb-5 text-base leading-[1.7] text-navy-soft md:text-lg">
                 {block}
               </p>
             );
@@ -256,7 +269,7 @@ export default async function BlogPostPage({ params }: Props) {
       </div>
 
       {/* Related + Latest — wider container */}
-      <div className="container mx-auto px-4 md:px-6 max-w-6xl">
+      <div className="mx-auto w-full max-w-[1440px] px-5 md:px-12">
         <RelatedPosts category={category} currentSlug={slug} />
         <LatestPosts currentSlug={slug} />
       </div>

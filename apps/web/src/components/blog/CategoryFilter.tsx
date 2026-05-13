@@ -28,24 +28,24 @@ export function CategoryFilter({ selected, onChange, categoryNames }: CategoryFi
     if (cat === ALL_VALUE) return t('catAll');
     const tKey = CATEGORY_T_KEY[cat];
     if (tKey) return t(tKey);
-    // Dynamic category without a translation key — show the name as-is
+    // Dynamic category without a translation key — show name as-is.
     return cat;
   }
 
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+    <div className="scrollbar-none flex gap-2 overflow-x-auto pb-2">
       {categories.map((cat) => {
         const isActive = cat === selected;
         return (
           <button
             key={cat}
+            type="button"
             onClick={() => onChange(cat)}
-            className={[
-              'shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition-colors',
+            className={
               isActive
-                ? 'bg-foreground text-background'
-                : 'bg-muted text-muted-foreground hover:bg-muted/80',
-            ].join(' ')}
+                ? 'shrink-0 rounded-full bg-navy-deep px-5 py-2 text-sm font-medium text-white transition-colors'
+                : 'shrink-0 rounded-full border border-line bg-white px-5 py-2 text-sm font-medium text-navy-soft transition-colors hover:border-line-strong hover:text-navy'
+            }
           >
             {getLabel(cat)}
           </button>

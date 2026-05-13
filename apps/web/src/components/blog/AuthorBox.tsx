@@ -10,12 +10,11 @@ interface AuthorBoxProps {
 }
 
 export function AuthorBox({ name, locale, aboutLabel }: AuthorBoxProps) {
-  const bio =
-    locale === 'en' ? BRAND.author.bioEn : BRAND.author.bio;
+  const bio = locale === 'en' ? BRAND.author.bioEn : BRAND.author.bio;
 
   return (
-    <div className="mt-12 flex gap-4 rounded-2xl border border-sage-200 bg-sage-50/50 p-5">
-      <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-full bg-sage-200">
+    <div className="mt-12 flex gap-5 rounded-2xl border border-line bg-paper p-6">
+      <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-bamboo-soft to-bamboo-deep">
         {BRAND.author.image ? (
           <Image
             src={BRAND.author.image}
@@ -26,18 +25,16 @@ export function AuthorBox({ name, locale, aboutLabel }: AuthorBoxProps) {
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
-            <User className="h-8 w-8 text-sage-400" />
+            <User className="h-7 w-7 text-navy-deep" />
           </div>
         )}
       </div>
       <div className="flex flex-col justify-center">
-        <p className="text-sm font-semibold text-foreground">{name}</p>
-        <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
-          {bio}
-        </p>
+        <p className="font-display text-base font-semibold text-navy">{name}</p>
+        <p className="mt-1 text-sm leading-relaxed text-navy-soft">{bio}</p>
         <Link
           href={BRAND.author.aboutUrl}
-          className="mt-2 text-sm font-medium text-sage-600 hover:text-sage-700 transition-colors"
+          className="mt-3 inline-flex items-center gap-1 font-mono text-xs font-medium uppercase tracking-[0.1em] text-bamboo-deep transition-colors hover:text-navy"
         >
           {aboutLabel} →
         </Link>

@@ -1,17 +1,14 @@
 import { BLOG_CATEGORY_LIST } from '@/config/blogCategories';
 
-export const BLOG_CATEGORIES = BLOG_CATEGORY_LIST.map((c) => c.name) as unknown as readonly [
-  'Porady dietetyczne',
-  'Odchudzanie',
-  'Zdrowie i choroby',
-  'Przepisy',
-  'AI i dietetyka',
-  'Motywacja',
-  'Subskrypcja',
-  'Thermomix & Airfryer',
-];
+export const BLOG_CATEGORIES = BLOG_CATEGORY_LIST.map((c) => c.name);
 
-export type BlogCategory = (typeof BLOG_CATEGORIES)[number];
+/**
+ * Category type — runtime values come from BLOG_CATEGORY_LIST (bambooIT 8)
+ * but legacy DietetykDEV strings may still arrive from old DB rows, so we
+ * widen to `string` and rely on category-styles + category-t-key fallbacks
+ * to render unknown values sensibly.
+ */
+export type BlogCategory = string;
 
 export interface BlogFaqItem {
   question: string;

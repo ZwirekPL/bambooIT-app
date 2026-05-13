@@ -19,18 +19,18 @@ export function TableOfContents({ items, title }: TableOfContentsProps) {
   return (
     <nav
       aria-label={title}
-      className="mb-10 rounded-2xl border border-sage-200 bg-sage-50/50 p-5"
+      className="mb-10 rounded-2xl border border-line bg-paper p-6"
     >
-      <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-sage-700">
-        <List className="h-4 w-4" />
+      <h2 className="mb-4 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-[0.15em] text-bamboo-deep">
+        <List className="h-4 w-4" aria-hidden="true" />
         {title}
       </h2>
-      <ol className="list-none space-y-1.5">
+      <ol className="list-none space-y-2">
         {items.map((item) => (
-          <li key={item.id} className={item.level === 3 ? 'pl-4' : ''}>
+          <li key={item.id} className={item.level === 3 ? 'pl-5' : ''}>
             <a
               href={`#${item.id}`}
-              className="text-sm text-muted-foreground hover:text-sage-700 transition-colors"
+              className="text-sm text-navy-soft transition-colors hover:text-bamboo-deep"
             >
               {item.text}
             </a>

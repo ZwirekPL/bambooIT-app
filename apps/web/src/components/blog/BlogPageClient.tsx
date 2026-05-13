@@ -50,19 +50,23 @@ export function BlogPageClient({ posts, categoryNames, translations: t }: BlogPa
         onSearchChange={setSearch}
       />
 
-      <section className="py-10">
-        <div className="container mx-auto px-4 md:px-6 space-y-8">
-          {/* Category filter */}
-          <CategoryFilter selected={category} onChange={setCategory} categoryNames={categoryNames} />
+      <section className="bg-paper px-5 py-12 md:px-12 md:py-16">
+        <div className="mx-auto w-full max-w-[1440px] space-y-8">
+          <CategoryFilter
+            selected={category}
+            onChange={setCategory}
+            categoryNames={categoryNames}
+          />
 
-          {/* Grid */}
           {filtered.length === 0 ? (
             <div className="py-20 text-center">
-              <p className="text-xl font-semibold mb-2">{t.noPostsTitle}</p>
-              <p className="text-muted-foreground">{t.noPostsDesc}</p>
+              <p className="mb-2 font-display text-2xl font-semibold tracking-[-0.02em] text-navy">
+                {t.noPostsTitle}
+              </p>
+              <p className="text-navy-soft">{t.noPostsDesc}</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filtered.map((post) => (
                 <BlogCard key={post.id} post={post} />
               ))}
