@@ -437,6 +437,63 @@
       }
     }
   },
+  "audyt": {
+    "meta": {
+      "title": "Bezpłatny audyt IT — bambooIT",
+      "description": "Bezpłatny, niezobowiązujący audyt IT dla firm we Wrocławiu i okolicach. Sprawdzamy bezpieczeństwo, backup, infrastrukturę i wystawiamy raport z rekomendacjami."
+    },
+    "header": {
+      "eyebrow": "Bezpłatny audyt IT",
+      "heading": "Sprawdzimy, czy Twoje IT <em>śpi spokojnie.</em>",
+      "lede": "Bezpłatny audyt na miejscu — przyjeżdżamy, oglądamy, mierzymy, wystawiamy raport. Bez zobowiązań, bez ukrytych haczyków. Decydujesz co dalej."
+    },
+    "benefits": {
+      "heading": "Co konkretnie <em>sprawdzamy</em> podczas audytu",
+      "items": {
+        "security": {
+          "tag": "Bezpieczeństwo",
+          "title": "Antywirus + polityka haseł",
+          "desc": "Sprawdzamy stan zabezpieczeń: jakie macie antywirusy, czy są aktualne, jakie hasła, czy jest 2FA, jak wygląda dostęp do danych."
+        },
+        "backup": {
+          "tag": "Backup",
+          "title": "Czy backup działa — naprawdę",
+          "desc": "Sprawdzamy czy macie kopie zapasowe, gdzie są przechowywane, kiedy ostatni raz były testowane. 9 na 10 firm odkrywa że backup nie działa dopiero gdy go potrzebuje."
+        },
+        "infrastructure": {
+          "tag": "Infrastruktura",
+          "title": "Mapa sprzętu + licencji",
+          "desc": "Spisujemy wszystkie urządzenia (laptopy, drukarki, serwery, switche, WiFi), oprogramowanie i licencje. Często okazuje się że płacicie za coś czego nie używacie."
+        },
+        "report": {
+          "tag": "Raport",
+          "title": "Konkretne rekomendacje + koszty",
+          "desc": "Po audycie dostajesz pisemny raport: co jest OK, co wymaga uwagi, co trzeba pilnie naprawić. Każda rekomendacja z szacunkową wyceną, żebyś mógł zdecydować priorytety."
+        }
+      }
+    },
+    "faq": {
+      "heading": "Pytania o <em>audyt.</em>",
+      "items": {
+        "1": {
+          "q": "Ile trwa audyt?",
+          "a": "Wizyta na miejscu zazwyczaj 2-3 godziny dla firmy 3-15 stanowisk. Większe firmy lub bardziej rozproszone infrastruktury — pół dnia. Raport otrzymujesz w ciągu 3 dni roboczych od wizyty."
+        },
+        "2": {
+          "q": "Czy audyt naprawdę jest bezpłatny?",
+          "a": "Tak, w 100%. Bez ukrytych kosztów, bez zobowiązań do podpisania umowy. Płacisz dopiero gdy zdecydujesz się na pakiet obsługi IT lub konkretną usługę z raportu."
+        },
+        "3": {
+          "q": "Czy musimy się przygotować?",
+          "a": "Nie. Idealnie jeśli będzie obecna osoba która zna trochę firmę (właściciel lub office manager) i ma dostęp do haseł administracyjnych — ale to nie jest wymagane. Pracujemy z tym co znajdziemy."
+        },
+        "4": {
+          "q": "Co jeśli nie podpiszemy żadnej umowy?",
+          "a": "Wtedy zostaje Ci raport, który możesz wykorzystać samodzielnie lub zlecić innej firmie. To Twój dokument, Twoje dane, Twój wybór. Bez urazy."
+        }
+      }
+    }
+  },
   "notFound": {
     "title": "Strona nie istnieje",
     "description": "Nie możemy znaleźć strony, której szukasz.",

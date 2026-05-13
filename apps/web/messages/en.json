@@ -437,6 +437,63 @@
       }
     }
   },
+  "audyt": {
+    "meta": {
+      "title": "Free IT audit — bambooIT",
+      "description": "Free, no-obligation IT audit for businesses in Wrocław and the surrounding area. We check security, backup, infrastructure, and deliver a report with recommendations."
+    },
+    "header": {
+      "eyebrow": "Free IT audit",
+      "heading": "We'll check if your IT <em>sleeps soundly.</em>",
+      "lede": "Free on-site audit — we come, look, measure, deliver a report. No strings, no hidden hooks. You decide what's next."
+    },
+    "benefits": {
+      "heading": "What we actually <em>check</em> during the audit",
+      "items": {
+        "security": {
+          "tag": "Security",
+          "title": "Antivirus + password policy",
+          "desc": "We review the security stack: which antivirus is running, whether it's updated, password practices, 2FA presence, data access patterns."
+        },
+        "backup": {
+          "tag": "Backup",
+          "title": "Whether backup actually works",
+          "desc": "We check whether you have backups, where they're stored, when they were last restore-tested. 9 out of 10 companies discover their backup doesn't work only when they need it."
+        },
+        "infrastructure": {
+          "tag": "Infrastructure",
+          "title": "Hardware + license inventory",
+          "desc": "We catalog all devices (laptops, printers, servers, switches, WiFi), software, and licenses. Often you find you're paying for things you don't use."
+        },
+        "report": {
+          "tag": "Report",
+          "title": "Concrete recommendations + costs",
+          "desc": "After the audit you get a written report: what's OK, what needs attention, what needs immediate action. Each recommendation with an estimated cost so you can prioritise."
+        }
+      }
+    },
+    "faq": {
+      "heading": "Audit <em>questions.</em>",
+      "items": {
+        "1": {
+          "q": "How long does the audit take?",
+          "a": "An on-site visit is typically 2-3 hours for a company with 3-15 seats. Larger or more distributed setups — half a day. You get the report within 3 business days of the visit."
+        },
+        "2": {
+          "q": "Is the audit really free?",
+          "a": "Yes, 100%. No hidden costs, no obligation to sign anything. You pay only when you choose a support package or a specific service from the report."
+        },
+        "3": {
+          "q": "Do we need to prepare?",
+          "a": "No. Ideally someone who knows the company (owner or office manager) with access to admin passwords is around — but it's not required. We work with what we find."
+        },
+        "4": {
+          "q": "What if we don't sign anything?",
+          "a": "Then you keep the report, use it yourself or hand it to another vendor. Your document, your data, your choice. No hard feelings."
+        }
+      }
+    }
+  },
   "notFound": {
     "title": "Page not found",
     "description": "We can't find the page you're looking for.",

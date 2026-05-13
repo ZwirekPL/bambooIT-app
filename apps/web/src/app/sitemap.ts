@@ -61,6 +61,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     ...bilingualEntry('',                  'weekly',  1.0),
     ...bilingualEntry('/pakiety',          'monthly', 0.9),
+    ...bilingualEntry('/audyt',            'monthly', 0.9),
     ...bilingualEntry('/blog',             'daily',   0.8),
     ...bilingualEntry('/dokumenty-prawne', 'monthly', 0.3),
   ];
