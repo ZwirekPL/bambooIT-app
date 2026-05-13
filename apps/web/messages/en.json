@@ -594,6 +594,99 @@
       }
     }
   },
+  "oNas": {
+    "meta": {
+      "title": "About us — two people, one team — bambooIT",
+      "description": "bambooIT is a two-person IT team. Remigiusz — IT support and packages. Wirgiliusz — websites, apps, automation. No call center, no corporate distance."
+    },
+    "hero": {
+      "eyebrow": "About us — two people, one team",
+      "heading": "On the other end sits <em>a real person.</em>",
+      "lede": "<strong>Not a call center. Not consultant number 7. Not a first-line support chatbot.</strong> bambooIT is a two-person team where each of us knows our clients by name, remembers the details of their infrastructure, and replies personally — even to questions asked for the tenth time."
+    },
+    "stats": {
+      "items": {
+        "specialists": {
+          "value": "2",
+          "label": "Specialists on the team"
+        },
+        "pillars": {
+          "value": "4",
+          "label": "Competency areas under one roof"
+        },
+        "callcenters": {
+          "value": "0",
+          "label": "Call centers and bots"
+        },
+        "decisions": {
+          "value": "100%",
+          "label": "Decisions on the client's side"
+        }
+      }
+    },
+    "story": {
+      "label": "How bambooIT came to be",
+      "heading": "From a simple <em>observation.</em>",
+      "p1": "Small and medium businesses have two IT choices on the market: <strong>a one-person \"IT guy who does everything\"</strong>, who disappears on vacation, or <strong>a large agency</strong>, where you talk to five people and none of them know your company's name.",
+      "p2": "bambooIT was born from a simple idea: <strong>keep only the good parts.</strong> The closeness and personal relationship of a one-person IT contact. The full competency of an agency. And pack it into a two-person, specialised team where each person has their area — but both understand the whole.",
+      "p3": "Hence our name. Bamboo grows slowly, but once it's up — it's both flexible and unbreakable. Your technology should work the same way."
+    },
+    "team": {
+      "label": "Team",
+      "heading": "Two people. Two specialisations. One <em>contact.</em>",
+      "skillsLabel": "Specialisation",
+      "people": {
+        "remigiusz": {
+          "role": "01 / IT support",
+          "name": "Remigiusz",
+          "bio": "Runs <strong>IT support and subscription packages</strong>. Years of solving everyday technical problems for small businesses — from printers and email to networks, security, and workstation setup. <strong>Your first line of contact</strong> when something stops working.",
+          "skills": {
+            "remote": "Remote help",
+            "network": "Networks + Wi-Fi",
+            "m365": "Microsoft 365",
+            "security": "Security",
+            "backup": "Backup",
+            "hardware": "Printers + hardware"
+          }
+        },
+        "wirgiliusz": {
+          "role": "02 / Websites, apps, automation",
+          "name": "Wirgiliusz",
+          "bio": "Builds <strong>websites, web applications, and process automation</strong>. Works in modern technologies (Next.js, React, n8n, Make). Creator of the e-dietetyk.com SaaS for professional dietitians. <strong>Your partner</strong> when your company grows and needs something more than an off-the-shelf tool.",
+          "skills": {
+            "nextjs": "Next.js / React",
+            "typescript": "TypeScript",
+            "postgres": "PostgreSQL",
+            "automation": "n8n / Make",
+            "stripe": "Stripe",
+            "anthropic": "Anthropic API"
+          }
+        }
+      }
+    },
+    "values": {
+      "label": "How we work",
+      "heading": "Four rules we <em>don't break.</em>",
+      "items": {
+        "noCallcenter": {
+          "title": "No call center",
+          "desc": "Write, call, click — it goes directly to the person who knows your company. Zero hand-offs, zero tickets in limbo."
+        },
+        "transparentPricing": {
+          "title": "Transparent pricing",
+          "desc": "Fixed fee, clear scope, zero hidden costs. Project quotes always upfront, never after the fact."
+        },
+        "yourOwnership": {
+          "title": "Your ownership",
+          "desc": "Code, passwords, access, documentation — all belongs to you. You can leave anytime, taking everything with you."
+        },
+        "sayNo": {
+          "title": "We say no",
+          "desc": "When a project doesn't make sense, we say so directly. When a cheaper solution suffices — we propose it, even at lower margin."
+        }
+      }
+    }
+  },
   "notFound": {
     "title": "Page not found",
     "description": "We can't find the page you're looking for.",

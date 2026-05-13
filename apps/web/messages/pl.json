@@ -594,6 +594,99 @@
       }
     }
   },
+  "oNas": {
+    "meta": {
+      "title": "O nas — dwie osoby, jeden zespół — bambooIT",
+      "description": "Bambooit to dwuosobowy zespół IT. Remigiusz — obsługa IT i pakiety. Wirgiliusz — strony, aplikacje, automatyzacje. Bez infolinii, bez korporacyjnej dystansy."
+    },
+    "hero": {
+      "eyebrow": "O nas — dwie osoby, jeden zespół",
+      "heading": "Po drugiej stronie siedzi <em>konkretny człowiek.</em>",
+      "lede": "<strong>Nie infolinia. Nie konsultant numer 7. Nie chatbot z pierwszej linii wsparcia.</strong> Bambooit to dwuosobowy zespół, w którym każdy zna swoich klientów po imieniu, pamięta szczegóły ich infrastruktury i odpowiada osobiście — nawet na pytania, które zadaje się po raz dziesiąty."
+    },
+    "stats": {
+      "items": {
+        "specialists": {
+          "value": "2",
+          "label": "Specjalistów w zespole"
+        },
+        "pillars": {
+          "value": "4",
+          "label": "Obszary kompetencji pod jednym dachem"
+        },
+        "callcenters": {
+          "value": "0",
+          "label": "Infolinii i botów"
+        },
+        "decisions": {
+          "value": "100%",
+          "label": "Decyzji po stronie klienta"
+        }
+      }
+    },
+    "story": {
+      "label": "Skąd Bambooit",
+      "heading": "Z prostej <em>obserwacji.</em>",
+      "p1": "Małe i średnie firmy mają dwa wybory na rynku IT: <strong>jednoosobowy „informatyk od wszystkiego\"</strong>, który znika na urlopie, albo <strong>duża agencja</strong>, w której rozmawiasz z pięcioma osobami i żadna nie wie, jak nazywa się Twoja firma.",
+      "p2": "Bambooit powstał z prostego pomysłu: <strong>zostawmy z tego tylko to co dobre.</strong> Bliskość i osobistą relację jednoosobowego informatyka. Pełnię kompetencji agencji. I zamknijmy to w dwuosobowym, wyspecjalizowanym zespole, w którym każdy ma swój obszar — ale obaj rozumieją całość.",
+      "p3": "Stąd nasza nazwa. Bambus rośnie powoli, ale jak już wyrośnie — jest jednocześnie elastyczny i nie do złamania. Twoja technologia powinna działać tak samo."
+    },
+    "team": {
+      "label": "Zespół",
+      "heading": "Dwie osoby. Dwie specjalizacje. Jeden <em>kontakt.</em>",
+      "skillsLabel": "Specjalizacja",
+      "people": {
+        "remigiusz": {
+          "role": "01 / Obsługa IT",
+          "name": "Remigiusz",
+          "bio": "Opiekuje się <strong>obsługą IT i pakietami abonamentowymi</strong>. Od lat rozwiązuje codzienne problemy techniczne małych firm — od drukarek i poczty, po sieci, bezpieczeństwo i konfigurację stanowisk. <strong>Twoja pierwsza linia kontaktu</strong>, gdy coś przestaje działać.",
+          "skills": {
+            "remote": "Pomoc zdalna",
+            "network": "Sieci i Wi-Fi",
+            "m365": "Microsoft 365",
+            "security": "Bezpieczeństwo",
+            "backup": "Backup",
+            "hardware": "Drukarki i sprzęt"
+          }
+        },
+        "wirgiliusz": {
+          "role": "02 / Strony, aplikacje, automatyzacje",
+          "name": "Wirgiliusz",
+          "bio": "Buduje <strong>strony internetowe, aplikacje webowe i automatyzacje procesów</strong>. Pracuje w nowoczesnych technologiach (Next.js, React, n8n, Make). Twórca SaaS-u e-dietetyk.com dla profesjonalnych dietetyków. <strong>Twój partner</strong>, gdy firma rośnie i potrzebuje czegoś więcej niż gotowca z internetu.",
+          "skills": {
+            "nextjs": "Next.js / React",
+            "typescript": "TypeScript",
+            "postgres": "PostgreSQL",
+            "automation": "n8n / Make",
+            "stripe": "Stripe",
+            "anthropic": "Anthropic API"
+          }
+        }
+      }
+    },
+    "values": {
+      "label": "Jak pracujemy",
+      "heading": "Cztery zasady, których <em>nie łamiemy.</em>",
+      "items": {
+        "noCallcenter": {
+          "title": "Bez infolinii",
+          "desc": "Piszesz, dzwonisz, klikasz — trafia bezpośrednio do osoby, która zna Twoją firmę. Zero przekierowań, zero ticketów w czyśćcu."
+        },
+        "transparentPricing": {
+          "title": "Transparentne ceny",
+          "desc": "Stała opłata, jasny zakres, zero ukrytych kosztów. Wycena projektowa zawsze przed startem, nie po fakcie."
+        },
+        "yourOwnership": {
+          "title": "Twoja własność",
+          "desc": "Kod, hasła, dostępy, dokumentacja — wszystko należy do Ciebie. Możesz w każdej chwili odejść, zabierając wszystko."
+        },
+        "sayNo": {
+          "title": "Mówimy „nie\"",
+          "desc": "Gdy projekt nie ma sensu, mówimy to wprost. Gdy tańsze rozwiązanie wystarczy — proponujemy je, mimo niższej marży."
+        }
+      }
+    }
+  },
   "notFound": {
     "title": "Strona nie istnieje",
     "description": "Nie możemy znaleźć strony, której szukasz.",
