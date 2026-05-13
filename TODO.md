@@ -719,7 +719,7 @@ Per D-069 (§4.0 frontend-first gate) execution shifted from week-numbered to FE
 **Frontend track:**
 - [x] **FE-1** — W1.CC.* foundation (tokens, fonts, header, footer, BRAND, SEO, homepage hero) — 7 commits in session 2026-05-13 (`0cfcb8a` → `7d27f08`)
 - [x] **FE-2** — homepage full static stack — 15 sections in 4 commits (`c43dfd9` → `0cdb865`): Marquee, OfferGrid+TeamLine, 4× NarrativeSection, Manifesto+Numbers, HorizontalServices (6 cards), PricingTiers (3 cards per D-007), Process (4 steps), Industries (6 — mockup version not TODO.md FE-7 list), AuditForm (client, UI-only stub), FAQ (client accordion), FinalCTA
-- [ ] **FE-3** — `/pakiety` + `/audyt` + `/kontakt` static
+- [x] **FE-3** — `/pakiety` + `/audyt` + `/kontakt` static — 3 commits (`a54df73` → `5e7cad3`). PageHeader shared component + ComparisonTable + PricingFAQ + AuditBenefits + AuditFAQ + ContactFormSection (client UI-only stub). Sitemap updated for all 3 routes.
 - [ ] **FE-4** — `/pomoc-zdalna` static
 - [ ] **FE-5** — `/o-nas` static
 - [ ] **FE-6** — blog infra + 5 MDX articles
