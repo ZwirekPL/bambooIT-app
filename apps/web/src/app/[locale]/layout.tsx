@@ -32,6 +32,7 @@ import { BRAND } from '@config/brand';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Providers } from '@/components/layout/Providers';
+import { BambooLoader } from '@/components/layout/BambooLoader';
 import { CookieBanner } from '@/components/legal/CookieBanner';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { GeoTracker } from '@/components/analytics/GeoTracker';
@@ -88,6 +89,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       className={`${fraunces.variable} ${archivo.variable} ${jetbrainsMono.variable} ${GeistSans.variable} ${GeistMono.variable}`}
     >
       <body>
+        <BambooLoader />
         <GoogleAnalytics />
         <GeoTracker />
         <NextIntlClientProvider locale={locale} messages={messages}>
