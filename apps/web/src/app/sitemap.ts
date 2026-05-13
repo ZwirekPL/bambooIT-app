@@ -63,6 +63,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...bilingualEntry('/pakiety',          'monthly', 0.9),
     ...bilingualEntry('/audyt',            'monthly', 0.9),
     ...bilingualEntry('/kontakt',          'monthly', 0.7),
+    ...bilingualEntry('/pomoc-zdalna',     'monthly', 0.6),
     ...bilingualEntry('/blog',             'daily',   0.8),
     ...bilingualEntry('/dokumenty-prawne', 'monthly', 0.3),
   ];

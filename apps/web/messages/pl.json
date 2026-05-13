@@ -531,6 +531,69 @@
       }
     }
   },
+  "pomocZdalna": {
+    "meta": {
+      "title": "Pomoc zdalna — pobierz AnyDesk lub RustDesk — bambooIT",
+      "description": "Pomoc zdalna w 5 minut. Pobierz AnyDesk lub RustDesk, podaj nam ID i hasło sesji, my zajmiemy się resztą. Bezpieczne, szyfrowane połączenie."
+    },
+    "header": {
+      "eyebrow": "Pomoc zdalna",
+      "heading": "Pomoc <em>w 5 minut.</em>",
+      "lede": "Pobierz program, uruchom, podaj nam ID i hasło sesji. Po kilku sekundach widzimy Twój ekran i naprawiamy problem. Bez wizyty na miejscu, bez wysyłania komputera, bez tłumaczenia przez telefon co widzisz."
+    },
+    "downloads": {
+      "heading": "Wybierz program do <em>pobrania</em>",
+      "anydesk": {
+        "tag": "Rekomendowane",
+        "title": "AnyDesk",
+        "desc": "Najczęściej używany przez nas program — szybki, stabilny, działa na słabym łączu. Bezpłatny dla klientów. Pobierz odpowiednią wersję i uruchom — instalacja nie jest wymagana.",
+        "windowsBtn": "Windows",
+        "macBtn": "macOS",
+        "linuxBtn": "Linux"
+      },
+      "rustdesk": {
+        "tag": "Open-source",
+        "title": "RustDesk",
+        "desc": "Alternatywa open-source — pełna kontrola nad kodem, własny serwer relay jeśli potrzebujesz. Dla firm wymagających audytu źródła kodu.",
+        "btn": "Pobierz z rustdesk.com"
+      }
+    },
+    "howItWorks": {
+      "heading": "Jak to <em>wygląda</em> od strony klienta",
+      "steps": {
+        "1": {
+          "title": "Pobierz i uruchom",
+          "desc": "Kliknij wybrany przycisk powyżej, otwórz pobrany plik. Program uruchamia się od razu — bez instalacji, bez konta."
+        },
+        "2": {
+          "title": "Podaj nam ID + hasło",
+          "desc": "W programie zobaczysz 9-cyfrowe ID. Hasło sesji ustawiasz sam jedno-razowo (lub pokaże Ci się automatyczne). Wyślij nam te dwie wartości — telefonem, mailem albo w czacie."
+        },
+        "3": {
+          "title": "Akceptujesz połączenie",
+          "desc": "Gdy próbujemy się połączyć, AnyDesk wyświetla Ci pytanie „akceptować?\". Klikasz tak. Od tego momentu widzisz wszystko co robimy — w każdej chwili możesz odłączyć jednym kliknięciem."
+        }
+      }
+    },
+    "security": {
+      "label": "Bezpieczeństwo",
+      "heading": "Zero <em>backdoor.</em> Zero stałego dostępu.",
+      "points": {
+        "1": {
+          "title": "Szyfrowanie end-to-end",
+          "desc": "AnyDesk używa TLS 1.2 z AES-256. RustDesk podobnie. Nikt poza nami i Tobą nie widzi co się dzieje na ekranie — w tym dostawca AnyDeska."
+        },
+        "2": {
+          "title": "Bez stałego dostępu",
+          "desc": "Po zakończeniu sesji odłączamy się. Następnym razem znów potrzebujemy ID i Twojej zgody. Nie ma żadnego trybu „bambooIT może się podłączyć kiedy chce\"."
+        },
+        "3": {
+          "title": "Widzisz wszystko",
+          "desc": "Cały czas widzisz co robimy — myszka rusza się, kursor zmienia, programy się otwierają. W razie czego klikasz „rozłącz\" i koniec sesji."
+        }
+      }
+    }
+  },
   "notFound": {
     "title": "Strona nie istnieje",
     "description": "Nie możemy znaleźć strony, której szukasz.",

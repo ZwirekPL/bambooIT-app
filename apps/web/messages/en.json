@@ -531,6 +531,69 @@
       }
     }
   },
+  "pomocZdalna": {
+    "meta": {
+      "title": "Remote help — download AnyDesk or RustDesk — bambooIT",
+      "description": "Remote help in 5 minutes. Download AnyDesk or RustDesk, share your ID and session password, we'll take it from there. Secure, encrypted connection."
+    },
+    "header": {
+      "eyebrow": "Remote help",
+      "heading": "Help <em>in 5 minutes.</em>",
+      "lede": "Download the program, run it, share your ID and session password. Seconds later we see your screen and fix the issue. No on-site visit, no shipping the machine, no describing what you see over the phone."
+    },
+    "downloads": {
+      "heading": "Pick a program to <em>download</em>",
+      "anydesk": {
+        "tag": "Recommended",
+        "title": "AnyDesk",
+        "desc": "Our most-used tool — fast, stable, works on weak connections. Free for clients. Download the right version and run — no install required.",
+        "windowsBtn": "Windows",
+        "macBtn": "macOS",
+        "linuxBtn": "Linux"
+      },
+      "rustdesk": {
+        "tag": "Open-source",
+        "title": "RustDesk",
+        "desc": "Open-source alternative — full source control, self-hostable relay if needed. For companies that require source-code audits.",
+        "btn": "Download at rustdesk.com"
+      }
+    },
+    "howItWorks": {
+      "heading": "What it <em>looks like</em> on your side",
+      "steps": {
+        "1": {
+          "title": "Download and run",
+          "desc": "Click a button above, open the downloaded file. The program runs immediately — no install, no account."
+        },
+        "2": {
+          "title": "Share ID + password",
+          "desc": "The program shows a 9-digit ID. You set the session password one-time (or one auto-generates). Send us both — phone, email, or chat."
+        },
+        "3": {
+          "title": "Accept the connection",
+          "desc": "When we connect, AnyDesk asks you to accept. Click yes. From that moment you see everything we do — disconnect anytime with one click."
+        }
+      }
+    },
+    "security": {
+      "label": "Security",
+      "heading": "Zero <em>backdoor.</em> Zero persistent access.",
+      "points": {
+        "1": {
+          "title": "End-to-end encryption",
+          "desc": "AnyDesk uses TLS 1.2 with AES-256. RustDesk similarly. No one — including AnyDesk's vendor — sees what happens on screen besides us and you."
+        },
+        "2": {
+          "title": "No persistent access",
+          "desc": "When the session ends, we disconnect. Next time we need your ID and your consent again. There is no persistent connection mode."
+        },
+        "3": {
+          "title": "You see everything",
+          "desc": "You watch what we do — mouse moves, cursor changes, programs open. If anything looks off, click \"disconnect\" and the session ends."
+        }
+      }
+    }
+  },
   "notFound": {
     "title": "Page not found",
     "description": "We can't find the page you're looking for.",
