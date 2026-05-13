@@ -3,12 +3,6 @@ import { getTranslations } from 'next-intl/server';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users } from 'lucide-react';
 
-// TODO(K9-cleanup): Full admin dashboard placeholder after K5b drop.
-// Original page used ~30 diet-domain types (DietCacheStats, DietitianStats,
-// AiCostsListResponse, plan status rows, recipe quality widget, AI cost panel).
-// Rebuild bambooIT admin overview in faza 4 — likely KPIs: active companies,
-// MRR/ARR, ticket volume, support hours used per package, churn rate.
-
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('admin');
   return {

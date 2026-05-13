@@ -3,13 +3,13 @@ import { AppError } from '../utils/errors';
 import { isStripeConfigured, createCheckoutSession as stripeCheckout } from './stripe.service';
 import type { ProductType, CheckoutProductType } from './order.service';
 import { getReferralDiscount, markReferralRedeemed, applyReferralOnRegistration } from './referral.service';
+import { hasUserUsedTrial } from './trialFingerprint.service';
 
 const APP_URL = process.env.APP_URL ?? 'http://localhost:3000';
 const DEFAULT_LOCALE = 'pl';
 const BASE_URL = `${APP_URL}/${DEFAULT_LOCALE}`;
 
-import { isSubscriptionProduct, isTrialProduct, TRIAL_PERIOD_DAYS } from '../config/planLimits';
-import { hasUserUsedTrial } from './trialFingerprint.service';
+const TRIAL_PERIOD_DAYS = 7;
 
 /** Maps product types to Stripe price env variable names. */
 const PRICE_ENV_MAP: Partial<Record<CheckoutProductType, string>> = {
@@ -49,7 +49,7 @@ export async function createSession(
   const mockMode = !isStripeConfigured();
 
   // Trial abuse check + order creation in a transaction to prevent TOCTOU race
-  if (isTrialProduct(productType)) {
+  if (productType === 'TRIAL') {
     const alreadyUsed = await hasUserUsedTrial(userId);
     if (alreadyUsed) {
       throw new AppError(409, 'TRIAL_ALREADY_USED', 'You have already used your free trial');
@@ -64,7 +64,7 @@ export async function createSession(
     },
   });
 
-  const mode = isSubscriptionProduct(productType) ? 'subscription' : 'payment';
+  const mode = 'subscription';
 
   // Apply referral code if provided at checkout (and not already applied at registration)
   if (referralCode) {
@@ -86,7 +86,7 @@ export async function createSession(
     metadata: { productType, userId, orderId: order.id },
     mode,
     discountPercent: discountPercent > 0 ? discountPercent : undefined,
-    trialPeriodDays: isTrialProduct(productType) ? TRIAL_PERIOD_DAYS : undefined,
+    trialPeriodDays: productType === 'TRIAL' ? TRIAL_PERIOD_DAYS : undefined,
   });
 
   // Mark referral as redeemed if discount was applied

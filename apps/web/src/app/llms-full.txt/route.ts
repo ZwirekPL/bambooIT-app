@@ -79,7 +79,6 @@ The user fills out a comprehensive dietary questionnaire (3–5 minutes) coverin
   - Sodium control (<2000mg, enhanced for hypertension)
   - Cooking time budget
   - Seasonal ingredient preferences
-  - Glycemic index optimization for diabetic patients
   - Shopping list efficiency (ingredient reuse)
 - **GPT-4.1** generates natural language meal descriptions and cooking instructions
 - **Fallback chain**: OR-Tools → Greedy algorithm → GPT (ensures plan delivery)

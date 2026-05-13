@@ -134,20 +134,6 @@ export async function listUsers({ page, limit, search, role, excludeRole, hideDe
   return { users, total, page, limit };
 }
 
-// TODO(5c-cleanup): Tenant model dropped per D-025 (bambooIT is B2B, not SaaS multi-tenant).
-// All 5 service functions commented:
-// - listTenants({ page, limit, search }): paginated list with owner + patients count
-// - getTenantById(id): findUnique with owner + patients count
-// - softDeleteTenant(id): set deletedAt
-// - restoreTenant(id): clear deletedAt
-// - updateTenantById(id, { name?, slug? }): update with slug uniqueness check
-//
-// export interface ListTenantsOptions {
-//   page: number;
-//   limit: number;
-//   search?: string;
-// }
-
 export async function getStats() {
   const [
     totalUsers,

@@ -1,0 +1,153 @@
+
+> web@0.1.0 test
+> vitest run
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90mC:/Users/wirig/Desktop/bambooIT/apps/web[39m
+
+ [32m✓[39m src/__tests__/lib/sentry-scrub.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+[90mstderr[2m | src/__tests__/lib/cookie-consent.test.ts[2m > [22m[2mpersistCookieConsent[2m > [22m[2mwrites cookie and returns consent object
+[22m[39m[cookie-consent] backend sync failed: [TypeError: Failed to parse URL from /api/proxy/profile/consents/cookies] {
+  [cause]: TypeError: Invalid URL
+  [90m    at new URL (node:internal/url:819:25)[39m
+      at new URL$1 (file:///C:/Users/wirig/Desktop/bambooIT/node_modules/[4mvitest[24m/dist/chunks/index.CyBMJtT7.js:556:9)
+  [90m    at new Request (node:internal/deps/undici/undici:11063:25)[39m
+  [90m    at fetch (node:internal/deps/undici/undici:11988:25)[39m
+  [90m    at fetch (node:internal/deps/undici/undici:16555:10)[39m
+  [90m    at fetch (node:internal/bootstrap/web/exposed-window-or-worker:83:12)[39m
+      at syncConsentToBackend (C:/Users/wirig/Desktop/bambooIT/apps/web/src/lib/cookie-consent.ts:123:10)
+      at persistCookieConsent (C:/Users/wirig/Desktop/bambooIT/apps/web/src/lib/cookie-consent.ts:111:8)
+      at C:/Users/wirig/Desktop/bambooIT/apps/web/src/__tests__/lib/cookie-consent.test.ts:86:15
+      at file:///C:/Users/wirig/Desktop/bambooIT/node_modules/[4m@vitest/runner[24m/dist/index.js:145:11 {
+    code: [32m'ERR_INVALID_URL'[39m,
+    input: [32m'/api/proxy/profile/consents/cookies'[39m
+  }
+}
+
+[90mstderr[2m | src/__tests__/lib/cookie-consent.test.ts[2m > [22m[2mpersistCookieConsent[2m > [22m[2mgetCookieConsent round-trips written value
+[22m[39m[cookie-consent] backend sync failed: [TypeError: Failed to parse URL from /api/proxy/profile/consents/cookies] {
+  [cause]: TypeError: Invalid URL
+  [90m    at new URL (node:internal/url:819:25)[39m
+      at new URL$1 (file:///C:/Users/wirig/Desktop/bambooIT/node_modules/[4mvitest[24m/dist/chunks/index.CyBMJtT7.js:556:9)
+  [90m    at new Request (node:internal/deps/undici/undici:11063:25)[39m
+  [90m    at fetch (node:internal/deps/undici/undici:11988:25)[39m
+  [90m    at fetch (node:internal/deps/undici/undici:16555:10)[39m
+  [90m    at fetch (node:internal/bootstrap/web/exposed-window-or-worker:83:12)[39m
+      at syncConsentToBackend (C:/Users/wirig/Desktop/bambooIT/apps/web/src/lib/cookie-consent.ts:123:10)
+      at persistCookieConsent (C:/Users/wirig/Desktop/bambooIT/apps/web/src/lib/cookie-consent.ts:111:8)
+      at C:/Users/wirig/Desktop/bambooIT/apps/web/src/__tests__/lib/cookie-consent.test.ts:93:5
+      at file:///C:/Users/wirig/Desktop/bambooIT/node_modules/[4m@vitest/runner[24m/dist/index.js:145:11 {
+    code: [32m'ERR_INVALID_URL'[39m,
+    input: [32m'/api/proxy/profile/consents/cookies'[39m
+  }
+}
+
+ [32m✓[39m src/__tests__/lib/api.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+[90mstderr[2m | src/__tests__/lib/cookie-consent.test.ts[2m > [22m[2mpersistCookieConsent[2m > [22m[2mdispatches CONSENT_EVENT with new state
+[22m[39m[cookie-consent] backend sync failed: [TypeError: Failed to parse URL from /api/proxy/profile/consents/cookies] {
+  [cause]: TypeError: Invalid URL
+  [90m    at new URL (node:internal/url:819:25)[39m
+      at new URL$1 (file:///C:/Users/wirig/Desktop/bambooIT/node_modules/[4mvitest[24m/dist/chunks/index.CyBMJtT7.js:556:9)
+  [90m    at new Request (node:internal/deps/undici/undici:11063:25)[39m
+  [90m    at fetch (node:internal/deps/undici/undici:11988:25)[39m
+  [90m    at fetch (node:internal/deps/undici/undici:16555:10)[39m
+  [90m    at fetch (node:internal/bootstrap/web/exposed-window-or-worker:83:12)[39m
+      at syncConsentToBackend (C:/Users/wirig/Desktop/bambooIT/apps/web/src/lib/cookie-consent.ts:123:10)
+      at persistCookieConsent (C:/Users/wirig/Desktop/bambooIT/apps/web/src/lib/cookie-consent.ts:111:8)
+      at C:/Users/wirig/Desktop/bambooIT/apps/web/src/__tests__/lib/cookie-consent.test.ts:102:5
+      at file:///C:/Users/wirig/Desktop/bambooIT/node_modules/[4m@vitest/runner[24m/dist/index.js:145:11 {
+    code: [32m'ERR_INVALID_URL'[39m,
+    input: [32m'/api/proxy/profile/consents/cookies'[39m
+  }
+}
+
+[90mstderr[2m | src/__tests__/lib/cookie-consent.test.ts[2m > [22m[2macceptAll / acceptEssentialOnly[2m > [22m[2macceptAll sets functional + analytics, not marketing
+[22m[39m[cookie-consent] backend sync failed: [TypeError: Failed to parse URL from /api/proxy/profile/consents/cookies] {
+  [cause]: TypeError: Invalid URL
+  [90m    at new URL (node:internal/url:819:25)[39m
+      at new URL$1 (file:///C:/Users/wirig/Desktop/bambooIT/node_modules/[4mvitest[24m/dist/chunks/index.CyBMJtT7.js:556:9)
+  [90m    at new Request (node:internal/deps/undici/undici:11063:25)[39m
+  [90m    at fetch (node:internal/deps/undici/undici:11988:25)[39m
+  [90m    at fetch (node:internal/deps/undici/undici:16555:10)[39m
+  [90m    at fetch (node:internal/bootstrap/web/exposed-window-or-worker:83:12)[39m
+      at syncConsentToBackend (C:/Users/wirig/Desktop/bambooIT/apps/web/src/lib/cookie-consent.ts:123:10)
+      at persistCookieConsent (C:/Users/wirig/Desktop/bambooIT/apps/web/src/lib/cookie-consent.ts:111:8)
+      at acceptAll (C:/Users/wirig/Desktop/bambooIT/apps/web/src/lib/cookie-consent.ts:154:10)
+      at C:/Users/wirig/Desktop/bambooIT/apps/web/src/__tests__/lib/cookie-consent.test.ts:114:15 {
+    code: [32m'ERR_INVALID_URL'[39m,
+    input: [32m'/api/proxy/profile/consents/cookies'[39m
+  }
+}
+
+[90mstderr[2m | src/__tests__/lib/cookie-consent.test.ts[2m > [22m[2macceptAll / acceptEssentialOnly[2m > [22m[2macceptEssentialOnly leaves only necessary
+[22m[39m[cookie-consent] backend sync failed: [TypeError: Failed to parse URL from /api/proxy/profile/consents/cookies] {
+  [cause]: TypeError: Invalid URL
+  [90m    at new URL (node:internal/url:819:25)[39m
+      at new URL$1 (file:///C:/Users/wirig/Desktop/bambooIT/node_modules/[4mvitest[24m/dist/chunks/index.CyBMJtT7.js:556:9)
+  [90m    at new Request (node:internal/deps/undici/undici:11063:25)[39m
+  [90m    at fetch (node:internal/deps/undici/undici:11988:25)[39m
+  [90m    at fetch (node:internal/deps/undici/undici:16555:10)[39m
+  [90m    at fetch (node:internal/bootstrap/web/exposed-window-or-worker:83:12)[39m
+      at syncConsentToBackend (C:/Users/wirig/Desktop/bambooIT/apps/web/src/lib/cookie-consent.ts:123:10)
+      at persistCookieConsent (C:/Users/wirig/Desktop/bambooIT/apps/web/src/lib/cookie-consent.ts:111:8)
+      at acceptEssentialOnly (C:/Users/wirig/Desktop/bambooIT/apps/web/src/lib/cookie-consent.ts:158:10)
+      at C:/Users/wirig/Desktop/bambooIT/apps/web/src/__tests__/lib/cookie-consent.test.ts:121:15 {
+    code: [32m'ERR_INVALID_URL'[39m,
+    input: [32m'/api/proxy/profile/consents/cookies'[39m
+  }
+}
+
+[90mstderr[2m | src/__tests__/lib/cookie-consent.test.ts[2m > [22m[2mresetCookieConsent[2m > [22m[2mclears cookie and dispatches null event
+[22m[39m[cookie-consent] backend sync failed: [TypeError: Failed to parse URL from /api/proxy/profile/consents/cookies] {
+  [cause]: TypeError: Invalid URL
+  [90m    at new URL (node:internal/url:819:25)[39m
+      at new URL$1 (file:///C:/Users/wirig/Desktop/bambooIT/node_modules/[4mvitest[24m/dist/chunks/index.CyBMJtT7.js:556:9)
+  [90m    at new Request (node:internal/deps/undici/undici:11063:25)[39m
+  [90m    at fetch (node:internal/deps/undici/undici:11988:25)[39m
+  [90m    at fetch (node:internal/deps/undici/undici:16555:10)[39m
+  [90m    at fetch (node:internal/bootstrap/web/exposed-window-or-worker:83:12)[39m
+      at syncConsentToBackend (C:/Users/wirig/Desktop/bambooIT/apps/web/src/lib/cookie-consent.ts:123:10)
+      at persistCookieConsent (C:/Users/wirig/Desktop/bambooIT/apps/web/src/lib/cookie-consent.ts:111:8)
+      at C:/Users/wirig/Desktop/bambooIT/apps/web/src/__tests__/lib/cookie-consent.test.ts:130:5
+      at file:///C:/Users/wirig/Desktop/bambooIT/node_modules/[4m@vitest/runner[24m/dist/index.js:145:11 {
+    code: [32m'ERR_INVALID_URL'[39m,
+    input: [32m'/api/proxy/profile/consents/cookies'[39m
+  }
+}
+
+ [32m✓[39m src/__tests__/lib/cookie-consent.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 23[2mms[22m[39m
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ [32m✓[39m src/__tests__/components/auth/LoginForm.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[33m 2374[2mms[22m[39m
+     [33m[2m✓[22m[39m calls signIn with credentials on form submit [33m 557[2mms[22m[39m
+     [33m[2m✓[22m[39m displays error message when signIn returns error [33m 529[2mms[22m[39m
+     [33m[2m✓[22m[39m redirects to /pl/dashboard on successful login [33m 487[2mms[22m[39m
+     [33m[2m✓[22m[39m disables submit button while loading [33m 371[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m4 passed[39m[22m[90m (4)[39m
+[2m      Tests [22m [1m[32m44 passed[39m[22m[90m (44)[39m
+[2m   Start at [22m 11:28:22
+[2m   Duration [22m 4.13s[2m (transform 349ms, setup 449ms, import 595ms, tests 2.41s, environment 3.04s)[22m
+

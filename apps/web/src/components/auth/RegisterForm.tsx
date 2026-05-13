@@ -81,8 +81,6 @@ export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
     } catch (err) {
       if (err instanceof ApiError && err.status === 409) {
         setError(t('errorEmailTaken'));
-      } else if (err instanceof ApiError && err.status === 400 && err.message.includes('dietitian')) {
-        setError(t('errorInvalidDietitianCode'));
       } else if (err instanceof ApiError && err.status === 400) {
         setError(t('errorValidation'));
       } else {

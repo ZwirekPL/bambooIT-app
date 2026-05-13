@@ -2,10 +2,6 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { BRAND } from '@config/brand';
 
-// TODO(4-cleanup): OrderCheckout component dropped in K4 (used CheckoutProductType
-// with diet enums TRIAL/TRIAL_YEARLY). Rebuild bambooIT checkout flow in K8
-// after ProductType enum replacement (START/FIRMA/FIRMA_PLUS).
-
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('order');
   return {

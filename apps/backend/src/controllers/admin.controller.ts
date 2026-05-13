@@ -5,14 +5,7 @@ import { passwordSchema } from '../utils/validation';
 import * as adminService from '../services/admin.service';
 import { logAudit, type AuditAction } from '../services/audit.service';
 import { prisma } from '@db';
-// TODO(5b-cleanup): aiUsage.service dropped in K5b (AiUsageLog model removed).
-// Claude API tracking rebuild in faza 4 with bambooIT semantics (companyId, sessionId, feature).
-// import { getAiUsageStats, listAiUsageLogs } from '../services/aiUsage.service';
-// TODO(2b-cleanup): mealReminder.service dropped in 2c → triggerMealReminders handler commented below
-// import { processMealReminders } from '../services/mealReminder.service';
 import * as appSettings from '../services/appSettings.service';
-// TODO(2b-cleanup): patient.service dropped in 2c → unlockPatientProfile handler commented below
-// import * as patientService from '../services/patient.service';
 import * as securityMonitoring from '../services/securityMonitoring.service';
 import { adminUnlockAccount } from '../services/antiAbuse.service';
 import * as deviceFingerprint from '../services/deviceFingerprint.service';
@@ -25,15 +18,6 @@ const paginationSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
-
-// TODO(5c-cleanup): Tenant model dropped per D-025 (bambooIT is B2B, not SaaS multi-tenant).
-// const tenantIdSchema = z.object({ id: z.string().cuid() });
-// const listTenantsQuerySchema = paginationSchema.extend({
-//   search: z.string().min(1).max(100).optional(),
-// });
-
-// TODO(5c-cleanup): Tenant dropped per D-025
-// const updateTenantBodySchema = z.object({ name?, slug? });
 
 const listUsersQuerySchema = paginationSchema.extend({
   search: z.string().min(1).max(100).optional(),
@@ -90,11 +74,6 @@ export async function listUsers(req: Request, res: Response, next: NextFunction)
     next(err);
   }
 }
-
-// TODO(5c-cleanup): Tenant model dropped per D-025 — all 5 handlers below commented.
-// listTenants, getTenantById, softDeleteTenant, restoreTenant, updateTenant
-// (used adminService.{listTenants, getTenantById, softDeleteTenant, restoreTenant, updateTenantById})
-// (audit log actions 'DELETE_TENANT'/'RESTORE_TENANT' commented in audit-labels.ts in K4)
 
 export async function getStats(req: Request, res: Response, next: NextFunction) {
   try {
@@ -328,26 +307,6 @@ const aiUsageListSchema = paginationSchema.extend({
   success: z.enum(['true', 'false']).optional(),
 });
 
-// TODO(5b-cleanup): AiUsageLog model dropped in K5b. Rebuild bambooIT Claude API tracking in faza 4.
-// export async function getAiUsage(req: Request, res: Response, next: NextFunction) { ... }
-// export async function listAiUsage(req: Request, res: Response, next: NextFunction) { ... }
-
-// TODO(2b-cleanup): mealReminder.service dropped in 2c
-// export async function triggerMealReminders(req: Request, res: Response, next: NextFunction) {
-//   try {
-//     const sentCount = await processMealReminders();
-//     return res.json({ ok: true, sentCount });
-//   } catch (err) {
-//     next(err);
-//   }
-// }
-
-// TODO(5b-cleanup): FrequentInput model dropped in K5b (was diet interview free-text analytics).
-// // PRE.10: GET /admin/frequent-inputs?field=dislikes&limit=20
-// export async function getFrequentInputs(req: Request, res: Response, next: NextFunction) {
-//   ... prisma.frequentInput.findMany({ ... }) ...
-// }
-
 // ─── App Settings (29.0) ─────────────────────────────────────────────────────
 
 export async function getSettings(_req: Request, res: Response, next: NextFunction) {
@@ -470,28 +429,6 @@ export async function grantAccess(req: Request, res: Response, next: NextFunctio
     next(err);
   }
 }
-
-// TODO(2b-cleanup): patient.service dropped in 2c
-// // ─── 39.1.2: Unlock patient profile ─────────────────────────────────────────
-//
-// export async function unlockPatientProfile(req: Request, res: Response, next: NextFunction) {
-//   try {
-//     const idParsed = z.object({ id: z.string().cuid() }).safeParse(req.params);
-//     if (!idParsed.success) return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid id'));
-//
-//     await patientService.unlockProfile(idParsed.data.id);
-//     logAudit({
-//       userId: req.user?.sub,
-//       action: 'UNLOCK_PATIENT_PROFILE',
-//       resourceType: 'PATIENT',
-//       resourceId: idParsed.data.id,
-//       ip: req.ip,
-//     });
-//     return res.json({ ok: true });
-//   } catch (err) {
-//     next(err);
-//   }
-// }
 
 // ─── 39.6.3: Admin unlock locked account ────────────────────────────────────
 

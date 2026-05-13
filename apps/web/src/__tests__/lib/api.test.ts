@@ -43,17 +43,15 @@ describe('apiFetch()', () => {
     expect(options.headers['Content-Type']).toBe('application/json');
   });
 
-  it('includes Authorization header when token provided', async () => {
+  it('routes browser calls through /api/proxy and omits Authorization header', async () => {
+    // After the proxy migration, client-side calls go through the Next.js
+    // proxy at /api/proxy/* which injects the backend token server-side from
+    // the NextAuth JWT cookie. The browser never sends the Authorization
+    // header — the `token` param is intentionally ignored on the client.
     const fetchMock = mockFetch(200, { status: 'ok' });
     await apiFetch('/health', { token: 'my-token' });
-    const [, options] = fetchMock.mock.calls[0] as [string, RequestInit & { headers: Record<string, string> }];
-    expect(options.headers['Authorization']).toBe('Bearer my-token');
-  });
-
-  it('does not include Authorization header when no token', async () => {
-    const fetchMock = mockFetch(200, { status: 'ok' });
-    await apiFetch('/health');
-    const [, options] = fetchMock.mock.calls[0] as [string, RequestInit & { headers: Record<string, string> }];
+    const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit & { headers: Record<string, string> }];
+    expect(url).toBe('/api/proxy/health');
     expect(options.headers['Authorization']).toBeUndefined();
   });
 
@@ -118,14 +116,14 @@ describe('api.auth.register', () => {
       password: 'secret123',
       firstName: 'Jan',
       lastName: 'Kowalski',
-      dietitianCode: 'CODE01',
+      referralCode: 'BAMBOO-A1B2C3',
       consents: { healthDataProcessing: true, aiDisclaimer: true, emailNotifications: false },
     });
 
     const [, options] = fetchMock.mock.calls[0] as [string, RequestInit];
     const body = JSON.parse(options.body as string);
     expect(body.firstName).toBe('Jan');
-    expect(body.dietitianCode).toBe('CODE01');
+    expect(body.referralCode).toBe('BAMBOO-A1B2C3');
   });
 });
 

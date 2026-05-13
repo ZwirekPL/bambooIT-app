@@ -102,9 +102,6 @@ function UserDetailDialog({
           <Row label={t('fieldEmail')} value={user.email} />
           <Row label={t('fieldRole')} value={user.role} />
           <Row label={t('fieldName')} value={name} />
-          {user.dietitianProfile && (
-            <Row label={t('fieldCode')} value={user.dietitianProfile.code} />
-          )}
           <Row
             label={t('fieldVerified')}
             value={user.emailVerified ? t('yes') : t('no')}
@@ -268,7 +265,6 @@ function CreateUserDialog({
   const [showPassword, setShowPassword] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [dietitianCode, setDietitianCode] = useState('');
   const [error, setError] = useState('');
   const [isPending, startTransition] = useTransition();
 
@@ -279,7 +275,6 @@ function CreateUserDialog({
     setShowPassword(false);
     setFirstName('');
     setLastName('');
-    setDietitianCode('');
     setError('');
   };
 
@@ -298,7 +293,6 @@ function CreateUserDialog({
             password: password || undefined,
             firstName: firstName || undefined,
             lastName: lastName || undefined,
-            dietitianCode: dietitianCode || undefined,
           },
           token
         );
@@ -397,15 +391,6 @@ function CreateUserDialog({
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="create-dietitianCode">{t('createDietitianCode')}</Label>
-            <Input
-              id="create-dietitianCode"
-              value={dietitianCode}
-              onChange={(e) => setDietitianCode(e.target.value)}
-              placeholder={t('createDietitianCodePlaceholder')}
-            />
           </div>
           {error && (
             <p className="text-sm text-destructive">{error}</p>

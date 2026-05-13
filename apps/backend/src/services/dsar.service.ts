@@ -93,7 +93,6 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
   ]);
 
   // Interviews and dietPlans require companyId
-  // TODO(5b-cleanup): Interview + DietPlan locals dropped (model removed in K5b).
   let orders: Array<{
     id: string;
     productType: string;
@@ -102,9 +101,6 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
   }> = [];
 
   if (company) {
-    // TODO(5b-cleanup): Interview + DietPlan dropped in K5b. RODO export of diet domain
-    // rebuild for bambooIT data (Company, Subscription, AuditFormSubmissions,
-    // ContactMessages, ChatSessions) in faza 4. Orders export still works (Patient zostaje).
     const [rawOrders] = await Promise.all([
       prisma.order.findMany({
         where: { companyId: company.id },
@@ -142,7 +138,6 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
       acceptedAt: c.acceptedAt.toISOString(),
       revokedAt: c.revokedAt?.toISOString() ?? null,
     })),
-    // TODO(5b-cleanup): Interview + DietPlan dropped in K5b. RODO exports rebuild in faza 4.
     interviews: [],
     dietPlans: [],
     orders: orders.map((o) => ({

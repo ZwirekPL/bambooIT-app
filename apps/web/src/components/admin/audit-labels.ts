@@ -1,10 +1,6 @@
 // Shared audit log labels & helpers for history drawers
 // Source of truth: AuditLogTable.tsx ACTION_LABELS / RESOURCE_LABELS
 //
-// TODO(4-cleanup): ~25 diet-specific entries commented in K4.
-// They will be removed once historical AuditLog entries are purged
-// in phase 4 (after Patient→Company rename). Plain string mapping
-// only — no impact on typecheck.
 
 export const ACTION_LABELS: Record<string, string> = {
   // — Auth / Account —
@@ -56,58 +52,6 @@ export const ACTION_LABELS: Record<string, string> = {
   REFERRAL_USED: 'Użycie kodu polecającego',
   REFERRAL_DISCOUNT_APPLIED: 'Zastosowanie rabatu',
 
-  // TODO(4-cleanup): diet labels — kept only as fallback for historical AuditLog rows.
-  // Purge after Patient→Company rename in phase 4.
-  // VIEW_INTERVIEW: 'Podgląd wywiadu',
-  // CREATE_INTERVIEW: 'Utworzenie wywiadu',
-  // GENERATE_PLAN: 'Generowanie planu',
-  // VIEW_PLAN: 'Podgląd planu',
-  // APPROVE_PLAN: 'Zatwierdzenie planu',
-  // SEND_PLAN: 'Wysłanie planu',
-  // PUBLISH_PLAN: 'Publikacja planu',
-  // EDIT_PLAN: 'Edycja planu',
-  // EXPORT_PLAN: 'Eksport planu',
-  // CREATE_MANUAL_PLAN: 'Ręczne tworzenie planu',
-  // VIEW_PATIENT: 'Podgląd pacjenta',
-  // UPDATE_PATIENT: 'Aktualizacja pacjenta',
-  // DELETE_PATIENT: 'Usunięcie pacjenta',
-  // UNLOCK_PATIENT_PROFILE: 'Odblokowanie profilu pacjenta',
-  // CREATE_DIETITIAN: 'Utworzenie dietetyka',
-  // UPDATE_DIETITIAN: 'Aktualizacja dietetyka',
-  // ROTATE_DIETITIAN_CODE: 'Rotacja kodu dietetyka',
-  // CREATE_RECIPE: 'Utworzenie przepisu',
-  // UPDATE_RECIPE: 'Aktualizacja przepisu',
-  // DELETE_RECIPE: 'Usunięcie przepisu',
-  // BULK_UPDATE_RECIPES: 'Masowa edycja przepisów',
-  // MERGE_RECIPES: 'Scalanie przepisów',
-  // CREATE_CLEAN_PRODUCT: 'Utworzenie produktu',
-  // UPDATE_CLEAN_PRODUCT: 'Aktualizacja produktu',
-  // DELETE_CLEAN_PRODUCT: 'Usunięcie produktu',
-  // BULK_UPDATE_CLEAN_PRODUCTS: 'Masowa edycja produktów',
-  // CREATE_PROTOCOL: 'Utworzenie protokołu',
-  // UPDATE_PROTOCOL: 'Aktualizacja protokołu',
-  // TOGGLE_PROTOCOL: 'Zmiana statusu protokołu',
-  // ASSIGN_PROTOCOL: 'Przypisanie protokołu',
-  // UNASSIGN_PROTOCOL: 'Odpisanie protokołu',
-  // PROTOCOL_AUTO_MATCHED: 'Auto-dopasowanie protokołu',
-  // PROTOCOL_CONFLICT_DETECTED: 'Wykryty konflikt protokołów',
-  // CREATE_PROTOCOL_TRIGGER: 'Utworzenie mapowania',
-  // UPDATE_PROTOCOL_TRIGGER: 'Aktualizacja mapowania',
-  // DELETE_PROTOCOL_TRIGGER: 'Usunięcie mapowania',
-  // CREATE_PROTOCOL_CONFLICT: 'Utworzenie konfliktu',
-  // UPDATE_PROTOCOL_CONFLICT: 'Aktualizacja konfliktu',
-  // DELETE_PROTOCOL_CONFLICT: 'Usunięcie konfliktu',
-  // AI_GENERATION_ENQUEUED: 'Generowanie AI zlecone',
-  // AI_REPAIR_ENQUEUED: 'Naprawa AI zlecona',
-  // AI_PARTIAL_REGEN_ENQUEUED: 'Częściowa regeneracja AI',
-  // REGENERATE_PARTIAL: 'Regeneracja częściowa',
-  // RED_FLAG_TRIGGERED: 'Red flag wyzwolony',
-  // GENERATION_BLOCKED: 'Generowanie zablokowane',
-  // CREATE_CHECKIN: 'Check-in',
-  // CHECKIN_ADAPTATION: 'Adaptacja z check-inu',
-  // REQUEST_MEAL_SWAP: 'Żądanie zamiany posiłku',
-  // CONFIRM_MEAL_SWAP: 'Potwierdzenie zamiany',
-  // CREATE_NOTE: 'Utworzenie notatki',
 };
 
 export const RESOURCE_LABELS: Record<string, string> = {
@@ -119,21 +63,6 @@ export const RESOURCE_LABELS: Record<string, string> = {
   REFERRAL: 'Polecenie',
   FEATURE_FLAG: 'Feature flag',
 
-  // TODO(4-cleanup): diet resource labels — kept only as fallback for historical rows.
-  // PATIENT: 'Pacjent',
-  // INTERVIEW: 'Wywiad',
-  // DIET_PLAN: 'Plan diety',
-  // TENANT: 'Tenant',
-  // FOOD_PRODUCT: 'Produkt spożywczy',
-  // RECIPE: 'Przepis',
-  // CLEAN_PRODUCT: 'Produkt',
-  // CHECKIN: 'Check-in',
-  // MEAL_SWAP: 'Zamiana posiłku',
-  // DIETITIAN_NOTE: 'Notatka',
-  // NUTRITION_PROTOCOL: 'Protokół żywieniowy',
-  // PROTOCOL_TRIGGER: 'Mapowanie protokołu',
-  // PROTOCOL_CONFLICT: 'Konflikt protokołów',
-  // DIET_TEMPLATE: 'Szablon diety',
 };
 
 export type Severity = 'critical' | 'warning' | 'normal';

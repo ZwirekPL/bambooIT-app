@@ -1,8 +1,6 @@
 import { Router } from 'express';
 import * as profileController from '../controllers/profile.controller';
 import * as notifController from '../controllers/notificationPreferences.controller';
-// TODO(2b-cleanup): note.controller dropped in 2b (diet notes) — listMy mount commented below
-// import * as noteController from '../controllers/note.controller';
 import * as dsarController from '../controllers/dsar.controller';
 
 export const profileRouter = Router();
@@ -14,13 +12,8 @@ profileRouter.get('/consents/history', dsarController.getConsentHistory);
 profileRouter.post('/consents/:type/revoke', dsarController.revokeConsent);
 profileRouter.post('/consents/cookies', dsarController.syncCookieConsents);
 
-// TODO(2c-cleanup): handlers commented in profile.controller — patient.service dropped. Rebuild as company profile in fazie 4.
-// profileRouter.get('/', profileController.getMyProfile);
-// profileRouter.patch('/', profileController.updateMyProfile);
 profileRouter.patch('/password', profileController.changePassword);
 profileRouter.patch('/email', profileController.changeEmail);
 profileRouter.get('/notifications', notifController.getNotificationPreferences);
 profileRouter.patch('/notifications', notifController.updateNotificationPreferences);
 profileRouter.delete('/account', profileController.deleteAccount);
-// TODO(2b-cleanup): note.controller dropped in 2b
-// profileRouter.get('/notes', noteController.listMy);

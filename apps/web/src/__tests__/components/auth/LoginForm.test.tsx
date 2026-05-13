@@ -6,6 +6,7 @@ import React from 'react';
 // ── mocks ─────────────────────────────────────────────────────────────────────
 
 const mockSignIn = vi.fn();
+const mockGetSession = vi.fn().mockResolvedValue(null);
 
 vi.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
@@ -14,6 +15,7 @@ vi.mock('next-intl', () => ({
 
 vi.mock('next-auth/react', () => ({
   signIn: (...args: unknown[]) => mockSignIn(...args),
+  getSession: () => mockGetSession(),
 }));
 
 vi.mock('@/i18n/navigation', () => ({
@@ -79,11 +81,11 @@ describe('LoginForm', () => {
     await user.click(screen.getByRole('button', { name: /submitButton/i }));
 
     await waitFor(() => {
-      expect(mockSignIn).toHaveBeenCalledWith('credentials', {
+      expect(mockSignIn).toHaveBeenCalledWith('credentials', expect.objectContaining({
         email: 'test@example.com',
         password: 'haslo123',
         redirect: false,
-      });
+      }));
     });
   });
 

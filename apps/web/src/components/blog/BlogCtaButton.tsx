@@ -2,10 +2,6 @@
 
 import { Link } from '@/i18n/navigation';
 
-// TODO(4-cleanup): SmartCtaLink dropped in K4 (logged-in users would route to /dashboard,
-// removed in K4 — diet panel). Simplified to anonymous-only CTA pointing to /zaloguj.
-// Re-add login-aware variant in K11 after /panel rebuild.
-
 interface BlogCtaButtonProps {
   label: string;
 }

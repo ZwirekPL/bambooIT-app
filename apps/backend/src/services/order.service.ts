@@ -222,14 +222,6 @@ export async function withdrawFromContract(userId: string) {
     throw new AppError(400, 'WITHDRAWAL_EXPIRED', 'No eligible order within 14 days');
   }
 
-  // TODO(5b-cleanup): DietPlan dropped in K5b. Rebuild "service delivered" check
-  // for bambooIT (e.g. ticket resolved, hours consumed) in faza 4.
-  // Art. 38 pkt 1 — block withdrawal if service was already delivered
-  // const deliveredPlan = await prisma.dietPlan.findFirst({ ... });
-  // if (deliveredPlan) {
-  //   throw new AppError(400, 'SERVICE_DELIVERED', '...');
-  // }
-
   await prisma.order.update({
     where: { id: recentOrder.id },
     data: { status: 'CANCELLED' },
@@ -273,11 +265,6 @@ export async function canWithdraw(userId: string): Promise<{
   });
 
   if (!recentOrder) return { eligible: false };
-
-  // TODO(5b-cleanup): DietPlan dropped in K5b. Rebuild "service delivered" check in faza 4.
-  // Art. 38 pkt 1 — if service was delivered (diet plan sent/published), withdrawal is lost.
-  // const deliveredPlan = await prisma.dietPlan.findFirst({ ... });
-  // if (deliveredPlan) return { eligible: false, serviceDelivered: true };
 
   const daysLeft = Math.ceil(
     (WITHDRAWAL_DAYS - (Date.now() - recentOrder.createdAt.getTime()) / 86400000)

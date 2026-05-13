@@ -14,8 +14,6 @@ export interface User {
   updatedAt: string;
 }
 
-// TODO(5c-cleanup): Tenant interface dropped per D-025 (bambooIT is B2B, not SaaS multi-tenant).
-
 export interface Company {
   id: string;
   userId: string;
@@ -23,11 +21,6 @@ export interface Company {
   contactLastName?: string;
   createdAt: string;
   updatedAt: string;
-  dietitian?: {
-    id: string;
-    email: string;
-    dietitianProfile?: { code: string } | null;
-  } | null;
 }
 
 export type ProductType = 'START' | 'FIRMA' | 'FIRMA_PLUS';
@@ -86,12 +79,7 @@ export interface Subscription {
   updatedAt: string;
 }
 
-// TODO(K9-cleanup): PatientInvoice — decide drop (diet-specific invoice
-// logic) vs rename to CompanyInvoice (generic invoice for company contact).
-// Verify usage in K9 before action. Currently used by lib/api.ts:171
-// (/orders/my/invoices endpoint) — works as generic invoice shape, so
-// rename to CompanyInvoice is likely the right call.
-export interface PatientInvoice {
+export interface CompanyInvoice {
   id: string;
   date: string;
   productType: string;
@@ -125,8 +113,6 @@ export interface SubscriptionItem {
   stripeSubscriptionId: string | null;
 }
 
-// TODO(5c-cleanup): AdminTenant dropped per D-025
-
 export interface AdminUser {
   id: string;
   email: string;
@@ -143,7 +129,6 @@ export interface AdminUser {
     contactFirstName?: string | null;
     contactLastName?: string | null;
   } | null;
-  dietitianProfile?: { code: string } | null;
 }
 
 export interface AuditLog {
@@ -258,7 +243,6 @@ export interface PublicTestimonial extends Testimonial {
 }
 
 // ─── NutritionTargets types ──────────────────────────────────────────────────
-
 
 // ─── Clinical Rules ──────────────────────────────────────────────────────────
 

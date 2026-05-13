@@ -11,7 +11,6 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { cn } from '@/lib/utils';
 import { BRAND } from '@config/brand';
 
-// TODO(4-cleanup): 12 diet admin nav items commented in K4. Rebuild bambooIT admin in phase 4.
 const navItems = [
   { href: '/admin',              labelKey: 'nav.home',     icon: LayoutDashboard },
   { href: '/admin/uzytkownicy',  labelKey: 'nav.users',    icon: Users           },

@@ -3,7 +3,7 @@
  * Uses NEXT_PUBLIC_API_URL (client + server) for all requests.
  * Server-only auth requests use API_URL env variable.
  */
-import type { Company, Order, ProductType, CheckoutProductType, Subscription, AdminStats, UserRole, User, AdminUser, AuditLog, BlogPost, BlogListItem, BlogCategoryConfig, AccessStatus, Testimonial, TestimonialWithUser, PublicTestimonial, NotificationPreferences, SubscriptionStats, SubscriptionItem, PatientInvoice } from '@/types/api';
+import type { Company, Order, ProductType, CheckoutProductType, Subscription, AdminStats, UserRole, User, AdminUser, AuditLog, BlogPost, BlogListItem, BlogCategoryConfig, AccessStatus, Testimonial, TestimonialWithUser, PublicTestimonial, NotificationPreferences, SubscriptionStats, SubscriptionItem, CompanyInvoice } from '@/types/api';
 import { getApiBaseUrl } from './api-url';
 
 /** Tracks whether a 401 auto-logout is already in progress to prevent multiple redirects */
@@ -96,7 +96,6 @@ export const api = {
       password: string;
       firstName?: string;
       lastName?: string;
-      dietitianCode?: string;
       referralCode?: string;
       consents: {
         healthDataProcessing: boolean;
@@ -162,7 +161,7 @@ export const api = {
         token,
       }),
     listMyInvoices: (token: string) =>
-      apiFetch<{ ok: boolean; invoices: PatientInvoice[] }>('/orders/my/invoices', { token }),
+      apiFetch<{ ok: boolean; invoices: CompanyInvoice[] }>('/orders/my/invoices', { token }),
     canWithdraw: (token: string) =>
       apiFetch<{ ok: boolean; eligible: boolean; orderId?: string; daysLeft?: number }>('/orders/my/can-withdraw', { token }),
     withdraw: (token: string) =>
@@ -175,7 +174,7 @@ export const api = {
     get: (token: string) =>
       apiFetch<{ ok: boolean; company: Company }>('/profile', { token }),
     update: (
-      data: Partial<Pick<Company, 'contactFirstName' | 'contactLastName'>> & { dietitianCode?: string; unlinkDietitian?: boolean },
+      data: Partial<Pick<Company, 'contactFirstName' | 'contactLastName'>>,
       token: string
     ) =>
       apiFetch<{ ok: boolean; company: Company }>('/profile', {
@@ -197,17 +196,6 @@ export const api = {
       token: string
     ) =>
       apiFetch<{ ok: boolean }>('/profile/email', {
-        method: 'PATCH',
-        body: JSON.stringify(data),
-        token,
-      }),
-    getDietitian: (token: string) =>
-      apiFetch<{ ok: boolean; profile: { code: string; firstName: string | null; lastName: string | null; email: string } }>('/profile/dietitian', { token }),
-    updateDietitian: (
-      data: { firstName?: string; lastName?: string },
-      token: string
-    ) =>
-      apiFetch<{ ok: boolean; profile: { code: string; firstName: string | null; lastName: string | null; email: string } }>('/profile/dietitian', {
         method: 'PATCH',
         body: JSON.stringify(data),
         token,
@@ -286,8 +274,6 @@ export const api = {
       if (params.dateTo) query.set('dateTo', params.dateTo);
       return apiFetch<{ ok: boolean; items: SubscriptionItem[]; total: number; page: number; limit: number }>(`/admin/subscriptions?${query}`, { token });
     },
-    // TODO(5b.5-cleanup): DietCacheStats type + /admin/diet-cache/stats endpoint dropped in K2c
-    // getDietCacheStats: (token: string) => apiFetch<DietCacheStats>('/admin/diet-cache/stats', { token }),
     listUsers: (params: { page?: number; limit?: number; search?: string; role?: UserRole; excludeRole?: UserRole; hideDeleted?: boolean; inactiveMonths?: number; sortBy?: string; sortOrder?: string; createdFrom?: string; createdTo?: string; subscriptionStatus?: string }, token: string) => {
       const query = new URLSearchParams();
       if (params.page) query.set('page', String(params.page));
@@ -325,33 +311,8 @@ export const api = {
         method: 'PATCH',
         token,
       }),
-    createUser: (data: { email: string; password?: string; firstName?: string; lastName?: string; dietitianCode?: string }, token: string) =>
+    createUser: (data: { email: string; password?: string; firstName?: string; lastName?: string }, token: string) =>
       apiFetch<{ ok: boolean; userId: string; email: string; role: string; firstName: string | null; lastName: string | null }>('/admin/users', {
-        method: 'POST',
-        body: JSON.stringify(data),
-        token,
-      }),
-    listDietitians: (params: { page?: number; limit?: number; search?: string; sortBy?: string; sortOrder?: string; hideDeleted?: boolean }, token: string) => {
-      const query = new URLSearchParams();
-      if (params.page) query.set('page', String(params.page));
-      if (params.limit) query.set('limit', String(params.limit));
-      if (params.search) query.set('search', params.search);
-      if (params.sortBy) query.set('sortBy', params.sortBy);
-      if (params.sortOrder) query.set('sortOrder', params.sortOrder);
-      if (params.hideDeleted) query.set('hideDeleted', 'true');
-      // TODO(5b.5-cleanup): AdminDietitian type dropped; /admin/dietitians endpoint will go in K7 (DIETITIAN role drop)
-      return apiFetch<{ ok: boolean; dietitians: Array<Record<string, unknown>>; total: number; page: number; limit: number }>(
-        `/admin/dietitians?${query.toString()}`,
-        { token }
-      );
-    },
-    toggleDietitianActive: (userId: string, token: string) =>
-      apiFetch<{ ok: boolean; active: boolean; patientsAffected: number }>(`/admin/dietitians/${userId}/toggle-active`, {
-        method: 'PATCH',
-        token,
-      }),
-    createDietitian: (data: { email: string; password?: string; firstName?: string; lastName?: string }, token: string) =>
-      apiFetch<{ ok: boolean; dietitianUserId: string; email: string; code: string; firstName: string | null; lastName: string | null }>('/admin/dietitians', {
         method: 'POST',
         body: JSON.stringify(data),
         token,
@@ -364,20 +325,6 @@ export const api = {
     resendVerification: (id: string, token: string) =>
       apiFetch<{ ok: boolean; id: string; email: string }>(`/admin/users/${id}/resend-verification`, {
         method: 'POST',
-        token,
-      }),
-    rotateDietitianCode: (userId: string, token: string) =>
-      apiFetch<{ ok: boolean; userId: string; oldCode: string; newCode: string }>(`/admin/dietitians/${userId}/rotate-code`, {
-        method: 'POST',
-        token,
-      }),
-    // TODO(5b.5-cleanup): DietitianPatient/AdminDietitian types dropped; endpoints go in K7
-    getDietitianPatients: (userId: string, token: string) =>
-      apiFetch<{ ok: boolean; patients: Array<Record<string, unknown>>; total: number }>(`/admin/dietitians/${userId}/patients`, { token }),
-    updateDietitian: (userId: string, data: { firstName?: string; lastName?: string; email?: string }, token: string) =>
-      apiFetch<{ ok: boolean; dietitian: Record<string, unknown> }>(`/admin/dietitians/${userId}`, {
-        method: 'PATCH',
-        body: JSON.stringify(data),
         token,
       }),
     getSettings: (token: string) =>
@@ -410,8 +357,6 @@ export const api = {
         method: 'POST',
         token,
       }),
-    // TODO(5c-cleanup): Tenant dropped per D-025 — 5 admin tenant methods commented
-    // listTenants, getTenantById, updateTenant, deleteTenant, restoreTenant
     listAuditLogs: (
       params: {
         page?: number;
@@ -565,35 +510,6 @@ export const api = {
     getInvoices: (month: string, token: string) =>
       apiFetch<{ ok: boolean; invoices: Array<{ url: string; filename: string }>; count: number }>(`/admin/accounting/invoices-export?month=${month}`, { token }),
   },
-  adminConsultations: {
-    list: (params: { page?: number; limit?: number; status?: string }, token: string) => {
-      const query = new URLSearchParams();
-      if (params.page) query.set('page', String(params.page));
-      if (params.limit) query.set('limit', String(params.limit));
-      if (params.status) query.set('status', params.status);
-      return apiFetch<{
-        ok: boolean;
-        consultations: Array<{
-          id: string;
-          createdAt: string;
-          status: string;
-          consultationPhone: string | null;
-          patientFirstName: string | null;
-          patientLastName: string | null;
-          patientEmail: string;
-        }>;
-        total: number;
-        page: number;
-        limit: number;
-      }>(`/admin/consultations?${query.toString()}`, { token });
-    },
-    updateStatus: (id: string, status: 'COMPLETED' | 'CANCELLED', token: string) =>
-      apiFetch<{ ok: boolean }>(`/admin/consultations/${id}/status`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status }),
-        token,
-      }),
-  },
   access: {
     status: (token: string) =>
       apiFetch<{ ok: boolean } & AccessStatus>('/access/status', { token }),
@@ -702,7 +618,6 @@ export const api = {
         };
       }>('/referrals/admin/stats', { token }),
   },
-
 
   // ── Measurements (79.3) ──────────────────────────────────────────────────
 

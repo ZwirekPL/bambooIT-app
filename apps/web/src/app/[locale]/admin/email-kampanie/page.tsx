@@ -1,14 +1,5 @@
 'use client';
 
-// TODO(K9-cleanup): Email campaigns placeholder after K5c drop.
-// Original page (~1319 LOC) was a full UI for diet-specific email campaigns
-// (WEEKLY_SUMMARY, DIETITIAN_SUMMARY, TRIGGER_PLATEAU, TRIGGER_MILESTONE,
-// TRIGGER_INACTIVE, TRIGGER_PLAN_EXPIRY) with patient-targeted template
-// variables. EmailCampaign + EmailSend models were dropped in K5c.
-// Rebuild bambooIT email campaigns in faza 4 — likely scope:
-// newsletter, satisfaction surveys, package-renewal reminders, onboarding
-// drip campaigns for new B2B clients.
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Mail } from 'lucide-react';
 
