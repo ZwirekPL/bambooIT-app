@@ -1,15 +1,20 @@
 import type { MetadataRoute } from 'next';
 import { BRAND } from '@config/brand';
 
+// Paths that must not be crawled or indexed. Auth/account flows return
+// stateful or personalised content; the admin area is staff-only; API
+// endpoints serve JSON; checkout success/cancel pages are transactional.
+// Future: add '/panel/' once the client dashboard ships in W4.CC.7.
 const PROTECTED_PATHS = [
   '/api/',
   '/admin/',
-  '/dashboard/',
-  '/dietetyk/',
-  '/onboarding/',
   '/zamow/',
+  '/zamowienie/',
   '/zaloguj/',
   '/rejestracja/',
+  '/resetuj-haslo/',
+  '/zapomnialem-hasla/',
+  '/zweryfikuj-email/',
 ];
 
 export default function robots(): MetadataRoute.Robots {

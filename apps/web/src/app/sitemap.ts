@@ -53,15 +53,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ];
   }
 
+  // Only routes that actually exist today are listed. New routes (/pakiety,
+  // /audyt, /kontakt, /o-nas, /pomoc-zdalna, /branze/*) get added to the
+  // sitemap in the same commit that ships each page (W2.CC, W3.CC, W4.CC).
+  // Listing routes that 404 is a SEO anti-pattern — crawlers de-prioritise
+  // the whole sitemap when they hit broken entries.
   const staticPages: MetadataRoute.Sitemap = [
-    ...bilingualEntry('', 'weekly', 1.0),
-    ...bilingualEntry('/blog', 'daily', 0.8),
-    ...bilingualEntry('/oferta', 'monthly', 0.7),
-    ...bilingualEntry('/o-nas', 'monthly', 0.6),
-    ...bilingualEntry('/faq', 'monthly', 0.6),
-    ...bilingualEntry('/konsultacja', 'monthly', 0.7),
-    ...bilingualEntry('/slownik', 'monthly', 0.6),
-    ...bilingualEntry('/jak-to-dziala', 'monthly', 0.7),
+    ...bilingualEntry('',                  'weekly',  1.0),
+    ...bilingualEntry('/blog',             'daily',   0.8),
     ...bilingualEntry('/dokumenty-prawne', 'monthly', 0.3),
   ];
 
