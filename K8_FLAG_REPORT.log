@@ -1,0 +1,60 @@
+═════════════════════════════════════════════════════════
+K8 Enum Reform — FLAG REPORT (no auto-replace)
+═════════════════════════════════════════════════════════
+
+Files scanned: 229
+Files flagged: 15
+Files skipped (K9 territory): 7
+Total flags: 118
+
+--- Pattern counts ---
+    19  PT: 'CONSULTATION'
+    12  PT: 'PLAN_2W'
+    12  PT: 'PLAN_4W'
+     9  SP: 'PRO_MONTHLY'
+     7  PT: 'FREE_7'
+     7  SP: 'PRO_YEARLY'
+     7  SP: 'FREE' (plan context)
+     7  TYPE: SubscriptionPlan import/reference
+     5  PT: 'OPIEKA_MIESIECZNA'
+     5  PT: 'OPIEKA_ROCZNA'
+     3  ENV: STRIPE_PRICE_OPIEKA_MIESIECZNA → drop
+     3  ENV: STRIPE_PRICE_OPIEKA_ROCZNA → drop
+     2  ENV: STRIPE_PRICE_PLAN_2W → drop
+     2  ENV: STRIPE_PRICE_PLAN_4W → drop
+     2  ENV: STRIPE_PRICE_CONSULTATION → drop
+     2  PT: 'PREMIUM' (legacy)
+     2  PT: 'CONSULTATION_1W' (legacy)
+     2  PT: 'AI_2W' (legacy)
+     2  PT: 'AI_4W' (legacy)
+     2  PT: 'SUBSCRIPTION_1M' (legacy)
+     2  PT: 'CONSULTATION_2W' (legacy)
+     2  PT: 'CONSULTATION_4W' (legacy)
+     2  ENV: STRIPE_PRO_YEARLY_PRICE_ID → rename to STRIPE_PRICE_FIRMA_PLUS
+
+--- Flagged files (sorted by hit count) ---
+   19 hits  apps/backend/src/services/adminSubscription.service.ts
+   17 hits  apps/web/src/types/api.ts
+   16 hits  apps/backend/src/services/order.service.ts
+   15 hits  apps/backend/src/services/subscription.service.ts
+   12 hits  apps/web/src/components/admin/SubscriptionStatsCards.tsx
+   11 hits  apps/backend/src/services/checkout.service.ts
+    6 hits  apps/backend/src/controllers/checkout.controller.ts
+    6 hits  apps/backend/src/controllers/order.controller.ts
+    5 hits  apps/backend/.env.example
+    3 hits  apps/backend/src/services/admin.service.ts
+    2 hits  apps/backend/src/controllers/admin.controller.ts
+    2 hits  apps/backend/src/controllers/subscription.controller.ts
+    2 hits  apps/web/src/lib/api.ts
+    1 hits  apps/backend/src/services/audit.service.ts
+    1 hits  apps/web/src/components/checkout/CheckoutSuccess.tsx
+
+--- Skipped files (K9 territory) ---
+  apps/backend/src/config/planLimits.ts
+  apps/backend/src/utils/composeMealsFlag.ts
+  apps/backend/src/utils/cuisineMapping.ts
+  apps/backend/src/utils/ingredientDisplayName.ts
+  apps/backend/src/utils/mealSchedule.ts
+  apps/backend/src/utils/scaleRecipeSteps.ts
+  apps/backend/src/utils/templateRenderer.ts
+

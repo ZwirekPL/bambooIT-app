@@ -253,10 +253,6 @@ adminRouter.get('/security/bans', adminController.listSecurityBans);
 adminRouter.post('/security/bans', adminController.createSecurityBan);
 adminRouter.delete('/security/bans/:id', adminController.removeSecurityBan);
 
-// 41.3 — Consultations
-adminRouter.get('/consultations', adminController.listConsultations);
-adminRouter.patch('/consultations/:id/status', adminController.updateConsultationStatus);
-
 // 69 — Stripe Admin
 adminRouter.get('/stripe/dashboard', stripeAdminController.getDashboard);
 adminRouter.get('/stripe/transactions', stripeAdminController.listTransactions);

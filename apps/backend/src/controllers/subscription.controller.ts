@@ -6,7 +6,7 @@ import { logAudit } from '../services/audit.service';
 import { isStripeConfigured } from '../services/stripe.service';
 
 const checkoutSchema = z.object({
-  plan: z.enum(['PRO_MONTHLY', 'PRO_YEARLY']),
+  plan: z.enum(['START', 'FIRMA', 'FIRMA_PLUS']),
 });
 
 export async function getMy(req: Request, res: Response, next: NextFunction): Promise<void> {

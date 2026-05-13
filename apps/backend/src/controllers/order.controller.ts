@@ -16,14 +16,7 @@ const companyIdParamSchema = z.object({ companyId: z.string().cuid() });
 const orderIdParamSchema = z.object({ id: z.string().cuid() });
 
 const createSchema = z.object({
-  productType: z.enum([
-    'FREE_7',
-    'OPIEKA_MIESIECZNA',
-    'OPIEKA_ROCZNA',
-    'PLAN_2W',
-    'PLAN_4W',
-    'CONSULTATION',
-  ]),
+  productType: z.enum(['START', 'FIRMA', 'FIRMA_PLUS']),
 });
 
 export async function createOrder(req: Request, res: Response, next: NextFunction) {
@@ -180,37 +173,6 @@ export async function getMyPortal(req: Request, res: Response, next: NextFunctio
     });
 
     return res.json({ ok: true, url });
-  } catch (err) {
-    next(err);
-  }
-}
-
-/** PATCH /orders/:id/consultation-phone — company saves phone after purchasing consultation. */
-const consultationPhoneSchema = z.object({
-  phone: z
-    .string()
-    .regex(/^(\+48)?\d{9}$/, 'Invalid Polish phone number (9 digits, optionally prefixed with +48)'),
-});
-
-export async function setConsultationPhone(req: Request, res: Response, next: NextFunction) {
-  const paramParsed = orderIdParamSchema.safeParse(req.params);
-  if (!paramParsed.success) {
-    return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid order id'));
-  }
-
-  const bodyParsed = consultationPhoneSchema.safeParse(req.body);
-  if (!bodyParsed.success) {
-    return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid phone number'));
-  }
-
-  const userId = req.user?.sub;
-  if (!userId) {
-    return res.status(401).json(apiError('UNAUTHORIZED', 'Not authenticated'));
-  }
-
-  try {
-    await orderService.setConsultationPhone(paramParsed.data.id, userId, bodyParsed.data.phone);
-    return res.json({ ok: true });
   } catch (err) {
     next(err);
   }

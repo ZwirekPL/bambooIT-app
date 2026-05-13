@@ -7,29 +7,57 @@ const APP_URL = process.env.APP_URL ?? 'http://localhost:3000';
 const DEFAULT_LOCALE = 'pl';
 const BASE_URL = `${APP_URL}/${DEFAULT_LOCALE}`;
 
-/** Resolves a Stripe price ID to a SubscriptionPlan. */
+// TODO(K8-deploy): On production deployment, Subscription rows with
+// plan IN ('FREE', 'PRO_MONTHLY', 'PRO_YEARLY') will be force-cast
+// to 'START' by migration USING clause. This is acceptable in dev
+// (0 rows) but production requires pre-migration data mapping:
+//
+// -- Map diet-era plans to bambooIT tiers (business decision per user):
+// UPDATE "Subscription" SET plan = 'START'
+//   WHERE plan IN ('FREE', 'PRO_MONTHLY');
+// UPDATE "Subscription" SET plan = 'FIRMA'
+//   WHERE plan = 'PRO_YEARLY';  -- or 'FIRMA_PLUS' per business decision
+//
+// -- Alternative for fresh bambooIT prod (no diet-era data migration):
+// DELETE FROM "Subscription";  -- nuclear option, drop all diet
+//   -- subscriptions before migration
+//
+// Similar consideration for Order.productType — 0 rows w dev
+// trivially passes; prod-future requires UPDATE/DELETE.
+//
+// Currently dev DB has 0 users + 0 subscriptions — zero impact
+// for K8 commit.
+// bambooIT not deployed to prod yet — these steps become relevant
+// when prod first launches with real users.
+
+/** Resolves a Stripe price ID to a SubscriptionPlan. Throws on unknown price. */
 function planFromPriceId(priceId: string | null | undefined): SubscriptionPlan {
-  if (!priceId) return 'PRO_MONTHLY';
-  if (priceId === process.env.STRIPE_PRO_YEARLY_PRICE_ID) return 'PRO_YEARLY';
-  return 'PRO_MONTHLY';
+  if (priceId === process.env.STRIPE_PRICE_START) return 'START';
+  if (priceId === process.env.STRIPE_PRICE_FIRMA) return 'FIRMA';
+  if (priceId === process.env.STRIPE_PRICE_FIRMA_PLUS) return 'FIRMA_PLUS';
+  throw new Error(`Unknown Stripe price ID: ${priceId}`);
 }
 
-/** Returns the subscription for a dietitian user, creating a FREE one if none exists. */
+/** Returns the subscription for a user (placeholder START plan if none exists). */
 export async function getMySubscription(userId: string) {
   const existing = await prisma.subscription.findUnique({ where: { userId } });
   if (existing) return existing;
 
+  // Placeholder Subscription created before Stripe webhook fires.
+  // Plan = 'START' as transient default until real plan resolved via webhook.
   return prisma.subscription.create({
-    data: { userId, plan: 'FREE', status: 'TRIALING' },
+    data: { userId, plan: 'START', status: 'TRIALING' },
   });
 }
 
-/** Creates a Stripe Checkout Session URL for upgrading to PRO. */
-export async function createCheckout(userId: string, email: string, plan: 'PRO_MONTHLY' | 'PRO_YEARLY') {
-  const priceId =
-    plan === 'PRO_MONTHLY'
-      ? process.env.STRIPE_PRO_MONTHLY_PRICE_ID
-      : process.env.STRIPE_PRO_YEARLY_PRICE_ID;
+/** Creates a Stripe Checkout Session URL for selected package. */
+export async function createCheckout(userId: string, email: string, plan: 'START' | 'FIRMA' | 'FIRMA_PLUS') {
+  const priceEnvMap: Record<typeof plan, string | undefined> = {
+    START: process.env.STRIPE_PRICE_START,
+    FIRMA: process.env.STRIPE_PRICE_FIRMA,
+    FIRMA_PLUS: process.env.STRIPE_PRICE_FIRMA_PLUS,
+  };
+  const priceId = priceEnvMap[plan];
 
   if (!priceId && isStripeConfigured()) {
     throw new AppError(500, 'STRIPE_NOT_CONFIGURED', 'Stripe price ID is not configured');
@@ -40,8 +68,8 @@ export async function createCheckout(userId: string, email: string, plan: 'PRO_M
   const url = await createCheckoutSession({
     stripeCustomerId: subscription.stripeCustomerId ?? undefined,
     priceId: priceId ?? 'price_mock',
-    successUrl: `${BASE_URL}/dietetyk/subskrypcja?checkout=success`,
-    cancelUrl: `${BASE_URL}/dietetyk/subskrypcja?checkout=cancel`,
+    successUrl: `${BASE_URL}/panel/subskrypcja?checkout=success`,
+    cancelUrl: `${BASE_URL}/panel/subskrypcja?checkout=cancel`,
     customerEmail: email,
     metadata: { plan, userId },
   });
@@ -59,7 +87,7 @@ export async function getPortal(userId: string) {
 
   const url = await createPortalSession({
     stripeCustomerId: subscription.stripeCustomerId ?? 'cus_mock',
-    returnUrl: `${BASE_URL}/dietetyk/subskrypcja`,
+    returnUrl: `${BASE_URL}/panel/subskrypcja`,
   });
 
   return { url };
@@ -74,10 +102,12 @@ export async function handleCheckoutCompleted(session: {
 }) {
   if (!session.customer || !session.subscription) return;
 
-  // Resolve plan from metadata (set during checkout) or default
-  const plan: SubscriptionPlan = (session.metadata?.plan === 'PRO_YEARLY')
-    ? 'PRO_YEARLY'
-    : 'PRO_MONTHLY';
+  // Resolve plan from metadata (set during checkout)
+  const metadataPlan = session.metadata?.plan;
+  const plan: SubscriptionPlan =
+    metadataPlan === 'FIRMA_PLUS' ? 'FIRMA_PLUS' :
+    metadataPlan === 'FIRMA' ? 'FIRMA' :
+    'START';
 
   // Find user by metadata userId, stripeCustomerId, or email (first-time checkout)
   let userId: string | undefined = session.metadata?.userId;

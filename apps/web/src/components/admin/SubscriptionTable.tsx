@@ -40,14 +40,9 @@ function statusBadge(status: string) {
 
 function productLabel(productType: string) {
   const map: Record<string, string> = {
-    PRO_MONTHLY: 'Opieka mies.',
-    PRO_YEARLY: 'Opieka roczna',
-    PLAN_2W: 'Plan 2-tyg.',
-    PLAN_4W: 'Plan 4-tyg.',
-    CONSULTATION: 'Konsultacja',
-    FREE: 'Free',
-    OPIEKA_MIESIECZNA: 'Opieka mies.',
-    OPIEKA_ROCZNA: 'Opieka roczna',
+    START: 'Pakiet Start',
+    FIRMA: 'Pakiet Firma',
+    FIRMA_PLUS: 'Pakiet Firma Plus',
   };
   return map[productType] ?? productType;
 }
@@ -138,11 +133,9 @@ export default function SubscriptionTable({ initialItems, initialTotal, token }:
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="__all__">{t('filterAll')}</SelectItem>
-              <SelectItem value="PRO_MONTHLY">Opieka mies.</SelectItem>
-              <SelectItem value="PRO_YEARLY">Opieka roczna</SelectItem>
-              <SelectItem value="PLAN_2W">Plan 2-tyg.</SelectItem>
-              <SelectItem value="PLAN_4W">Plan 4-tyg.</SelectItem>
-              <SelectItem value="CONSULTATION">Konsultacja</SelectItem>
+              <SelectItem value="START">Pakiet Start</SelectItem>
+              <SelectItem value="FIRMA">Pakiet Firma</SelectItem>
+              <SelectItem value="FIRMA_PLUS">Pakiet Firma Plus</SelectItem>
             </SelectContent>
           </Select>
 

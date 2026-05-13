@@ -5,16 +5,7 @@ import * as checkoutService from '../services/checkout.service';
 import { logAudit } from '../services/audit.service';
 
 const createSessionSchema = z.object({
-  productType: z.enum([
-    'FREE_7',
-    'TRIAL',
-    'TRIAL_YEARLY',
-    'OPIEKA_MIESIECZNA',
-    'OPIEKA_ROCZNA',
-    'PLAN_2W',
-    'PLAN_4W',
-    'CONSULTATION',
-  ]),
+  productType: z.enum(['TRIAL', 'START', 'FIRMA', 'FIRMA_PLUS']),
   referralCode: z.string().max(20).optional(),
 });
 

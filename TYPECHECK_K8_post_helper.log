@@ -1,0 +1,50 @@
+
+> bambooit@1.0.0 typecheck
+> npm run generate --workspace=database && npm run build --workspace=database && npm run build --workspace=backend && npm run type-check --workspace=web
+
+
+> database@1.0.0 generate
+> prisma generate
+
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+✔ Generated Prisma Client (v6.19.2) to .\..\..\node_modules\@prisma\client in 115ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+
+
+> database@1.0.0 build
+> tsc -p tsconfig.json
+
+
+> backend@1.0.0 build
+> tsc
+
+src/services/adminSubscription.service.ts(25,60): error TS2322: Type '"START"' is not assignable to type 'SubscriptionPlan | EnumSubscriptionPlanFilter<"Subscription"> | undefined'.
+src/services/adminSubscription.service.ts(26,60): error TS2322: Type '"FIRMA"' is not assignable to type 'SubscriptionPlan | EnumSubscriptionPlanFilter<"Subscription"> | undefined'.
+src/services/adminSubscription.service.ts(27,60): error TS2322: Type '"FIRMA_PLUS"' is not assignable to type 'SubscriptionPlan | EnumSubscriptionPlanFilter<"Subscription"> | undefined'.
+src/services/checkout.service.ts(62,7): error TS2322: Type 'import("c:/Users/wirig/Desktop/bambooIT/apps/backend/src/services/order.service").ProductType' is not assignable to type 'import("c:/Users/wirig/Desktop/bambooIT/node_modules/.prisma/client/index").$Enums.ProductType'.
+  Type '"START"' is not assignable to type 'ProductType'.
+src/services/order.service.ts(48,7): error TS2322: Type 'import("c:/Users/wirig/Desktop/bambooIT/apps/backend/src/services/order.service").ProductType' is not assignable to type 'import("c:/Users/wirig/Desktop/bambooIT/node_modules/.prisma/client/index").$Enums.ProductType'.
+  Type '"START"' is not assignable to type 'ProductType'.
+src/services/order.service.ts(78,7): error TS2322: Type 'import("c:/Users/wirig/Desktop/bambooIT/apps/backend/src/services/order.service").ProductType' is not assignable to type 'import("c:/Users/wirig/Desktop/bambooIT/node_modules/.prisma/client/index").$Enums.ProductType'.
+  Type '"START"' is not assignable to type 'ProductType'.
+src/services/subscription.service.ts(12,51): error TS2322: Type '"START"' is not assignable to type 'SubscriptionPlan'.
+src/services/subscription.service.ts(13,51): error TS2322: Type '"FIRMA"' is not assignable to type 'SubscriptionPlan'.
+src/services/subscription.service.ts(14,56): error TS2322: Type '"FIRMA_PLUS"' is not assignable to type 'SubscriptionPlan'.
+src/services/subscription.service.ts(26,21): error TS2322: Type '"START"' is not assignable to type 'SubscriptionPlan | undefined'.
+src/services/subscription.service.ts(84,9): error TS2322: Type '"START" | "FIRMA" | "FIRMA_PLUS"' is not assignable to type 'SubscriptionPlan'.
+  Type '"START"' is not assignable to type 'SubscriptionPlan'.
+npm error Lifecycle script `build` failed with error:
+npm error code 2
+npm error path c:\Users\wirig\Desktop\bambooIT\apps\backend
+npm error workspace backend@1.0.0
+npm error location c:\Users\wirig\Desktop\bambooIT\apps\backend
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c tsc

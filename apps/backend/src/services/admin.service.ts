@@ -59,7 +59,7 @@ export async function listUsers({ page, limit, search, role, excludeRole, hideDe
     } else if (subscriptionStatus === 'ONE_TIME') {
       where.company = { orders: { some: { status: { in: ['PAID', 'ACTIVE'] } } } };
     } else {
-      where.subscription = { status: subscriptionStatus as Prisma.EnumSubscriptionStatusFilter, plan: { not: 'FREE' } };
+      where.subscription = { status: subscriptionStatus as Prisma.EnumSubscriptionStatusFilter };
     }
   }
 
@@ -107,7 +107,7 @@ export async function listUsers({ page, limit, search, role, excludeRole, hideDe
     let subscriptionProductType: string | null = null;
     let subscriptionExpiresAt: Date | null = null;
 
-    if (sub && sub.plan !== 'FREE') {
+    if (sub) {
       subscriptionStatus = sub.status;
       subscriptionProductType = sub.plan;
       subscriptionExpiresAt = sub.currentPeriodEnd;
@@ -174,17 +174,9 @@ export async function getActionItems() {
 
   const [
     pendingTestimonials,
-    pendingConsultations,
-    // TODO(5a-cleanup): prisma.recipe dropped in K5a
-    // recipesNeedingWork,
     lockedAccounts,
   ] = await Promise.all([
     prisma.testimonial.count({ where: { status: 'PENDING' } }),
-    prisma.order.count({
-      where: { productType: 'CONSULTATION', status: 'PAID' },
-    }),
-    // TODO(5a-cleanup): prisma.recipe dropped in K5a
-    // prisma.recipe.count({ where: { qualityScore: { lt: 40 } } }),
     prisma.auditLog.count({
       where: { action: 'ACCOUNT_LOCKED', createdAt: { gte: yesterday } },
     }).catch(() => 0),
@@ -192,9 +184,6 @@ export async function getActionItems() {
 
   return {
     pendingTestimonials,
-    pendingConsultations,
-    // TODO(5a-cleanup): prisma.recipe dropped in K5a
-    // recipesNeedingWork,
     lockedAccounts,
   };
 }

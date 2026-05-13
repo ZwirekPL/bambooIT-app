@@ -14,7 +14,6 @@ orderRouter.post('/my/resume-subscription', requireAuth('CLIENT'), orderControll
 orderRouter.get('/my/can-withdraw', requireAuth('CLIENT'), orderController.canWithdraw);
 orderRouter.post('/my/withdraw', requireAuth('CLIENT'), orderController.withdrawFromContract);
 
-orderRouter.patch('/:id/consultation-phone', requireAuth('CLIENT'), orderController.setConsultationPhone);
 orderRouter.get('/:id/invoice', requireAuth(), orderController.getInvoice);
 
 // ADMIN manage orders

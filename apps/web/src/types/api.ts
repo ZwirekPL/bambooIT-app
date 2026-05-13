@@ -30,24 +30,10 @@ export interface Company {
   } | null;
 }
 
-export type ProductType =
-  | 'FREE_7'
-  | 'OPIEKA_MIESIECZNA'
-  | 'OPIEKA_ROCZNA'
-  | 'PLAN_2W'
-  | 'PLAN_4W'
-  | 'CONSULTATION'
-  // Legacy values (backward compatibility with existing orders)
-  | 'PREMIUM'
-  | 'CONSULTATION_1W'
-  | 'AI_2W'
-  | 'AI_4W'
-  | 'SUBSCRIPTION_1M'
-  | 'CONSULTATION_2W'
-  | 'CONSULTATION_4W';
+export type ProductType = 'START' | 'FIRMA' | 'FIRMA_PLUS';
 
 /** Extends ProductType with checkout-only virtual types (not stored in DB). */
-export type CheckoutProductType = ProductType | 'TRIAL' | 'TRIAL_YEARLY';
+export type CheckoutProductType = ProductType | 'TRIAL';
 
 export type OrderStatus = 'PENDING_PAYMENT' | 'PAID' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
 
@@ -83,7 +69,7 @@ export interface AccessStatus {
 }
 
 export type SubscriptionStatus = 'TRIALING' | 'ACTIVE' | 'PAST_DUE' | 'CANCELED' | 'INCOMPLETE';
-export type SubscriptionPlan = 'FREE' | 'PRO_MONTHLY' | 'PRO_YEARLY';
+export type SubscriptionPlan = 'START' | 'FIRMA' | 'FIRMA_PLUS';
 
 export interface Subscription {
   id: string;
@@ -120,9 +106,8 @@ export interface AdminStats {
 
 export interface SubscriptionStats {
   mrr: number;
-  activeSubscriptions: { total: number; monthly: number; yearly: number };
+  activeSubscriptions: { total: number; start: number; firma: number; firmaPlus: number };
   trials: { active: number; expired: number };
-  oneTime: { plan2w: number; plan4w: number; consultation: number };
   churnRate: number;
 }
 

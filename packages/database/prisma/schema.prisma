@@ -13,20 +13,9 @@ enum UserRole {
 }
 
 enum ProductType {
-  FREE_7
-  OPIEKA_MIESIECZNA
-  OPIEKA_ROCZNA
-  PLAN_2W
-  PLAN_4W
-  CONSULTATION
-  // Legacy values (kept for backward compatibility with existing orders)
-  PREMIUM
-  CONSULTATION_1W
-  AI_2W
-  AI_4W
-  SUBSCRIPTION_1M
-  CONSULTATION_2W
-  CONSULTATION_4W
+  START
+  FIRMA
+  FIRMA_PLUS
 }
 
 enum OrderStatus {
@@ -48,9 +37,9 @@ enum SubscriptionStatus {
 }
 
 enum SubscriptionPlan {
-  FREE
-  PRO_MONTHLY
-  PRO_YEARLY
+  START
+  FIRMA
+  FIRMA_PLUS
 }
 
 // ─── Food Database Enums ──────────────────────────────────────────────────────
@@ -149,7 +138,6 @@ model Order {
   companyId         String
   productType       ProductType
   status            OrderStatus @default(PENDING_PAYMENT)
-  consultationPhone  String?     @db.VarChar(20)
   stripeInvoiceId    String?
   createdAt          DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
@@ -264,7 +252,7 @@ model Subscription {
   stripeCustomerId     String?            @unique
   stripeSubscriptionId String?            @unique
   stripePriceId        String?
-  plan                 SubscriptionPlan   @default(FREE)
+  plan                 SubscriptionPlan
   status               SubscriptionStatus @default(TRIALING)
   currentPeriodStart   DateTime?
   currentPeriodEnd     DateTime?

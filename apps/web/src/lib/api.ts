@@ -151,12 +151,6 @@ export const api = {
       apiFetch<{ ok: boolean; url: string }>('/orders/my/portal', { token }),
     getInvoice: (orderId: string, token: string) =>
       apiFetch<{ ok: boolean; invoiceUrl: string | null }>(`/orders/${orderId}/invoice`, { token }),
-    setConsultationPhone: (orderId: string, phone: string, token: string) =>
-      apiFetch<{ ok: boolean }>(`/orders/${orderId}/consultation-phone`, {
-        method: 'PATCH',
-        body: JSON.stringify({ phone }),
-        token,
-      }),
     cancelSubscription: (token: string) =>
       apiFetch<{ ok: boolean; subscription: Subscription }>('/orders/my/cancel-subscription', {
         method: 'POST',
@@ -264,7 +258,7 @@ export const api = {
         '/subscriptions/my',
         { token }
       ),
-    createCheckout: (plan: 'PRO_MONTHLY' | 'PRO_YEARLY', token: string) =>
+    createCheckout: (plan: 'START' | 'FIRMA' | 'FIRMA_PLUS', token: string) =>
       apiFetch<{ ok: boolean; url: string }>('/subscriptions/checkout', {
         method: 'POST',
         body: JSON.stringify({ plan }),

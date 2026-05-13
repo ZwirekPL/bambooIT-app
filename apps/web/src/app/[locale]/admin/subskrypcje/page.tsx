@@ -19,9 +19,8 @@ export default async function AdminSubscriptionsPage() {
 
   const defaultStats: SubscriptionStats = {
     mrr: 0,
-    activeSubscriptions: { total: 0, monthly: 0, yearly: 0 },
+    activeSubscriptions: { total: 0, start: 0, firma: 0, firmaPlus: 0 },
     trials: { active: 0, expired: 0 },
-    oneTime: { plan2w: 0, plan4w: 0, consultation: 0 },
     churnRate: 0,
   };
 

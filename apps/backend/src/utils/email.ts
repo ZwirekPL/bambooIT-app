@@ -1,12 +1,9 @@
 import nodemailer from 'nodemailer';
 
 const PRODUCT_LABELS: Record<string, string> = {
-  FREE_7: 'Plan 7-dniowy (bezpłatny)',
-  OPIEKA_MIESIECZNA: 'Opieka dietetyczna (miesięczna)',
-  OPIEKA_ROCZNA: 'Opieka dietetyczna (roczna)',
-  PLAN_2W: 'Plan dietetyczny 2-tygodniowy',
-  PLAN_4W: 'Plan dietetyczny 4-tygodniowy',
-  CONSULTATION: 'Konsultacja dietetyczna',
+  START: 'Pakiet Start',
+  FIRMA: 'Pakiet Firma',
+  FIRMA_PLUS: 'Pakiet Firma Plus',
 };
 
 function createTransporter() {
@@ -93,82 +90,6 @@ export async function sendOrderConfirmationEmail(
         </p>
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
         <p style="color: #9ca3af; font-size: 12px;">e-dietetyk.com</p>
-      </div>
-    `,
-  });
-}
-
-export interface ConsultationEmailData {
-  orderId: string;
-}
-
-/** Email to client after CONSULTATION purchase — simplified flow (41.1). */
-export async function sendConsultationPatientEmail(
-  to: string,
-  contactFirstName: string,
-  data: ConsultationEmailData,
-): Promise<void> {
-  const transporter = createTransporter();
-  const greeting = contactFirstName ? `Cześć ${contactFirstName}!` : 'Cześć!';
-  const orderNum = data.orderId.slice(-8).toUpperCase();
-
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM,
-    to,
-    subject: `Konsultacja — zamówienie #${orderNum} — e-dietetyk.com`,
-    text: `${greeting}\n\nDziękujemy za zakup konsultacji!\n\nNumer zamówienia: #${orderNum}\n\nSkontaktujemy się z Tobą mailowo w celu ustalenia terminu i formy konsultacji.\n\nZespół e-dietetyk.com`,
-    html: `
-      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
-        <h2 style="color:#1a1a1a;">Konsultacja</h2>
-        <p>${greeting}</p>
-        <p>Dziękujemy za zakup konsultacji! Twoje zamówienie <strong>#${orderNum}</strong> zostało opłacone.</p>
-        <p>Skontaktujemy się z Tobą <strong>mailowo</strong> w celu ustalenia terminu i formy konsultacji.</p>
-        <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0;" />
-        <p style="color:#9ca3af;font-size:12px;">e-dietetyk.com</p>
-      </div>
-    `,
-  });
-}
-
-/** Internal email when a client purchases a CONSULTATION. */
-export async function sendConsultationDietitianEmail(
-  to: string,
-  data: {
-    orderId: string;
-    contactName: string;
-    contactEmail: string;
-    contactPhone?: string;
-  },
-): Promise<void> {
-  const transporter = createTransporter();
-  const orderNum = data.orderId.slice(-8).toUpperCase();
-
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM,
-    to,
-    subject: `Nowa konsultacja — ${data.contactName} (#${orderNum}) — e-dietetyk.com`,
-    text: `Nowe zamówienie konsultacji!\n\nKlient: ${data.contactName}\nEmail: ${data.contactEmail}\n${data.contactPhone ? `Telefon: ${data.contactPhone}\n` : ''}\nNumer zamówienia: #${orderNum}\n\nSkontaktuj się z klientem w celu umówienia terminu.\n\ne-dietetyk.com`,
-    html: `
-      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
-        <h2 style="color:#1a1a1a;">Nowa konsultacja</h2>
-        <p>Klient zakupił konsultację. Skontaktuj się w celu umówienia terminu.</p>
-        <table style="width:100%;border-collapse:collapse;margin:24px 0;">
-          <tr style="border-bottom:1px solid #e5e7eb;">
-            <td style="padding:10px 0;color:#6b7280;font-size:14px;">Klient</td>
-            <td style="padding:10px 0;font-weight:bold;text-align:right;">${data.contactName}</td>
-          </tr>
-          <tr style="border-bottom:1px solid #e5e7eb;">
-            <td style="padding:10px 0;color:#6b7280;font-size:14px;">Email klienta</td>
-            <td style="padding:10px 0;text-align:right;"><a href="mailto:${data.contactEmail}" style="color:#16a34a;">${data.contactEmail}</a></td>
-          </tr>
-          ${data.contactPhone ? `<tr style="border-bottom:1px solid #e5e7eb;"><td style="padding:10px 0;color:#6b7280;font-size:14px;">Telefon klienta</td><td style="padding:10px 0;text-align:right;">${data.contactPhone}</td></tr>` : ''}
-          <tr>
-            <td style="padding:10px 0;color:#6b7280;font-size:14px;">Numer zamówienia</td>
-            <td style="padding:10px 0;font-weight:bold;text-align:right;">#${orderNum}</td>
-          </tr>
-        </table>
-        <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0;" />
-        <p style="color:#9ca3af;font-size:12px;">e-dietetyk.com</p>
       </div>
     `,
   });

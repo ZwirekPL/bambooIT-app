@@ -3,7 +3,6 @@ import { AppError } from '../utils/errors';
 import { isStripeConfigured, createCheckoutSession as stripeCheckout } from './stripe.service';
 import type { ProductType, CheckoutProductType } from './order.service';
 import { getReferralDiscount, markReferralRedeemed, applyReferralOnRegistration } from './referral.service';
-import { sendConsultationPatientEmail, sendConsultationDietitianEmail } from '../utils/email';
 
 const APP_URL = process.env.APP_URL ?? 'http://localhost:3000';
 const DEFAULT_LOCALE = 'pl';
@@ -12,21 +11,16 @@ const BASE_URL = `${APP_URL}/${DEFAULT_LOCALE}`;
 import { isSubscriptionProduct, isTrialProduct, TRIAL_PERIOD_DAYS } from '../config/planLimits';
 import { hasUserUsedTrial } from './trialFingerprint.service';
 
-/** Maps product types to Stripe price env variable names (29.2). */
+/** Maps product types to Stripe price env variable names. */
 const PRICE_ENV_MAP: Partial<Record<CheckoutProductType, string>> = {
-  FREE_7: '',
-  TRIAL: 'STRIPE_PRICE_OPIEKA_MIESIECZNA', // Trial uses same price as monthly subscription
-  TRIAL_YEARLY: 'STRIPE_PRICE_OPIEKA_ROCZNA', // Yearly trial uses yearly price
-  OPIEKA_MIESIECZNA: 'STRIPE_PRICE_OPIEKA_MIESIECZNA',
-  OPIEKA_ROCZNA: 'STRIPE_PRICE_OPIEKA_ROCZNA',
-  PLAN_2W: 'STRIPE_PRICE_PLAN_2W',
-  PLAN_4W: 'STRIPE_PRICE_PLAN_4W',
-  CONSULTATION: 'STRIPE_PRICE_CONSULTATION',
+  TRIAL: 'STRIPE_PRICE_START', // Trial uses START price (with Stripe trial period)
+  START: 'STRIPE_PRICE_START',
+  FIRMA: 'STRIPE_PRICE_FIRMA',
+  FIRMA_PLUS: 'STRIPE_PRICE_FIRMA_PLUS',
 };
 
 /**
- * Creates a Stripe Checkout session for a company order.
- * FREE_7 orders skip Stripe and redirect directly to success.
+ * Creates a Stripe Checkout session for a company subscription order.
  */
 export async function createSession(
   userId: string,
@@ -34,24 +28,6 @@ export async function createSession(
   productType: CheckoutProductType,
   referralCode?: string,
 ) {
-  // FREE_7 — no payment required, create order directly
-  if (productType === 'FREE_7') {
-    const company = await prisma.company.findUnique({ where: { userId } });
-    if (!company) {
-      throw new AppError(404, 'NOT_FOUND', 'Company profile not found');
-    }
-
-    await prisma.order.create({
-      data: {
-        companyId: company.id,
-        productType,
-        status: 'PAID',
-      },
-    });
-
-    return { url: `${BASE_URL}/zamowienie/sukces?product=${productType}` };
-  }
-
   // Resolve Stripe price ID
   const envKey = PRICE_ENV_MAP[productType];
   const priceId = envKey ? process.env[envKey] : undefined;
@@ -65,12 +41,9 @@ export async function createSession(
     throw new AppError(404, 'NOT_FOUND', 'Company profile not found');
   }
 
-  // Trial types are checkout-only — map to the corresponding DB product type
-  const TRIAL_DB_MAP: Record<string, ProductType> = {
-    TRIAL: 'OPIEKA_MIESIECZNA',
-    TRIAL_YEARLY: 'OPIEKA_ROCZNA',
-  };
-  const dbProductType = (TRIAL_DB_MAP[productType] ?? productType) as ProductType;
+  // TRIAL is a checkout-only virtual type — map to START for DB persistence.
+  // Stripe handles trial period via subscription config (trialPeriodDays).
+  const dbProductType: ProductType = productType === 'TRIAL' ? 'START' : productType;
 
   // In mock mode (no Stripe), mark order as PAID immediately since no webhook will fire
   const mockMode = !isStripeConfigured();
@@ -137,37 +110,7 @@ export async function handleOrderCheckoutCompleted(orderId: string): Promise<voi
 
   if (count === 0) return; // Already processed or not found
 
-  // Fetch order for consultation email logic
-  const order = await prisma.order.findUnique({ where: { id: orderId } });
-
-  // Send consultation-specific emails (29.5)
-  if (order?.productType === 'CONSULTATION') {
-    sendConsultationEmails(order.id, order.companyId).catch((err) => {
-      console.error('[checkout] Failed to send consultation emails:', err);
-    });
-  }
-}
-
-/**
- * Sends consultation purchase emails to company and their dietitian (29.5).
- * Fire-and-forget — errors are logged but don't block the webhook response.
- */
-async function sendConsultationEmails(orderId: string, companyId: string): Promise<void> {
-  const company = await prisma.company.findUnique({
-    where: { id: companyId },
-    include: {
-      user: { select: { email: true } },
-    },
-  });
-  if (!company) return;
-
-  // Email to company — simplified: "we'll contact you by email to schedule"
-  await sendConsultationPatientEmail(
-    company.user.email,
-    company.contactFirstName ?? '',
-    { orderId },
-  );
-
-  // K7: dietitian-targeted internal notification removed (DietitianProfile
-  // dropped). Admin notifications for new consultations rebuild w fazie 4.
+  // K8: CONSULTATION product dropped (bambooIT MVP only subscription tiers).
+  // Order-specific post-payment side effects (audit log, notifications)
+  // rebuild w fazie 4 per package needs.
 }

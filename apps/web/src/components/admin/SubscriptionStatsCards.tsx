@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { Repeat, TrendingUp, Users, Clock, BarChart3, ExternalLink } from 'lucide-react';
+import { Repeat, TrendingUp, Clock, BarChart3, ExternalLink } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,12 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import type { SubscriptionStats, SubscriptionItem } from '@/types/api';
 
-type DialogFilter =
-  | 'ACTIVE'
-  | 'TRIALING'
-  | 'PLAN_2W'
-  | 'PLAN_4W'
-  | 'CONSULTATION';
+type DialogFilter = 'ACTIVE' | 'TRIALING';
 
 interface SubscriptionStatsCardsProps {
   stats: SubscriptionStats;
@@ -61,14 +56,9 @@ function StatCard({
 
 function productLabel(productType: string) {
   const map: Record<string, string> = {
-    PRO_MONTHLY: 'Opieka mies.',
-    PRO_YEARLY: 'Opieka roczna',
-    PLAN_2W: 'Plan 2-tyg.',
-    PLAN_4W: 'Plan 4-tyg.',
-    CONSULTATION: 'Konsultacja',
-    FREE: 'Free',
-    OPIEKA_MIESIECZNA: 'Opieka mies.',
-    OPIEKA_ROCZNA: 'Opieka roczna',
+    START: 'Pakiet Start',
+    FIRMA: 'Pakiet Firma',
+    FIRMA_PLUS: 'Pakiet Firma Plus',
   };
   return map[productType] ?? productType;
 }
@@ -76,9 +66,6 @@ function productLabel(productType: string) {
 const DIALOG_TITLE_KEY: Record<DialogFilter, string> = {
   ACTIVE: 'dialogSubscriptionsTitle',
   TRIALING: 'dialogTrialsTitle',
-  PLAN_2W: 'dialogPlan2wTitle',
-  PLAN_4W: 'dialogPlan4wTitle',
-  CONSULTATION: 'dialogConsultationTitle',
 };
 
 export default function SubscriptionStatsCards({ stats, token }: SubscriptionStatsCardsProps) {
@@ -95,17 +82,7 @@ export default function SubscriptionStatsCards({ stats, token }: SubscriptionSta
     setDialogItems([]);
 
     try {
-      const query = new URLSearchParams({ page: '1', limit: '100' });
-
-      // Subscription status filters
-      if (filter === 'ACTIVE' || filter === 'TRIALING') {
-        query.set('status', filter);
-      }
-      // One-time order product type filters
-      if (filter === 'PLAN_2W' || filter === 'PLAN_4W' || filter === 'CONSULTATION') {
-        query.set('productType', filter);
-      }
-
+      const query = new URLSearchParams({ page: '1', limit: '100', status: filter });
       const res = await fetch(`/api/proxy/admin/subscriptions?${query}`);
       if (res.ok) {
         const data = await res.json();
@@ -117,8 +94,6 @@ export default function SubscriptionStatsCards({ stats, token }: SubscriptionSta
       setLoading(false);
     }
   }, [token]);
-
-  const isOneTimeFilter = dialogFilter === 'PLAN_2W' || dialogFilter === 'PLAN_4W' || dialogFilter === 'CONSULTATION';
 
   return (
     <>
@@ -134,7 +109,7 @@ export default function SubscriptionStatsCards({ stats, token }: SubscriptionSta
         <StatCard
           label={t('activeSubscriptions')}
           value={stats.activeSubscriptions.total}
-          sublabel={`${t('monthly')}: ${stats.activeSubscriptions.monthly} / ${t('yearly')}: ${stats.activeSubscriptions.yearly}`}
+          sublabel={`Start: ${stats.activeSubscriptions.start} / Firma: ${stats.activeSubscriptions.firma} / Firma+: ${stats.activeSubscriptions.firmaPlus}`}
           icon={Repeat}
           iconClass="bg-blue-50 text-blue-600"
           onClick={() => openDialog('ACTIVE')}
@@ -152,31 +127,6 @@ export default function SubscriptionStatsCards({ stats, token }: SubscriptionSta
           value={`${stats.churnRate}%`}
           icon={BarChart3}
           iconClass="bg-red-50 text-red-500"
-        />
-      </div>
-
-      {/* One-time stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-lg">
-        <StatCard
-          label={t('plan2w')}
-          value={stats.oneTime.plan2w}
-          icon={Users}
-          iconClass="bg-violet-50 text-violet-600"
-          onClick={() => openDialog('PLAN_2W')}
-        />
-        <StatCard
-          label={t('plan4w')}
-          value={stats.oneTime.plan4w}
-          icon={Users}
-          iconClass="bg-violet-50 text-violet-600"
-          onClick={() => openDialog('PLAN_4W')}
-        />
-        <StatCard
-          label={t('consultationCount')}
-          value={stats.oneTime.consultation}
-          icon={Users}
-          iconClass="bg-violet-50 text-violet-600"
-          onClick={() => openDialog('CONSULTATION')}
         />
       </div>
 
@@ -219,7 +169,7 @@ export default function SubscriptionStatsCards({ stats, token }: SubscriptionSta
                         </p>
                       )}
                     </div>
-                    {item.stripeSubscriptionId && !isOneTimeFilter && (
+                    {item.stripeSubscriptionId && (
                       <a
                         href={`https://dashboard.stripe.com/subscriptions/${item.stripeSubscriptionId}`}
                         target="_blank"

@@ -3,24 +3,10 @@ import { AppError } from '../utils/errors';
 import { sendOrderConfirmationEmail, sendSubscriptionCancelEmail } from '../utils/email';
 import { getStripeClient } from './stripe.service';
 
-export type ProductType =
-  | 'FREE_7'
-  | 'OPIEKA_MIESIECZNA'
-  | 'OPIEKA_ROCZNA'
-  | 'PLAN_2W'
-  | 'PLAN_4W'
-  | 'CONSULTATION'
-  // Legacy values (backward compatibility with existing orders)
-  | 'PREMIUM'
-  | 'CONSULTATION_1W'
-  | 'AI_2W'
-  | 'AI_4W'
-  | 'SUBSCRIPTION_1M'
-  | 'CONSULTATION_2W'
-  | 'CONSULTATION_4W';
+export type ProductType = 'START' | 'FIRMA' | 'FIRMA_PLUS';
 
 /** Extends ProductType with checkout-only virtual types (not stored in DB). */
-export type CheckoutProductType = ProductType | 'TRIAL' | 'TRIAL_YEARLY';
+export type CheckoutProductType = ProductType | 'TRIAL';
 
 interface CreateOrderInput {
   companyId: string;
@@ -147,32 +133,6 @@ export async function listMyOrders(userId: string) {
   });
 }
 
-/** Save phone number for a CONSULTATION order (41.2). */
-export async function setConsultationPhone(
-  orderId: string,
-  userId: string,
-  phone: string
-): Promise<void> {
-  const order = await prisma.order.findFirst({
-    where: { id: orderId },
-    include: { company: { select: { userId: true } } },
-  });
-  if (!order) {
-    throw new AppError(404, 'NOT_FOUND', 'Order not found');
-  }
-  if (order.company.userId !== userId) {
-    throw new AppError(403, 'FORBIDDEN', 'You do not own this order');
-  }
-  if (order.productType !== 'CONSULTATION') {
-    throw new AppError(400, 'INVALID_ORDER_TYPE', 'This order is not a consultation');
-  }
-
-  await prisma.order.update({
-    where: { id: orderId },
-    data: { consultationPhone: phone },
-  });
-}
-
 /** Returns the Subscription record for a company (if any). */
 export async function getMySubscription(userId: string) {
   return prisma.subscription.findUnique({ where: { userId } });
@@ -254,7 +214,6 @@ export async function withdrawFromContract(userId: string) {
       companyId: company.id,
       status: { in: ['PAID', 'ACTIVE'] },
       createdAt: { gte: cutoff },
-      productType: { not: 'FREE_7' },
     },
     orderBy: { createdAt: 'desc' },
   });
@@ -309,7 +268,6 @@ export async function canWithdraw(userId: string): Promise<{
       companyId: company.id,
       status: { in: ['PAID', 'ACTIVE'] },
       createdAt: { gte: cutoff },
-      productType: { not: 'FREE_7' },
     },
     orderBy: { createdAt: 'desc' },
   });
@@ -329,12 +287,9 @@ export async function canWithdraw(userId: string): Promise<{
 }
 
 const PRICE_MAP: Record<string, number> = {
-  OPIEKA_MIESIECZNA: 129,
-  OPIEKA_ROCZNA: 1188,
-  PLAN_2W: 129,
-  PLAN_4W: 199,
-  CONSULTATION: 399,
-  FREE_7: 0,
+  START: 390,
+  FIRMA: 690,
+  FIRMA_PLUS: 1190,
 };
 
 /** Lists paid orders as invoices for the company. */
