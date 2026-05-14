@@ -86,12 +86,12 @@ K10 to **pre-faza-4 sweep** — kończymy outstanding cleanup tasks z CLEANUP_CO
 
 ### K10 tasks
 
-- [ ] **K10.1** — Audit + drop `apps/backend/scripts/` legacy directory (40 .ts/.js files + `scripts/data/` + `scripts/scraper/`, ~5161 LOC). Verify zero consumers per script, drop wholesale.
-- [ ] **K10.2** — Rewrite `apps/web/src/app/llms.txt/route.ts` + `llms-full.txt/route.ts` z bambooIT IT-services context (zamiast diet platform). CC pisze drafty, Wirgiliusz review.
-- [ ] **K10.3** — EN locale reduction (D-023 alignment): drop `'en'` z `routing.ts`, reduce `en.json` do minimal stub (~50 LOC zamiast 614), verify `Link` components działają.
-- [ ] **K10.4** — Legal MDX content rewrite stub: `apps/web/content/legal/{pl,en}/{polityka-prywatnosci, regulamin, polityka-cookies, informacja-ai}.md`. CC pisze **stuby** (~100-200 LOC każdy, RODO-compliant placeholder), Wirgiliusz później do prawnika.
-- [ ] **K10.5** — Cosmetic: drop `types/api.ts` section dividers (linie 200, 257), update `webhook.controller.ts:96` outdated comment, rename `dietitianOverride` w `appSettings.service.ts:89-99`.
-- [ ] **K10.6** — Drop `RegisterForm.tsx` placeholder (~25 LOC, zostało w K7 z minimalną formą — faza 4 build C odbuduje z NIP/industry).
+- [x] **K10.1** — Drop `apps/backend/scripts/` legacy (5967 LOC, 43 plików) — commit `af2b778`
+- [x] **K10.2** — Rewrite `llms.txt` + `llms-full.txt` z bambooIT context — commit `63b27f5`
+- [x] **K10.3** — EN locale reduction (routing → only PL, en.json → 10-line stub, blog/AuthorBox unconditional PL, LocaleSwitcher auto-hide) — commit `257e774`
+- [x] **K10.4** — Legal stubs przepisane (polityka-prywatnosci, regulamin, polityka-cookies, informacja-ai), EN docs dropped — commit `(jeden z 42a95c3)` (z poprawką do K10.5)
+- [x] **K10.5** — Cosmetic: stale comments + section dividers + dietitianOverride rename — commit `42a95c3`
+- ~~**K10.6**~~ — moot (BE-2 rebuilt RegisterForm with full NIP/industry/phone fields)
 
 **Pattern do commit:** `chore(cleanup): K10 follow-up — legacy scripts + llms.txt + EN stub + legal placeholders`
 
