@@ -139,10 +139,10 @@ export default function SubscriptionTable({ initialItems, initialTotal, token }:
             </SelectContent>
           </Select>
 
-          <span className="text-xs text-muted-foreground hidden sm:inline">|</span>
+          <span className="text-xs text-navy-soft hidden sm:inline">|</span>
 
           <div className="flex items-center gap-1.5">
-            <CalendarDays className="h-3.5 w-3.5 text-muted-foreground" />
+            <CalendarDays className="h-3.5 w-3.5 text-navy-soft" />
             <Input
               type="date"
               value={dateFrom}
@@ -150,7 +150,7 @@ export default function SubscriptionTable({ initialItems, initialTotal, token }:
               className="h-8 w-full sm:w-[140px] text-xs px-2"
               placeholder={t('filterDateFrom')}
             />
-            <span className="text-xs text-muted-foreground">–</span>
+            <span className="text-xs text-navy-soft">–</span>
             <Input
               type="date"
               value={dateTo}
@@ -175,21 +175,21 @@ export default function SubscriptionTable({ initialItems, initialTotal, token }:
 
         {/* Table */}
         {loading ? (
-          <p className="text-sm text-muted-foreground py-8 text-center">{t('dialogLoading')}</p>
+          <p className="text-sm text-navy-soft py-8 text-center">{t('dialogLoading')}</p>
         ) : items.length === 0 ? (
-          <p className="text-sm text-muted-foreground py-8 text-center">{t('noResults')}</p>
+          <p className="text-sm text-navy-soft py-8 text-center">{t('noResults')}</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border text-left">
-                  <th className="py-2 pr-4 font-medium text-muted-foreground">{t('colUser')}</th>
-                  <th className="py-2 pr-4 font-medium text-muted-foreground">{t('colType')}</th>
-                  <th className="py-2 pr-4 font-medium text-muted-foreground">{t('colStatus')}</th>
-                  <th className="py-2 pr-4 font-medium text-muted-foreground">{t('colAmount')}</th>
-                  <th className="py-2 pr-4 font-medium text-muted-foreground">{t('colDate')}</th>
-                  <th className="py-2 pr-4 font-medium text-muted-foreground">{t('colRenewal')}</th>
-                  <th className="py-2 font-medium text-muted-foreground">{t('colActions')}</th>
+                  <th className="py-2 pr-4 font-medium text-navy-soft">{t('colUser')}</th>
+                  <th className="py-2 pr-4 font-medium text-navy-soft">{t('colType')}</th>
+                  <th className="py-2 pr-4 font-medium text-navy-soft">{t('colStatus')}</th>
+                  <th className="py-2 pr-4 font-medium text-navy-soft">{t('colAmount')}</th>
+                  <th className="py-2 pr-4 font-medium text-navy-soft">{t('colDate')}</th>
+                  <th className="py-2 pr-4 font-medium text-navy-soft">{t('colRenewal')}</th>
+                  <th className="py-2 font-medium text-navy-soft">{t('colActions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -198,16 +198,16 @@ export default function SubscriptionTable({ initialItems, initialTotal, token }:
                     <td className="py-3 pr-4">
                       <div className="font-medium truncate max-w-[200px]">{item.userEmail}</div>
                       {item.userName && (
-                        <div className="text-xs text-muted-foreground">{item.userName}</div>
+                        <div className="text-xs text-navy-soft">{item.userName}</div>
                       )}
                     </td>
                     <td className="py-3 pr-4">{productLabel(item.productType)}</td>
                     <td className="py-3 pr-4">{statusBadge(item.status)}</td>
                     <td className="py-3 pr-4 tabular-nums">{item.amount} zł</td>
-                    <td className="py-3 pr-4 tabular-nums text-muted-foreground">
+                    <td className="py-3 pr-4 tabular-nums text-navy-soft">
                       {new Date(item.createdAt).toLocaleDateString('pl-PL')}
                     </td>
-                    <td className="py-3 pr-4 tabular-nums text-muted-foreground">
+                    <td className="py-3 pr-4 tabular-nums text-navy-soft">
                       {item.currentPeriodEnd
                         ? new Date(item.currentPeriodEnd).toLocaleDateString('pl-PL')
                         : '—'}

@@ -146,7 +146,7 @@ function getActionSeverity(action: string): Severity {
 const SEVERITY_CLASSES: Record<Severity, string> = {
   critical: 'bg-red-100 text-red-700 border-red-200',
   warning: 'bg-amber-100 text-amber-700 border-amber-200',
-  normal: 'bg-muted text-foreground',
+  normal: 'bg-muted text-navy-deep',
 };
 
 // ── Grouped actions for dropdown ──────────────────────────────────────────
@@ -336,7 +336,7 @@ export function AuditLogTable({
       <div className="flex flex-col gap-3">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-navy-soft" />
             <Input
               value={search}
               onChange={(e) => handleSearchChange(e.target.value)}
@@ -353,7 +353,7 @@ export function AuditLogTable({
               <SelectItem value="__all__">{t('filterAll')}</SelectItem>
               {ACTION_GROUPS.map((group) => (
                 <div key={group.label}>
-                  <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">{group.label}</div>
+                  <div className="px-2 py-1.5 text-xs font-semibold text-navy-soft">{group.label}</div>
                   {group.actions.map((a) => (
                     <SelectItem key={a} value={a} className="pl-4 text-xs">
                       {ACTION_LABELS[a] ?? a}
@@ -382,7 +382,7 @@ export function AuditLogTable({
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
           <div className="flex gap-2 flex-1">
             <div className="flex-1">
-              <label className="text-xs text-muted-foreground mb-1 block">{t('filterDateFrom')}</label>
+              <label className="text-xs text-navy-soft mb-1 block">{t('filterDateFrom')}</label>
               <Input
                 type="date"
                 value={dateFrom}
@@ -391,7 +391,7 @@ export function AuditLogTable({
               />
             </div>
             <div className="flex-1">
-              <label className="text-xs text-muted-foreground mb-1 block">{t('filterDateTo')}</label>
+              <label className="text-xs text-navy-soft mb-1 block">{t('filterDateTo')}</label>
               <Input
                 type="date"
                 value={dateTo}
@@ -427,19 +427,19 @@ export function AuditLogTable({
         <table className="w-full text-sm">
           <thead className="border-b border-border bg-muted/40">
             <tr>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">
+              <th className="px-4 py-3 text-left font-medium text-navy-soft whitespace-nowrap">
                 {t('colTimestamp')}
               </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+              <th className="px-4 py-3 text-left font-medium text-navy-soft">
                 {t('colUser')}
               </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">
+              <th className="px-4 py-3 text-left font-medium text-navy-soft whitespace-nowrap">
                 {t('colAction')}
               </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden md:table-cell whitespace-nowrap">
+              <th className="px-4 py-3 text-left font-medium text-navy-soft hidden md:table-cell whitespace-nowrap">
                 {t('colResourceType')}
               </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden lg:table-cell">
+              <th className="px-4 py-3 text-left font-medium text-navy-soft hidden lg:table-cell">
                 {t('colIp')}
               </th>
             </tr>
@@ -447,7 +447,7 @@ export function AuditLogTable({
           <tbody className="divide-y divide-border">
             {logs.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                <td colSpan={5} className="px-4 py-8 text-center text-navy-soft">
                   {t('empty')}
                 </td>
               </tr>
@@ -460,11 +460,11 @@ export function AuditLogTable({
                   className="transition-colors hover:bg-muted/30 cursor-pointer"
                   onClick={() => setDetailLog(log)}
                 >
-                  <td className="px-4 py-3 text-muted-foreground whitespace-nowrap text-xs">
+                  <td className="px-4 py-3 text-navy-soft whitespace-nowrap text-xs">
                     {new Date(log.createdAt).toLocaleString('pl-PL')}
                   </td>
                   <td className="px-4 py-3 max-w-[160px] truncate">
-                    {log.user?.email ?? <span className="text-muted-foreground">{t('noUser')}</span>}
+                    {log.user?.email ?? <span className="text-navy-soft">{t('noUser')}</span>}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <Badge
@@ -475,10 +475,10 @@ export function AuditLogTable({
                       {actionLabel(log.action)}
                     </Badge>
                   </td>
-                  <td className="px-4 py-3 text-muted-foreground hidden md:table-cell text-xs">
+                  <td className="px-4 py-3 text-navy-soft hidden md:table-cell text-xs">
                     {log.resourceType ? resourceLabel(log.resourceType) : '—'}
                   </td>
-                  <td className="px-4 py-3 text-muted-foreground hidden lg:table-cell text-xs">
+                  <td className="px-4 py-3 text-navy-soft hidden lg:table-cell text-xs">
                     {log.ip ?? '—'}
                   </td>
                 </tr>
@@ -489,7 +489,7 @@ export function AuditLogTable({
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
+      <div className="flex items-center justify-between text-sm text-navy-soft">
         <span>
           {t('paginationInfo', {
             from: total === 0 ? 0 : Math.min((page - 1) * limit + 1, total),
@@ -527,7 +527,7 @@ export function AuditLogTable({
       </div>
 
       {/* Total count (51.10) */}
-      <div className="text-xs text-muted-foreground text-center py-1">
+      <div className="text-xs text-navy-soft text-center py-1">
         {t('totalCount', { count: total })}
       </div>
 
@@ -547,7 +547,7 @@ export function AuditLogTable({
                   <Badge variant="outline" className={cn('text-xs', SEVERITY_CLASSES[getActionSeverity(detailLog.action)])}>
                     {actionLabel(detailLog.action)}
                   </Badge>
-                  <span className="ml-2 text-xs text-muted-foreground font-mono">{detailLog.action}</span>
+                  <span className="ml-2 text-xs text-navy-soft font-mono">{detailLog.action}</span>
                 </DetailRow>
                 <DetailRow label={t('colResourceType')} value={detailLog.resourceType ? resourceLabel(detailLog.resourceType) : '—'} />
                 <DetailRow label="Resource ID" value={detailLog.resourceId ?? '—'} />
@@ -584,7 +584,7 @@ export function AuditLogTable({
 function DetailRow({ label, value, children }: { label: string; value?: string; children?: React.ReactNode }) {
   return (
     <div className="flex justify-between gap-4">
-      <span className="text-muted-foreground shrink-0">{label}</span>
+      <span className="text-navy-soft shrink-0">{label}</span>
       {children ?? <span className="font-medium text-right break-all">{value}</span>}
     </div>
   );

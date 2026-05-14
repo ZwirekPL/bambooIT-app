@@ -134,7 +134,7 @@ function UserDetailDialog({
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between gap-4">
-      <span className="text-muted-foreground shrink-0">{label}</span>
+      <span className="text-navy-soft shrink-0">{label}</span>
       <span className="font-medium text-right break-all">{value}</span>
     </div>
   );
@@ -364,7 +364,7 @@ function CreateUserDialog({
               <button
                 type="button"
                 onClick={() => setShowPassword(v => !v)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-navy-soft hover:text-navy-deep"
                 tabIndex={-1}
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -385,7 +385,7 @@ function CreateUserDialog({
               <button
                 type="button"
                 onClick={() => setShowPassword(v => !v)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-navy-soft hover:text-navy-deep"
                 tabIndex={-1}
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -814,7 +814,7 @@ export function UsersTable({
       {/* Search + role filter + add button */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-navy-soft" />
           <Input
             value={search}
             onChange={(e) => handleSearchChange(e.target.value)}
@@ -875,10 +875,10 @@ export function UsersTable({
           {t('filterInactive3Months')}
         </Button>
 
-        <span className="text-xs text-muted-foreground hidden sm:inline">|</span>
+        <span className="text-xs text-navy-soft hidden sm:inline">|</span>
 
         <div className="flex items-center gap-1.5">
-          <CalendarDays className="h-3.5 w-3.5 text-muted-foreground" />
+          <CalendarDays className="h-3.5 w-3.5 text-navy-soft" />
           <Input
             type="date"
             value={createdFrom}
@@ -886,7 +886,7 @@ export function UsersTable({
             className="h-8 w-[140px] text-xs px-2"
             placeholder={t('dateFrom')}
           />
-          <span className="text-xs text-muted-foreground">–</span>
+          <span className="text-xs text-navy-soft">–</span>
           <Input
             type="date"
             value={createdTo}
@@ -906,7 +906,7 @@ export function UsersTable({
           )}
         </div>
 
-        <span className="text-xs text-muted-foreground hidden sm:inline">|</span>
+        <span className="text-xs text-navy-soft hidden sm:inline">|</span>
 
         <Select value={subStatusFilter || '__all__'} onValueChange={(v) => handleSubStatusFilter(v === '__all__' ? '' : v)}>
           <SelectTrigger className="h-8 w-[160px] text-xs">
@@ -955,32 +955,32 @@ export function UsersTable({
                   className="rounded"
                 />
               </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                <button onClick={() => handleSort('email')} className="inline-flex items-center gap-1 hover:text-foreground transition-colors">
+              <th className="px-4 py-3 text-left font-medium text-navy-soft">
+                <button onClick={() => handleSort('email')} className="inline-flex items-center gap-1 hover:text-navy-deep transition-colors">
                   {t('colEmail')}
                   {sortBy === 'email' ? (sortOrder === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3 opacity-40" />}
                 </button>
               </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                <button onClick={() => handleSort('role')} className="inline-flex items-center gap-1 hover:text-foreground transition-colors">
+              <th className="px-4 py-3 text-left font-medium text-navy-soft">
+                <button onClick={() => handleSort('role')} className="inline-flex items-center gap-1 hover:text-navy-deep transition-colors">
                   {t('colRole')}
                   {sortBy === 'role' ? (sortOrder === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3 opacity-40" />}
                 </button>
               </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden sm:table-cell">
+              <th className="px-4 py-3 text-left font-medium text-navy-soft hidden sm:table-cell">
                 {t('colStatus')}
               </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden md:table-cell">
+              <th className="px-4 py-3 text-left font-medium text-navy-soft hidden md:table-cell">
                 {t('colSubscription')}
               </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden md:table-cell">
-                <button onClick={() => handleSort('lastLoginAt')} className="inline-flex items-center gap-1 hover:text-foreground transition-colors">
+              <th className="px-4 py-3 text-left font-medium text-navy-soft hidden md:table-cell">
+                <button onClick={() => handleSort('lastLoginAt')} className="inline-flex items-center gap-1 hover:text-navy-deep transition-colors">
                   {t('colLastLogin')}
                   {sortBy === 'lastLoginAt' ? (sortOrder === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3 opacity-40" />}
                 </button>
               </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden lg:table-cell">
-                <button onClick={() => handleSort('createdAt')} className="inline-flex items-center gap-1 hover:text-foreground transition-colors">
+              <th className="px-4 py-3 text-left font-medium text-navy-soft hidden lg:table-cell">
+                <button onClick={() => handleSort('createdAt')} className="inline-flex items-center gap-1 hover:text-navy-deep transition-colors">
                   {t('colCreated')}
                   {sortBy === 'createdAt' ? (sortOrder === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3 opacity-40" />}
                 </button>
@@ -991,7 +991,7 @@ export function UsersTable({
           <tbody className="divide-y divide-border">
             {users.length === 0 && (
               <tr>
-                <td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">
+                <td colSpan={8} className="px-4 py-8 text-center text-navy-soft">
                   {t('empty')}
                 </td>
               </tr>
@@ -1017,7 +1017,7 @@ export function UsersTable({
                 <td className="px-4 py-3 font-medium max-w-[200px] truncate">
                   {user.email}
                   {user.id === currentUserId && (
-                    <span className="ml-2 text-xs text-muted-foreground">({t('you')})</span>
+                    <span className="ml-2 text-xs text-navy-soft">({t('you')})</span>
                   )}
                 </td>
                 <td className="px-4 py-3">
@@ -1046,7 +1046,7 @@ export function UsersTable({
                 <td className="px-4 py-3 hidden md:table-cell">
                   {(() => {
                     const s = user.subscriptionStatus;
-                    if (!s || s === 'NONE') return <span className="text-xs text-muted-foreground">—</span>;
+                    if (!s || s === 'NONE') return <span className="text-xs text-navy-soft">—</span>;
                     const badgeClasses: Record<string, string> = {
                       ACTIVE: 'bg-green-100 text-green-700 border-green-200',
                       TRIALING: 'bg-blue-100 text-blue-700 border-blue-200',
@@ -1066,12 +1066,12 @@ export function UsersTable({
                     );
                   })()}
                 </td>
-                <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">
+                <td className="px-4 py-3 text-navy-soft hidden md:table-cell">
                   {user.lastLoginAt
                     ? new Date(user.lastLoginAt).toLocaleDateString('pl-PL')
                     : <span className="text-xs italic">{t('neverLoggedIn')}</span>}
                 </td>
-                <td className="px-4 py-3 text-muted-foreground hidden lg:table-cell">
+                <td className="px-4 py-3 text-navy-soft hidden lg:table-cell">
                   {new Date(user.createdAt).toLocaleDateString('pl-PL')}
                 </td>
                 <td className="px-4 py-3 text-right">
@@ -1147,7 +1147,7 @@ export function UsersTable({
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
+      <div className="flex items-center justify-between text-sm text-navy-soft">
         <span>
           {t('paginationInfo', { from: Math.min((page - 1) * limit + 1, total), to: Math.min(page * limit, total), total })}
         </span>
@@ -1177,7 +1177,7 @@ export function UsersTable({
       </div>
 
       {/* Total count */}
-      <div className="text-xs text-muted-foreground text-center py-1">
+      <div className="text-xs text-navy-soft text-center py-1">
         {t('totalCount', { count: total })}
       </div>
 
@@ -1282,14 +1282,14 @@ export function UsersTable({
           <SheetHeader>
             <SheetTitle>{t('historyTitle')}</SheetTitle>
             {historyUser && (
-              <p className="text-sm text-muted-foreground break-all">{historyUser.email}</p>
+              <p className="text-sm text-navy-soft break-all">{historyUser.email}</p>
             )}
           </SheetHeader>
           <div className="mt-4 px-1 space-y-1">
             {historyLoading ? (
-              <p className="text-sm text-muted-foreground py-8 text-center">{t('loading')}</p>
+              <p className="text-sm text-navy-soft py-8 text-center">{t('loading')}</p>
             ) : historyLogs.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-8 text-center">{t('historyEmpty')}</p>
+              <p className="text-sm text-navy-soft py-8 text-center">{t('historyEmpty')}</p>
             ) : (
               historyLogs.map((log) => {
                 const severity = getActionSeverity(log.action);
@@ -1303,16 +1303,16 @@ export function UsersTable({
                       </div>
                       <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                         {log.resourceType && (
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-xs text-navy-soft">
                             {resourceLabel(log.resourceType)}
                             {log.resourceId ? ` · ${log.resourceId.slice(0, 8)}…` : ''}
                           </span>
                         )}
                         {log.ip && (
-                          <span className="text-xs text-muted-foreground/60">IP: {log.ip}</span>
+                          <span className="text-xs text-navy-soft/60">IP: {log.ip}</span>
                         )}
                       </div>
-                      <p className="text-xs text-muted-foreground/70 mt-1 tabular-nums">
+                      <p className="text-xs text-navy-soft/70 mt-1 tabular-nums">
                         {formatActivityDate(log.createdAt)}
                       </p>
                     </div>
