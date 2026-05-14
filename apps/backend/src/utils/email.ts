@@ -117,19 +117,67 @@ function smtpConfigured(): boolean {
   );
 }
 
+function resendConfigured(): boolean {
+  return Boolean(process.env.RESEND_API_KEY);
+}
+
+/**
+ * Resend transport — direct REST call (no SDK dependency). Same payload
+ * shape as nodemailer; chosen when RESEND_API_KEY is set.
+ *
+ * Resend free tier: 3000 emails/month, 100/day. Paid: 50000/month.
+ */
+async function sendViaResend(opts: {
+  from: string;
+  to: string;
+  subject: string;
+  text: string;
+  html: string;
+}): Promise<void> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) throw new Error('RESEND_API_KEY not set');
+
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(opts),
+  });
+
+  if (!res.ok) {
+    const errorBody = await res.text().catch(() => '<no body>');
+    throw new Error(`Resend API ${res.status}: ${errorBody}`);
+  }
+}
+
+/**
+ * Unified send() — picks transport based on env. Priority:
+ *   1. Resend (if RESEND_API_KEY set) — preferred for production
+ *   2. nodemailer/SMTP (if SMTP_HOST + creds set) — dev (Mailtrap) or
+ *      legacy prod
+ *   3. No-op + log + skip (dev without any provider)
+ *
+ * Failures are thrown — callers (leadNotifications, subscription welcome,
+ * etc.) wrap in try/catch + Sentry so DB writes aren't blocked.
+ */
 async function send(to: string, subject: string, text: string, html: string): Promise<void> {
-  if (!smtpConfigured()) {
-    console.warn(`[email] SMTP not configured — skipping send to ${to} (subject: ${subject})`);
+  const from = process.env.RESEND_FROM_EMAIL ?? process.env.SMTP_FROM ?? `${BRAND_NAME} <${SUPPORT_EMAIL}>`;
+
+  if (resendConfigured()) {
+    return sendViaResend({ from, to, subject, text, html });
+  }
+
+  if (smtpConfigured()) {
+    const transporter = createTransporter();
+    await transporter.sendMail({ from, to, subject, text, html });
     return;
   }
-  const transporter = createTransporter();
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM ?? `${BRAND_NAME} <${SUPPORT_EMAIL}>`,
-    to,
-    subject,
-    text,
-    html,
-  });
+
+  console.warn(
+    `[email] Neither RESEND_API_KEY nor SMTP_* configured — skipping send to ${to} (subject: ${subject})`,
+  );
 }
 
 // ─── Password reset ───────────────────────────────────────────────────────────
