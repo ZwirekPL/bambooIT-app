@@ -89,13 +89,16 @@ export default async function LocaleLayout({ children, params }: Props) {
       className={`${fraunces.variable} ${archivo.variable} ${jetbrainsMono.variable} ${GeistSans.variable} ${GeistMono.variable}`}
     >
       <body>
+        <a href="#main" className="skip-link">
+          Przejdź do głównej treści
+        </a>
         <BambooLoader />
         <GoogleAnalytics />
         <GeoTracker />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <Providers>
             <Header />
-            <main>{children}</main>
+            <main id="main">{children}</main>
             <Footer />
             <CookieBanner />
           </Providers>

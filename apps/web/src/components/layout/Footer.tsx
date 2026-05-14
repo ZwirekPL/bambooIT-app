@@ -15,7 +15,7 @@ export function Footer() {
             © {year} {BRAND.name} Sp. z o.o. — {t('tagline')}
           </p>
           <nav className="flex flex-wrap items-center gap-x-3 gap-y-2" aria-label="Legal navigation">
-            <span className="text-white/40">NIP {BRAND.nip}</span>
+            <span className="text-white/60">NIP {BRAND.nip}</span>
             <span aria-hidden="true" className="text-white/20">·</span>
             <Link href="/o-nas" className="text-white/60 hover:text-bamboo transition-colors">
               {t('aboutUs')}

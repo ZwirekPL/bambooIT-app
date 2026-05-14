@@ -276,7 +276,7 @@ function TextareaField({
         name={name}
         placeholder={placeholder}
         rows={3}
-        className="resize-y border-b border-white/20 bg-transparent py-3 text-base text-white placeholder:text-white/30 outline-none transition-colors focus:border-bamboo"
+        className="resize-y border-b border-white/20 bg-transparent py-3 text-base text-white placeholder:text-white/50 outline-none transition-colors focus:border-bamboo"
       />
     </div>
   );

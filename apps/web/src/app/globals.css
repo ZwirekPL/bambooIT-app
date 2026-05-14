@@ -2,6 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── A11y: keyboard focus indicators ─────────────────────────────────────
+   Every interactive element gets a visible focus ring when reached by
+   keyboard (Tab/Shift+Tab). Bamboo-deep ring sits against any background
+   (paper, white, navy-deep). Mouse clicks don't trigger this — only
+   keyboard navigation. */
+:focus-visible {
+  outline: 2px solid #7A9B2E; /* bamboo-deep */
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Inside dark surfaces (navy hero / footer / audit section) the bamboo
+   stays readable, but bump to a lighter ring for higher contrast. */
+.bg-navy-deep :focus-visible,
+.bg-navy :focus-visible {
+  outline-color: #A0B838; /* bamboo (lighter) */
+}
+
+/* Skip-link helper — visible only on focus. Place a target #main on
+   page layouts and the link in Header. */
+.skip-link {
+  position: absolute;
+  left: -10000px;
+  top: 1rem;
+  z-index: 100;
+  background: #1F2A44; /* navy-deep */
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  left: 1rem;
+}
+
 @layer base {
   :root {
     /* Base surfaces */
