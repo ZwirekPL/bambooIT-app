@@ -167,6 +167,7 @@
     },
     "pricing": {
       "badge": "Najpopularniejszy",
+      "secondaryAuditCta": "Pomocy wybrać? Zacznij od audytu →",
       "cards": {
         "start": {
           "label": "Dla startujących",

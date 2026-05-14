@@ -269,7 +269,7 @@ function TierCardContent({
       </ul>
 
       <Link
-        href="/audyt"
+        href={`/zamow?plan=${TIER_TO_PLAN[tier.id]}`}
         className={
           isFeatured
             ? 'rounded-full bg-bamboo px-6 py-3.5 text-center text-sm font-semibold text-navy-deep transition-colors hover:bg-white'
@@ -278,6 +278,23 @@ function TierCardContent({
       >
         {t(`cards.${tier.id}.cta`)}
       </Link>
+
+      <Link
+        href="/audyt"
+        className={
+          isFeatured
+            ? 'mt-3 text-center font-mono text-[11px] uppercase tracking-[0.15em] text-bamboo underline-offset-4 transition-colors hover:underline'
+            : 'mt-3 text-center font-mono text-[11px] uppercase tracking-[0.15em] text-bamboo-deep underline-offset-4 transition-colors hover:underline'
+        }
+      >
+        {t('secondaryAuditCta')}
+      </Link>
     </article>
   );
 }
+
+const TIER_TO_PLAN: Record<TierId, 'START' | 'FIRMA' | 'FIRMA_PLUS'> = {
+  start: 'START',
+  firma: 'FIRMA',
+  firmaPlus: 'FIRMA_PLUS',
+};
