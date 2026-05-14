@@ -241,7 +241,7 @@ export const api = {
   checkout: {
     createSession: (
       data: { productType: CheckoutProductType; referralCode?: string },
-      token: string
+      token?: string
     ) =>
       apiFetch<{ ok: boolean; url: string }>('/checkout/create-session', {
         method: 'POST',

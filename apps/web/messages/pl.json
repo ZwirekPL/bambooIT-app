@@ -1202,7 +1202,7 @@
     "idleLogoutNotice": "Zostałeś wylogowany z powodu braku aktywności. Zaloguj się ponownie."
   },
   "order": {
-    "title": "Podsumowanie zamówienia",
+    "title": "Składanie zamówienia",
     "subtitle": "Potwierdź plan i przejdź do wywiadu",
     "product": "Wybrany plan",
     "ctaButton": "Kup i przejdź do wywiadu",
@@ -1211,6 +1211,12 @@
     "loginRequired": "Musisz być zalogowany, aby złożyć zamówienie.",
     "loginCta": "Zaloguj się",
     "errorGeneral": "Wystąpił błąd podczas składania zamówienia. Spróbuj ponownie.",
+    "errorGeneric": "Coś poszło nie tak. Spróbuj ponownie za chwilę.",
+    "errorInvalidPlan": "Nieprawidłowy pakiet w linku. Wybierz pakiet z listy.",
+    "errorTitle": "Nie udało się rozpocząć płatności",
+    "backToPricing": "Wróć do pakietów",
+    "redirectingTitle": "Przekierowujemy do płatności...",
+    "redirectingMessage": "Za chwilę otworzy się bezpieczna strona Stripe.",
     "consentTrial": "Rozumiem i wyrażam zgodę, że po zakończeniu 7-dniowego bezpłatnego okresu próbnego moja karta zostanie obciążona kwotą {price} zł/mies., a subskrypcja będzie automatycznie odnawiana co miesiąc do momentu jej anulowania.",
     "consentSubscription": "Wyrażam zgodę na automatyczne odnawianie subskrypcji w każdym okresie rozliczeniowym do momentu jej anulowania.",
     "consentCancelInfo": "Możesz anulować subskrypcję w dowolnym momencie z poziomu swojego panelu. Anulowanie w trakcie okresu próbnego oznacza brak obciążenia.",
