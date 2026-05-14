@@ -6,6 +6,7 @@ import { uploadBlogImage } from '../controllers/upload.controller';
 import * as stripeAdminController from '../controllers/stripeAdmin.controller';
 import * as accountingController from '../controllers/accounting.controller';
 import * as featureFlagController from '../controllers/featureFlag.controller';
+import * as leadsAdminController from '../controllers/leads-admin.controller';
 import { prisma } from '@db';
 import { logAudit } from '../services/audit.service';
 
@@ -92,6 +93,15 @@ adminRouter.delete('/stripe/coupons/:id', stripeAdminController.deleteCoupon);
 // 54.6 — Subscriptions
 adminRouter.get('/subscriptions/stats', adminController.getSubscriptionStats);
 adminRouter.get('/subscriptions', adminController.listSubscriptions);
+
+// Leads (Faza 4 — BE-4 admin)
+adminRouter.get('/leads', leadsAdminController.list);
+adminRouter.get('/leads/stats', leadsAdminController.stats);
+adminRouter.get('/leads/export.csv', leadsAdminController.exportCsv);
+adminRouter.get('/leads/:id', leadsAdminController.getById);
+adminRouter.patch('/leads/:id/status', leadsAdminController.updateStatus);
+adminRouter.post('/leads/:id/notes', leadsAdminController.addNote);
+adminRouter.delete('/leads/:id/notes/:noteId', leadsAdminController.deleteNote);
 
 // 70 — Accounting
 adminRouter.get('/accounting/revenue', accountingController.getRevenue);
