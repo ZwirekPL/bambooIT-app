@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   motion,
   useReducedMotion,
@@ -10,6 +10,7 @@ import {
 } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
+import { LOADER_DURATION_MS, LOADER_FADE_MS } from '@/components/layout/BambooLoader';
 
 /**
  * Hero choreography (A2 + A3 + A4 from §5a):
@@ -112,36 +113,32 @@ function PandaMascot() {
         transition={{ duration: 0.5, delay: 1.33 }}
       />
 
-      {/* Head outline + facets — pathLength draw */}
-      {[
-        '160,135 200,115 240,135 270,180 260,240 200,290 140,240 130,180',
-      ].map((points, idx) => (
-        <motion.polygon
-          key={`outline-${idx}`}
-          points={points}
-          fill="none"
-          className="stroke-navy"
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          initial={{ pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{ duration: 1.6, delay: 0.7, ease: [0.4, 0, 0.2, 1] }}
-        />
-      ))}
+      {/* Head outline + facets — pathLength draw (path elements are the most
+          reliable framer-motion target for pathLength animation). */}
+      <motion.path
+        d="M160 135 L200 115 L240 135 L270 180 L260 240 L200 290 L140 240 L130 180 Z"
+        fill="none"
+        className="stroke-navy"
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 1.6, delay: 0.7, ease: [0.4, 0, 0.2, 1] }}
+      />
 
       {[
-        { x1: 200, y1: 115, x2: 200, y2: 290 },
-        { x1: 160, y1: 135, x2: 200, y2: 200 },
-        { x1: 240, y1: 135, x2: 200, y2: 200 },
-        { x1: 130, y1: 180, x2: 200, y2: 200 },
-        { x1: 270, y1: 180, x2: 200, y2: 200 },
-        { x1: 140, y1: 240, x2: 200, y2: 200 },
-        { x1: 260, y1: 240, x2: 200, y2: 200 },
-      ].map((line, idx) => (
-        <motion.line
-          key={`line-${idx}`}
-          {...line}
+        'M200 115 L200 290',
+        'M160 135 L200 200',
+        'M240 135 L200 200',
+        'M130 180 L200 200',
+        'M270 180 L200 200',
+        'M140 240 L200 200',
+        'M260 240 L200 200',
+      ].map((d, idx) => (
+        <motion.path
+          key={`facet-${idx}`}
+          d={d}
           fill="none"
           className="stroke-navy"
           strokeWidth={2}
@@ -255,7 +252,27 @@ function SplitChars({
   return (
     <span className={className}>
       {Array.from(text).map((char, idx) => (
-        <span key={idx} className="inline-block overflow-hidden">
+        // Padding + matching negative margin on all four sides:
+        //   - bottom: room for Polish descenders (j, ł, ą, ę) without clip
+        //   - left/right: room for italic Fraunces side bearings on j, k, r
+        //   - matching negative margins keep the laid-out width/height the
+        //     same so letter spacing and line-height (leading-[0.92]) stay
+        //     tight per design. The wrapper still clips the entrance mask
+        //     (motion.span y: 110% → 0%) because the clipped axis is the
+        //     vertical motion direction, and bottom is anchored at 0 of the
+        //     padding-extended bbox.
+        <span
+          key={idx}
+          className="inline-block overflow-hidden"
+          style={{
+            paddingBottom: '0.35em',
+            marginBottom: '-0.35em',
+            paddingLeft: '0.18em',
+            paddingRight: '0.18em',
+            marginLeft: '-0.18em',
+            marginRight: '-0.18em',
+          }}
+        >
           <motion.span
             variants={variants}
             transition={{ duration: TITLE_DURATION, ease: [0.2, 0, 0.2, 1] }}
@@ -275,6 +292,22 @@ export function HeroSection() {
   const shouldReduceMotion = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
 
+  // Defer panda mount until BambooLoader has faded out — otherwise the
+  // ~2.7s draw choreography (A3) plays out entirely behind the loader
+  // overlay and the user only sees the finished panda. 200ms buffer.
+  const [pandaMounted, setPandaMounted] = useState(false);
+  useEffect(() => {
+    if (shouldReduceMotion) {
+      setPandaMounted(true);
+      return;
+    }
+    const timer = setTimeout(
+      () => setPandaMounted(true),
+      LOADER_DURATION_MS + LOADER_FADE_MS - 200,
+    );
+    return () => clearTimeout(timer);
+  }, [shouldReduceMotion]);
+
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ['start start', 'end start'],
@@ -289,17 +322,26 @@ export function HeroSection() {
   return (
     <section
       ref={ref}
-      className="relative flex min-h-[88vh] flex-col justify-center overflow-hidden bg-paper px-5 pb-16 pt-20 md:px-12 md:pb-20 md:pt-24"
+      // min-h-screen guarantees the pricing card in the bottom row sits within
+      // the viewport on 1080p; trimmed vertical padding leaves room for the
+      // mascot above the bottom row without overlap.
+      className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-paper px-5 pb-10 pt-20 md:px-12 md:pb-14 md:pt-24"
     >
       <HeroGrid yShift={shouldReduceMotion ? undefined : gridY} />
 
-      {/* Panda mascot — hidden on mobile, dimmed on tablet, full on desktop */}
+      {/* Panda mascot — hidden on mobile, dimmed on tablet, full on desktop.
+          Mount is deferred until after BambooLoader finishes so the draw
+          choreography (A3, ~2.7s total) doesn't play out under the loader
+          overlay. */}
       <motion.div
         aria-hidden="true"
-        className="pointer-events-none absolute right-[-15%] top-1/2 z-0 hidden w-[60vw] -translate-y-1/2 opacity-20 md:block lg:right-[-2%] lg:w-[min(46vw,640px)] lg:opacity-100"
+        // top-[18%]: panda anchored to the upper portion of the hero so it
+        // sits clearly above the pricing card in the bottom row, with the
+        // mascot's upper half tucking close to the hero's top edge.
+        className="pointer-events-none absolute right-[-15%] top-[18%] z-0 hidden w-[50vw] -translate-y-1/2 opacity-20 md:block lg:right-[-2%] lg:w-[min(40vw,560px)] lg:opacity-100"
         style={shouldReduceMotion ? undefined : { y: pandaY }}
       >
-        <PandaMascot />
+        {pandaMounted && <PandaMascot />}
       </motion.div>
 
       <motion.div
@@ -321,7 +363,7 @@ export function HeroSection() {
 
         {/* 3-line title with char-by-char stagger */}
         <motion.h1
-          className="max-w-[14ch] font-display text-5xl font-light leading-[0.92] tracking-[-0.045em] text-navy sm:text-6xl md:text-7xl lg:text-8xl xl:text-[9rem]"
+          className="max-w-[14ch] font-display text-5xl font-light leading-[0.92] tracking-[-0.045em] text-navy sm:text-6xl md:text-7xl lg:text-[6.5rem] xl:text-[8rem]"
           initial="hidden"
           animate="visible"
           transition={{
@@ -336,7 +378,7 @@ export function HeroSection() {
 
         {/* Bottom row: lede + pricing card — fades up after title */}
         <motion.div
-          className="mt-12 grid grid-cols-1 items-end gap-8 md:mt-16 md:grid-cols-[1fr_auto] md:gap-12"
+          className="mt-8 grid grid-cols-1 items-end gap-8 md:mt-10 md:grid-cols-[1fr_auto] md:gap-12"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 2.1, ease: 'easeOut' }}

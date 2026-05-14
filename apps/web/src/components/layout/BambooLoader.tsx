@@ -14,7 +14,8 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
  * Uses Framer Motion (not GSAP) — simple enter/exit choreography, no
  * scroll trigger, idiomatic React fit.
  */
-const LOADER_DURATION_MS = 1800;
+export const LOADER_DURATION_MS = 1800;
+export const LOADER_FADE_MS = 800;
 const EASE_CUBIC = [0.7, 0, 0.2, 1] as const;
 
 export function BambooLoader() {
