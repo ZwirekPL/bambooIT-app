@@ -1,12 +1,13 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 const m = vi.hoisted(() => ({
-  user: { findMany: vi.fn(), delete: vi.fn() },
+  user: { findMany: vi.fn(), delete: vi.fn(), findUnique: vi.fn() },
   auditLog: { updateMany: vi.fn().mockResolvedValue({ count: 0 }) },
   tenant: { updateMany: vi.fn().mockResolvedValue({ count: 0 }) },
   company: { updateMany: vi.fn().mockResolvedValue({ count: 0 }) },
   supplementPrescription: { updateMany: vi.fn().mockResolvedValue({ count: 0 }) },
   nutritionProtocol: { updateMany: vi.fn().mockResolvedValue({ count: 0 }) },
+  lead: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
   logAudit: vi.fn(),
 }));
 
@@ -18,6 +19,7 @@ vi.mock('@db', () => ({
     company: m.company,
     supplementPrescription: m.supplementPrescription,
     nutritionProtocol: m.nutritionProtocol,
+    lead: m.lead,
     $transaction: async (fn: (tx: typeof prismaMock) => Promise<unknown>) => fn(prismaMock),
   },
 }));
@@ -33,6 +35,7 @@ const prismaMock = {
   company: m.company,
   supplementPrescription: m.supplementPrescription,
   nutritionProtocol: m.nutritionProtocol,
+  lead: m.lead,
 };
 
 import {
@@ -103,6 +106,8 @@ describe('hardDeleteUser', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     m.user.delete.mockResolvedValue({ id: 'u1' });
+    m.user.findUnique.mockResolvedValue({ email: 'a@x.pl' });
+    m.lead.deleteMany.mockResolvedValue({ count: 0 });
   });
 
   it('nulls all FK references before deleting the User', async () => {
@@ -115,12 +120,34 @@ describe('hardDeleteUser', () => {
     // Company.dietitianId nullification dropped in K7 (column removed entirely)
     expect(m.user.delete).toHaveBeenCalledWith({ where: { id: 'u1' } });
   });
+
+  it('deletes marketing Leads matching user email (RODO Art. 17)', async () => {
+    m.user.findUnique.mockResolvedValueOnce({ email: 'a@x.pl' });
+    m.lead.deleteMany.mockResolvedValueOnce({ count: 2 });
+
+    await hardDeleteUser('u1');
+
+    expect(m.lead.deleteMany).toHaveBeenCalledWith({
+      where: { email: 'a@x.pl' },
+    });
+  });
+
+  it('skips Lead cleanup when user is already gone (defensive)', async () => {
+    m.user.findUnique.mockResolvedValueOnce(null);
+
+    await hardDeleteUser('u1');
+
+    expect(m.lead.deleteMany).not.toHaveBeenCalled();
+    expect(m.user.delete).toHaveBeenCalledWith({ where: { id: 'u1' } });
+  });
 });
 
 describe('runUserCleanupJob', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     m.user.delete.mockResolvedValue({ id: 'u1' });
+    m.user.findUnique.mockResolvedValue({ email: 'a@x.pl' });
+    m.lead.deleteMany.mockResolvedValue({ count: 0 });
   });
 
   it('returns empty report when nothing to delete', async () => {

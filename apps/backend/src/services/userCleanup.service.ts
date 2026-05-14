@@ -37,10 +37,21 @@ export async function findExpiredSoftDeletedUsers(now: Date = new Date()) {
  * Hard-delete a single User. Nulls FK references first so Postgres does not
  * reject the delete. All writes happen in one transaction — partial state is
  * impossible.
+ *
+ * Also deletes Lead rows matching this user's email — Lead has no FK to User
+ * (anonymous at submission), but it carries the same person's PII. RODO
+ * Art. 17 right to erasure covers it.
  */
 export async function hardDeleteUser(userId: string): Promise<void> {
   await prisma.$transaction(async (tx) => {
+    const user = await tx.user.findUnique({
+      where: { id: userId },
+      select: { email: true },
+    });
     await tx.auditLog.updateMany({ where: { userId }, data: { userId: null } });
+    if (user) {
+      await tx.lead.deleteMany({ where: { email: user.email } });
+    }
     await tx.user.delete({ where: { id: userId } });
   });
 }

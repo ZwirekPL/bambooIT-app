@@ -52,6 +52,18 @@ interface UserDataExport {
     status: string;
     currentPeriodEnd: string | null;
   } | null;
+  leads: Array<{
+    id: string;
+    type: string;
+    status: string;
+    company: string | null;
+    phone: string | null;
+    industry: string | null;
+    sizeRange: string | null;
+    description: string;
+    source: string | null;
+    createdAt: string;
+  }>;
   auditLog: Array<{
     action: string;
     createdAt: string;
@@ -73,7 +85,7 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
   }
 
   // Fetch all related data in parallel
-  const [company, consents, subscription, auditLogs] = await Promise.all([
+  const [company, consents, subscription, auditLogs, leads] = await Promise.all([
     prisma.company.findUnique({ where: { userId } }),
     prisma.userConsent.findMany({
       where: { userId },
@@ -88,6 +100,24 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
         action: true,
         createdAt: true,
         ip: true,
+      },
+    }),
+    // Marketing-site leads matched by email — Lead has no FK to User (anonymous
+    // at submission), so cross-system PII for the same person is joined here.
+    prisma.lead.findMany({
+      where: { email: user.email },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        type: true,
+        status: true,
+        company: true,
+        phone: true,
+        industry: true,
+        sizeRange: true,
+        description: true,
+        source: true,
+        createdAt: true,
       },
     }),
   ]);
@@ -153,6 +183,18 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
           currentPeriodEnd: subscription.currentPeriodEnd?.toISOString() ?? null,
         }
       : null,
+    leads: leads.map((l) => ({
+      id: l.id,
+      type: l.type,
+      status: l.status,
+      company: l.company,
+      phone: l.phone,
+      industry: l.industry,
+      sizeRange: l.sizeRange,
+      description: l.description,
+      source: l.source,
+      createdAt: l.createdAt.toISOString(),
+    })),
     auditLog: auditLogs.map((a) => ({
       action: a.action,
       createdAt: a.createdAt.toISOString(),
