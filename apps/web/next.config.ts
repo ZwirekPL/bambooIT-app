@@ -10,17 +10,23 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: path.join(__dirname, '../../'),
   images: {
     remotePatterns: [
-      // Production server (e-dietetyk.com)
+      // Production server (bambooIT)
       {
         protocol: 'https',
-        hostname: 'e-dietetyk.com',
+        hostname: 'bambooit.pl',
         pathname: '/uploads/**',
       },
-      // Local dev backend
+      // Local dev backend (e-dietetyk port 4000 + bambooIT port 4001)
       {
         protocol: 'http',
         hostname: 'localhost',
         port: '4000',
+        pathname: '/uploads/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '4001',
         pathname: '/uploads/**',
       },
     ],
