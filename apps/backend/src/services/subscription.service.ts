@@ -1,7 +1,82 @@
 import { prisma } from '@db';
 import { AppError } from '../utils/errors';
 import { isStripeConfigured, createCheckoutSession, createPortalSession } from './stripe.service';
+import { sendSubscriptionWelcomeEmail, sendPaymentFailedEmail } from '../utils/email';
+import * as Sentry from '@sentry/node';
 import type { SubscriptionPlan } from '@prisma/client';
+
+const PLAN_LABELS: Record<SubscriptionPlan, string> = {
+  START: 'Pakiet Start',
+  FIRMA: 'Pakiet Firma',
+  FIRMA_PLUS: 'Pakiet Firma Plus',
+};
+
+const PLAN_PRICES_NET: Record<SubscriptionPlan, number> = {
+  START: 390,
+  FIRMA: 690,
+  FIRMA_PLUS: 1190,
+};
+
+// "First invoice" detection window — if invoice period starts within
+// FIRST_INVOICE_WINDOW_MS of Subscription.createdAt, treat it as the
+// inaugural invoice and send the welcome email.
+const FIRST_INVOICE_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+async function notifyWelcomeIfFirstInvoice(
+  subscriptionId: string,
+  periodStart: Date | undefined,
+): Promise<void> {
+  const sub = await prisma.subscription.findUnique({
+    where: { stripeSubscriptionId: subscriptionId },
+    include: { user: { select: { email: true } } },
+  });
+  if (!sub || !sub.user?.email) return;
+
+  const start = periodStart ?? sub.currentPeriodStart;
+  if (!start) return;
+
+  const elapsed = Math.abs(start.getTime() - sub.createdAt.getTime());
+  if (elapsed > FIRST_INVOICE_WINDOW_MS) return;
+
+  const locale = 'pl';
+  const appUrl = process.env.APP_URL ?? 'http://localhost:3000';
+
+  try {
+    await sendSubscriptionWelcomeEmail(sub.user.email, {
+      productLabel: PLAN_LABELS[sub.plan],
+      amountPerMonth: PLAN_PRICES_NET[sub.plan],
+      panelUrl: `${appUrl}/${locale}/panel/subskrypcja`,
+      remoteHelpUrl: `${appUrl}/${locale}/pomoc-zdalna`,
+    });
+  } catch (err) {
+    console.error('[subscription] welcome email failed:', err);
+    Sentry.captureException(err, { tags: { stripeSubscriptionId: subscriptionId } });
+  }
+}
+
+async function notifyPaymentFailed(subscriptionId: string): Promise<void> {
+  const sub = await prisma.subscription.findUnique({
+    where: { stripeSubscriptionId: subscriptionId },
+    include: { user: { select: { email: true } } },
+  });
+  if (!sub || !sub.user?.email || !sub.stripeCustomerId) return;
+
+  const appUrl = process.env.APP_URL ?? 'http://localhost:3000';
+
+  try {
+    const portal = await createPortalSession({
+      stripeCustomerId: sub.stripeCustomerId,
+      returnUrl: `${appUrl}/pl/panel/subskrypcja`,
+    });
+    await sendPaymentFailedEmail(sub.user.email, {
+      productLabel: PLAN_LABELS[sub.plan],
+      portalUrl: portal,
+    });
+  } catch (err) {
+    console.error('[subscription] payment-failed email failed:', err);
+    Sentry.captureException(err, { tags: { stripeSubscriptionId: subscriptionId } });
+  }
+}
 
 const APP_URL = process.env.APP_URL ?? 'http://localhost:3000';
 const DEFAULT_LOCALE = 'pl';
@@ -175,6 +250,10 @@ export async function handleInvoicePaid(invoice: {
       ...(periodEnd ? { currentPeriodEnd: periodEnd } : {}),
     },
   });
+
+  // Send welcome email on the inaugural invoice only. Detection: period
+  // start within 1h of Subscription.createdAt. Subsequent renewals skip.
+  await notifyWelcomeIfFirstInvoice(invoice.subscription, periodStart);
 }
 
 export async function handleSubscriptionDeleted(stripeSubscriptionId: string) {
@@ -245,4 +324,6 @@ export async function handleInvoicePaymentFailed(invoice: {
     where: { stripeSubscriptionId: invoice.subscription },
     data: { status: 'PAST_DUE' },
   });
+
+  await notifyPaymentFailed(invoice.subscription);
 }
