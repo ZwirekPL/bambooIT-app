@@ -10,6 +10,7 @@ import {
 } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
+import { useMediaQuery, breakpoints } from '@/hooks/useMediaQuery';
 
 type TierId = 'start' | 'firma' | 'firmaPlus';
 
@@ -43,14 +44,16 @@ const TIERS: TierConfig[] = [
 export function PricingTiersSection() {
   const t = useTranslations('home.pricing');
   const shouldReduceMotion = useReducedMotion();
-  const outerRef = useRef<HTMLDivElement>(null);
+  // 3D scatter assembly only renders at md+: at mobile width the initial
+  // x: ±300 positions push tier cards outside the viewport and the
+  // grid-cols-1 stack makes the choreography unreadable. Below md we
+  // render the same static grid as reduced-motion users see. The animated
+  // variant is split into <AnimatedPricingTiers /> so its `useScroll` hook
+  // is never invoked on mobile (avoiding the "Target ref defined but not
+  // hydrated" warning from framer-motion).
+  const isDesktop = useMediaQuery(breakpoints.md);
 
-  const { scrollYProgress } = useScroll({
-    target: outerRef,
-    offset: ['start start', 'end end'],
-  });
-
-  if (shouldReduceMotion) {
+  if (shouldReduceMotion || !isDesktop) {
     return (
       <section
         id="pricing"
@@ -64,6 +67,21 @@ export function PricingTiersSection() {
       </section>
     );
   }
+
+  return <AnimatedPricingTiers t={t} />;
+}
+
+function AnimatedPricingTiers({
+  t,
+}: {
+  t: ReturnType<typeof useTranslations<'home.pricing'>>;
+}) {
+  const outerRef = useRef<HTMLDivElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: outerRef,
+    offset: ['start start', 'end end'],
+  });
 
   // Background drift x: -50% → +50% across full scroll
   const bgX = useTransform(scrollYProgress, [0, 1], ['-50%', '50%']);
@@ -117,30 +135,34 @@ function AnimatedTierCard({
 }) {
   const { initial } = tier;
 
-  // Phase 1 assembly (0 → 0.6): animate from initial scattered position to rest.
-  const x = useTransform(progress, [0, 0.6], [initial.x, 0]);
-  const z = useTransform(progress, [0, 0.6], [initial.z, 0]);
-  const rotateY = useTransform(progress, [0, 0.6], [initial.rotY, 0]);
-  const rotateZ = useTransform(progress, [0, 0.6], [initial.rotZ, 0]);
-  const rotateX = useTransform(progress, [0, 0.6], [initial.rotX ?? 0, 0]);
-  const opacity = useTransform(progress, [0, 0.6], [0, 1]);
+  // Phase 1 assembly (0 → 0.35): animate from initial scattered position to
+  // rest. Shortened from 0.6 so cards reach full opacity within the first
+  // third of the pinned scroll — leaves the remaining ~⅔ for the featured
+  // emphasis and a quiet hold so users actually read the prices at full
+  // saturation before the section unpins.
+  const ASSEMBLY_END = 0.7;
+  const x = useTransform(progress, [0, ASSEMBLY_END], [initial.x, 0]);
+  const z = useTransform(progress, [0, ASSEMBLY_END], [initial.z, 0]);
+  const rotateY = useTransform(progress, [0, ASSEMBLY_END], [initial.rotY, 0]);
+  const rotateZ = useTransform(progress, [0, ASSEMBLY_END], [initial.rotZ, 0]);
+  const rotateX = useTransform(progress, [0, ASSEMBLY_END], [initial.rotX ?? 0, 0]);
+  const opacity = useTransform(progress, [0, ASSEMBLY_END], [0, 1]);
 
-  // Phase 2 emphasis (0.6 → 1.0): featured tier rises + scales.
+  // Phase 2 emphasis (0.35 → 1.0): featured tier rises + scales.
   const y = useTransform(progress, (p) => {
-    if (p < 0.6) {
-      // Linear from initial.y to 0
-      return initial.y * (1 - p / 0.6);
+    if (p < ASSEMBLY_END) {
+      return initial.y * (1 - p / ASSEMBLY_END);
     }
     if (tier.featured) {
-      const riseP = (p - 0.6) / 0.4;
+      const riseP = (p - ASSEMBLY_END) / (1 - ASSEMBLY_END);
       return -20 * riseP;
     }
     return 0;
   });
 
   const scale = useTransform(progress, (p) => {
-    if (!tier.featured || p < 0.6) return 1;
-    const riseP = (p - 0.6) / 0.4;
+    if (!tier.featured || p < ASSEMBLY_END) return 1;
+    const riseP = (p - ASSEMBLY_END) / (1 - ASSEMBLY_END);
     return 1 + 0.05 * riseP;
   });
 
