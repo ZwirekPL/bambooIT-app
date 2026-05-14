@@ -66,8 +66,8 @@ function NavLink({
       className={cn(
         'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
         isActive
-          ? 'bg-sage-100 text-sage-800'
-          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+          ? 'bg-bamboo-deep/10 text-navy-deep'
+          : 'text-navy-soft hover:bg-paper hover:text-navy-deep',
       )}
     >
       <Icon className="h-4 w-4 shrink-0" />
@@ -81,6 +81,18 @@ function SidebarContent({ email, onLinkClick }: { email: string; onLinkClick?: (
 
   return (
     <div className="flex h-full flex-col">
+      <div className="px-4 pt-5 pb-3">
+        <span className="font-display text-xl font-bold tracking-[-0.02em] text-navy-deep">
+          bamboo
+        </span>
+        <span className="font-display text-xl font-bold tracking-[-0.02em] text-bamboo-deep">
+          it
+        </span>
+        <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-navy-soft">
+          {t('title')}
+        </p>
+      </div>
+
       <nav className="flex-1 px-2 py-2 space-y-0.5">
         {navItems.map(({ href, labelKey, icon }) => (
           <NavLink
@@ -93,17 +105,16 @@ function SidebarContent({ email, onLinkClick }: { email: string; onLinkClick?: (
         ))}
       </nav>
 
-      <div className="border-t border-border px-3 py-4 space-y-2">
-        <p className="truncate text-xs text-muted-foreground px-1">{email}</p>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+      <div className="border-t border-line px-3 py-4 space-y-2">
+        <p className="truncate text-xs text-navy-soft px-1">{email}</p>
+        <button
+          type="button"
           onClick={() => performFullLogout('/')}
+          className="flex w-full items-center justify-start gap-2 rounded-md px-3 py-2 text-sm font-medium text-navy-soft transition-colors hover:bg-paper hover:text-navy-deep"
         >
           <LogOut className="h-4 w-4" />
           {t('logout')}
-        </Button>
+        </button>
       </div>
     </div>
   );
@@ -116,12 +127,12 @@ export function AdminSidebar({ email }: AdminSidebarProps) {
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-60 shrink-0 flex-col border-r border-border bg-background">
+      <aside className="hidden md:flex w-60 shrink-0 flex-col border-r border-line bg-white">
         <SidebarContent email={email} />
       </aside>
 
       {/* Mobile top bar */}
-      <div className="flex items-center border-b border-border bg-background px-2 py-2 md:hidden">
+      <div className="flex items-center border-b border-line bg-white px-2 py-2 md:hidden">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
             <Button size="icon" variant="ghost" aria-label={t('nav.menu')}>
