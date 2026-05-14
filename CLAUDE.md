@@ -2,8 +2,9 @@
 
 > **Ten plik czyta Claude Code automatycznie przy każdej sesji.** Zawiera kontekst projektu, konwencje, decyzje architektoniczne i ścieżki krytyczne. Aktualizuj go gdy zmienia się coś fundamentalnego.
 
-**Ostatnia aktualizacja:** 2026-05-11
-**Status projektu:** Po cleanupie z DietetykDEV, przed fazą implementacji.
+**Ostatnia aktualizacja:** 2026-05-14
+**Status projektu:** Faza 4 build w toku — BE-1 → BE-4 zamknięte, BE-5 (deploy + CI/CD)
+czeka aż Wirgiliusz ma terminal VPS. Marketing site + admin UI + email transport gotowe.
 
 ---
 
@@ -59,7 +60,8 @@ Szczegółowy biznesplan: zobacz `PRD.md`.
 
 ### Infra
 - **Package manager:** npm (workspaces, NIE pnpm)
-- **Node version:** [VERIFY: sprawdź `.nvmrc` / `engines.node` w root package.json]
+- **Node version:** 22 (per `.github/workflows/ci.yml`). Brak pin file `.nvmrc` / `engines.node`
+  — dodać przed BE-5 deploy żeby PM2 / Vercel używał zgodnej wersji.
 - **Hosting docelowy:** VPS współdzielony z e-dietetyk (osobny port, baza, user systemowy)
 - **Reverse proxy:** Nginx
 - **Process manager:** PM2 lub Coolify [TBD — zdecydować podczas deployu]
@@ -295,7 +297,10 @@ if (file.size > MAX_UPLOAD_BYTES) throw new Error("File too large");
 
 ## 6. Model danych (wysoki poziom)
 
-> **[VERIFY AFTER CLEANUP]** Ta sekcja będzie wymagała aktualizacji po finalnym cleanupie. Sprawdź rzeczywiste pola w `packages/database/prisma/schema.prisma`.
+> **Status:** Sekcja zsynchronizowana ze schema.prisma po BE-1 (Lead) + BE-2 (Company business
+> fields). Aktualne modele to także: Order, Subscription, AuditLog, Post, BlogCategoryConfig,
+> Testimonial, ReferralCode, ReferralUsage, UserConsent, AppSettings, FeatureFlag, oraz
+> anti-abuse modele (TrialFingerprint, DeviceFingerprint, SecurityBan).
 
 ### Modele core
 - **User** — konto użytkownika (rola: ADMIN | CLIENT)
@@ -487,17 +492,18 @@ W TypeScript używaj `decimal.js` lub `Prisma.Decimal` do arytmetyki.
 
 | Service | Status | Account | Notes |
 |---------|--------|---------|-------|
-| Stripe | [TBD] | [collaborator?] | Osobny od e-dietetyk czy te same, ale osobne products? |
-| Fakturownia | [TBD] | [account] | Osobne konto dla bambooIT |
-| Resend | [TBD] | [account] | Domain: `bambooit.pl` |
-| Anthropic API | [TBD] | [account] | Osobny klucz dla rozróżnienia kosztów |
-| Sentry | [TBD] | [project] | Osobny project: `bambooit-backend`, `bambooit-web` |
-| Google Analytics 4 | [TBD] | [property] | Nowy property dla bambooit.pl |
-| Meta Pixel | [TBD] | [pixel ID] | Nowy pixel |
-| GitHub | [TBD] | Wirgiliusz/bambooit | Private repo |
-| VPS | [SAME] | [provider] | Współdzielony z e-dietetyk, osobne user/baza |
-| Domena | [TBD] | bambooit.pl | Zweryfikuj dostępność! |
-| AnyDesk/RustDesk | [TBD] | [account] | Kto kupuje licencje — klient czy bambooit? |
+| Stripe | [TODO Wirgiliusz] | — | Osobne products (3 Price IDs) + webhook secret. Code gotowy, mock mode dopóki brak `STRIPE_SECRET_KEY`. |
+| Fakturownia / wfirma | [DECISION PENDING] | — | Decyzja providera open (2026-05-14, memory: project-invoicing-deferred). Integracja w osobnej fazie. |
+| Resend | [READY TO FLIP] | — | Code gotowy (utils/email.ts dispatch). Wpisz `RESEND_API_KEY` + `RESEND_FROM_EMAIL` w .env → automatyczny switch z SMTP. |
+| SMTP (Mailtrap dev / prod fallback) | [TODO Wirgiliusz] | — | Alternatywa dla Resend. Dev: Mailtrap free tier wystarcza. |
+| Anthropic API | [FUTURE — faza 5] | — | Chat AI widget — faza 5; obecnie nieaktywny. |
+| Sentry | [TODO Wirgiliusz] | — | Osobny project: `bambooit-backend`, `bambooit-web`. SENTRY_DSN w .env. |
+| Google Analytics 4 | [FUTURE — faza 5] | — | D-063 — nie w MVP. Cookie consent infrastructure gotowa (BE-4 backend wiring TBD). |
+| Meta Pixel | [FUTURE — faza 5] | — | Po pierwszej fali outreachu Remigiusza, kiedy zaczynamy testować płatne kanały. |
+| GitHub | [TODO Wirgiliusz] | — | Private repo `bambooIT`. Po remote — CI workflow ruszy (ci.yml już skonfigurowany). |
+| VPS | [SHARED] | e-dietetyk VPS | Współdzielony z e-dietetyk (ADR-003), osobny user `bambooit_user` + baza `bambooit_prod`, port 4001 backend + 3001 web. |
+| Domena | [TODO Wirgiliusz] | bambooit.pl | Sprawdź dostępność + zarejestruj. DNS A record → IP VPS. |
+| AnyDesk/RustDesk | [LEFT TO CLIENT] | — | Klient pobiera za darmo. Per-session pomoc zdalna, nie wymaga naszego konta. |
 
 ---
 
@@ -537,18 +543,19 @@ W TypeScript używaj `decimal.js` lub `Prisma.Decimal` do arytmetyki.
 
 ---
 
-## 12. Sekcje do uzupełnienia po cleanupie
+## 12. Sekcje do uzupełnienia (live)
 
-Te punkty będą wymagały aktualizacji gdy Claude Code skończy 14 commitów z PLAN_CZYSZCZENIA.md:
+Status na 2026-05-14 (po BE-1..BE-4 + K10 sweep + A/B/C/D batch):
 
-- [ ] **§1 Stack** — zweryfikować wszystkie wersje (Node, npm, Next.js, Prisma) zgodnie z `package.json`
-- [ ] **§2 Struktura repo** — zaktualizować rzeczywistą listę folderów (po cleanupie usunięte będą `scraper/`, `policies/`, `queues/`, `pdf/`, większość `services/`)
-- [ ] **§3 Komendy** — zweryfikować że root scripts faktycznie działają (`typecheck`, `build:all`, `db:generate`)
-- [ ] **§6 Model danych** — zaktualizować na podstawie finalnego `schema.prisma`
-- [ ] **§7 Przepływy** — dopisać szczegóły gdy chat AI i panel klienta będą faktycznie zaimplementowane
-- [ ] **§10 Zewnętrzne konta** — uzupełnić gdy konta zostaną założone
+- [x] **§1 Stack** — zweryfikowane (Node 22, Next.js 15, Prisma 6.19, NextAuth v5)
+- [x] **§2 Struktura repo** — zaktualizowane po K7-K10 cleanup (legacy scripts dropped, EN reduced)
+- [x] **§3 Komendy** — root composite `typecheck` ma npm 11 quirk (per-workspace działa zawsze)
+- [x] **§6 Model danych** — synchronized z BE-1 (Lead) + BE-2 (Company business fields)
+- [ ] **§7 Przepływy** — chat AI dalej w faza 5; panel klienta /panel/subskrypcja + /panel/profil opisać
+- [x] **§10 Zewnętrzne konta** — status każdego provider'a zaktualizowany (decyzja Fakturownia/wfirma open)
 
-Markery `[VERIFY AFTER CLEANUP]`, `[TBD]`, `[VERIFY]` wskazują miejsca wymagające weryfikacji.
+Markery `[TODO Wirgiliusz]`, `[READY TO FLIP]`, `[DECISION PENDING]`, `[FUTURE]` zastąpiły
+stare `[TBD]` / `[VERIFY]`.
 
 ---
 
