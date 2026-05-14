@@ -105,12 +105,17 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    overflow-x: hidden;
+    /* `clip` instead of `hidden`: prevents horizontal overflow without
+       creating a new scroll container, which would otherwise break
+       `position: sticky` on every section that uses scroll-driven
+       animations (NarrativeSection, HorizontalServicesSection,
+       PricingTiersSection, ProcessSection, ManifestoText). */
+    overflow-x: clip;
   }
 
   html {
     scroll-behavior: smooth;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 }
 

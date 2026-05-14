@@ -77,7 +77,11 @@ export function HorizontalServicesSection() {
   return (
     <section
       id="services"
-      className="relative overflow-hidden bg-navy-deep text-white"
+      // No `overflow-hidden` here: it would create a CSS scroll container,
+      // which makes the inner `position: sticky` element pin to this section
+      // instead of the window — breaking the A9 pinned horizontal scroll.
+      // Horizontal clipping is handled by the sticky inner (line below).
+      className="relative bg-navy-deep text-white"
     >
       {/* Intro — scrolls normally */}
       <div className="mx-auto w-full max-w-[1440px] px-5 py-24 md:px-12 md:py-32">
@@ -88,6 +92,7 @@ export function HorizontalServicesSection() {
           </div>
           <h2 className="font-display text-4xl font-light leading-none tracking-[-0.035em] text-white md:text-5xl lg:text-6xl xl:text-7xl">
             {t.rich('intro.heading', {
+              br: () => <br />,
               em: (chunks) => <em className="font-semibold italic text-bamboo">{chunks}</em>,
             })}
           </h2>
@@ -108,7 +113,11 @@ export function HorizontalServicesSection() {
         </div>
       ) : (
         <div ref={outerRef} className="relative h-[600vh]">
-          <div className="sticky top-0 flex h-screen flex-col overflow-hidden pb-16">
+          {/* justify-center: vertically center the cards row in the sticky
+              viewport so they sit at the eye line instead of being pinned
+              to the top of the section (which left a large empty area below
+              the cards). */}
+          <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden pb-16">
             <motion.div
               ref={trackRef}
               style={{ x }}
