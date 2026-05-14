@@ -1,39 +1,56 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { XCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 export function CheckoutCanceled() {
   const t = useTranslations('checkout');
-  const searchParams = useSearchParams();
-  const product = searchParams.get('product');
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-cream-50 to-sage-50/40 py-16 px-4">
-      <div className="max-w-lg mx-auto text-center space-y-6">
-        <div className="flex justify-center">
-          <div className="rounded-full bg-muted p-4">
-            <XCircle className="h-12 w-12 text-muted-foreground" />
+    <section className="min-h-[calc(100vh-4rem)] bg-paper px-5 py-20 md:px-12 md:py-28">
+      <div className="mx-auto w-full max-w-[640px]">
+        <div className="rounded-3xl border border-line bg-white p-10 text-center md:p-14">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-navy-deep">
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              className="text-white"
+              aria-hidden="true"
+            >
+              <path d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+
+          <p className="mt-8 font-mono text-[11px] uppercase tracking-[0.2em] text-navy-soft">
+            {t('canceledEyebrow')}
+          </p>
+          <h1 className="mt-3 font-display text-3xl font-semibold tracking-[-0.02em] text-navy md:text-4xl">
+            {t('canceledTitle')}
+          </h1>
+          <p className="mx-auto mt-4 max-w-prose text-base leading-[1.6] text-navy-soft md:text-lg">
+            {t('canceledDescription')}
+          </p>
+
+          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href="/pakiety"
+              className="inline-flex items-center gap-2 rounded-full bg-navy-deep px-7 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-bamboo hover:text-navy-deep"
+            >
+              {t('canceledCtaRetry')}
+            </Link>
+            <Link
+              href="/audyt"
+              className="font-mono text-xs uppercase tracking-[0.15em] text-bamboo-deep underline-offset-4 transition-colors hover:underline"
+            >
+              {t('canceledCtaAudit')}
+            </Link>
           </div>
         </div>
-
-        <div className="space-y-2">
-          <h1 className="text-3xl font-extrabold tracking-tight">{t('canceledTitle')}</h1>
-          <p className="text-muted-foreground text-lg">{t('canceledDescription')}</p>
-        </div>
-
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Button asChild variant="sage" size="lg">
-            <Link href={product ? `/oferta` : '/oferta'}>{t('canceledCtaRetry')}</Link>
-          </Button>
-          <Button asChild variant="sage-outline" size="lg">
-            <Link href="/">{t('canceledCtaHome')}</Link>
-          </Button>
-        </div>
       </div>
-    </div>
+    </section>
   );
 }

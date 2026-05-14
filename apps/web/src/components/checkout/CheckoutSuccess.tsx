@@ -3,9 +3,6 @@
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { CheckCircle2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 
 const PRODUCT_LABELS: Record<string, string> = {
   START: 'Pakiet Start',
@@ -21,48 +18,69 @@ export function CheckoutSuccess() {
   const productLabel = product ? PRODUCT_LABELS[product] ?? product : null;
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-cream-50 to-sage-50/40 py-16 px-4">
-      <div className="max-w-lg mx-auto text-center space-y-6">
-        <div className="flex justify-center">
-          <div className="rounded-full bg-brand-green/10 p-4">
-            <CheckCircle2 className="h-12 w-12 text-brand-green" />
+    <section className="min-h-[calc(100vh-4rem)] bg-paper px-5 py-20 md:px-12 md:py-28">
+      <div className="mx-auto w-full max-w-[640px]">
+        <div className="rounded-3xl border border-bamboo/40 bg-white p-10 text-center md:p-14">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-bamboo">
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              className="text-navy-deep"
+              aria-hidden="true"
+            >
+              <path d="M5 12l5 5L20 7" />
+            </svg>
           </div>
-        </div>
 
-        <div className="space-y-2">
-          <h1 className="text-3xl font-extrabold tracking-tight">
+          <p className="mt-8 font-mono text-[11px] uppercase tracking-[0.2em] text-bamboo-deep">
+            {t('successEyebrow')}
+          </p>
+          <h1 className="mt-3 font-display text-3xl font-semibold tracking-[-0.02em] text-navy md:text-4xl">
             {t('successTitle')}
           </h1>
-          <p className="text-muted-foreground text-lg">
+          <p className="mx-auto mt-4 max-w-prose text-base leading-[1.6] text-navy-soft md:text-lg">
             {t('successDescription')}
           </p>
-        </div>
 
-        {isMock && (
-          <Card className="border-amber-200 bg-amber-50">
-            <CardContent className="py-3 text-sm text-amber-800">
+          {isMock && (
+            <p
+              role="status"
+              className="mt-6 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-3 text-sm text-amber-800"
+            >
               {t('mockWarning')}
-            </CardContent>
-          </Card>
-        )}
+            </p>
+          )}
 
-        <Card className="border-border">
-          <CardContent className="py-6 space-y-3">
-            {productLabel && (
-              <p className="text-sm text-muted-foreground">
-                {t('successProduct')}: <span className="font-semibold text-foreground">{productLabel}</span>
-              </p>
-            )}
-            <p className="text-sm text-muted-foreground">{t('successNextSteps')}</p>
-          </CardContent>
-        </Card>
+          {productLabel && (
+            <p className="mt-8 inline-flex items-center gap-2 rounded-full border border-line bg-paper px-5 py-2 font-mono text-xs uppercase tracking-[0.15em] text-navy">
+              {t('successProduct')}: <span className="font-bold text-navy-deep">{productLabel}</span>
+            </p>
+          )}
 
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Button asChild variant="sage" size="lg">
-            <Link href="/panel">Przejdź do panelu</Link>
-          </Button>
+          <p className="mx-auto mt-8 max-w-prose text-sm leading-[1.6] text-navy-soft">
+            {t('successNextSteps')}
+          </p>
+
+          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href="/panel/subskrypcja"
+              className="inline-flex items-center gap-2 rounded-full bg-navy-deep px-7 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-bamboo hover:text-navy-deep"
+            >
+              {t('successCtaSubscription')}
+            </Link>
+            <Link
+              href="/pomoc-zdalna"
+              className="font-mono text-xs uppercase tracking-[0.15em] text-bamboo-deep underline-offset-4 transition-colors hover:underline"
+            >
+              {t('successCtaRemoteHelp')}
+            </Link>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
