@@ -17,9 +17,10 @@ import { checkoutRouter } from './routes/checkout.routes';
 import { blogRouter } from './routes/blog.routes';
 import { testimonialRouter } from './routes/testimonial.routes';
 import { referralRouter } from './routes/referral.routes';
+import { leadsRouter } from './routes/leads.routes';
 import { errorHandler } from './middleware/errorHandler';
 import { requireAuth } from './middleware/auth';
-import { globalLimiter, authLimiter, userLimiter } from './middleware/rateLimiters';
+import { globalLimiter, authLimiter, userLimiter, leadLimiter } from './middleware/rateLimiters';
 import { csrfProtection } from './middleware/csrf';
 import {
   scheduleAuditRetention,
@@ -146,6 +147,7 @@ app.use('/subscriptions', requireAuth('ADMIN'), userLimiter, subscriptionRouter)
 app.use('/posts', globalLimiter, blogRouter);
 app.use('/testimonials', globalLimiter, testimonialRouter);
 app.use('/referrals', requireAuth(), userLimiter, referralRouter);
+app.use('/leads', leadLimiter, leadsRouter);
 
 // Global error handler — must be last
 app.use(errorHandler);

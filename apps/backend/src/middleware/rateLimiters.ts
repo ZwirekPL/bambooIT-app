@@ -77,6 +77,17 @@ export const pdfExportLimiter = rateLimit({
   message: RATE_LIMIT_MESSAGE,
 });
 
+// Lead submission limiter — keyed by IP (public marketing forms)
+// 5 zgłoszeń per IP per 15 min — legitimate user wysyła raz, bot łapie po 5
+export const leadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: isDev ? 50 : 5,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  store: makeStore('lead'),
+  message: RATE_LIMIT_MESSAGE,
+});
+
 // Per-user limiter for authenticated endpoints (applied AFTER requireAuth)
 // Keys by userId so limits survive restarts and work across multiple instances
 export const userLimiter = rateLimit({

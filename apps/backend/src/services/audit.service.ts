@@ -32,6 +32,7 @@ export type AuditAction =
   | 'LOGOUT'
   | 'CHANGE_USER_ROLE'
   | 'CREATE_USER'
+  | 'LEAD_CREATED'
   | 'SUBSCRIPTION_CHECKOUT_STARTED'
   | 'SUBSCRIPTION_PORTAL_ACCESSED'
   | 'STRIPE_CHECKOUT_COMPLETED'
@@ -165,6 +166,7 @@ export type AuditResourceType =
   | 'PROTOCOL_CONFLICT'
   | 'CONSENT'
   | 'DATA_EXPORT'
+  | 'LEAD'
   | 'MESSAGE'
   | 'AUDIT_LOG';
 
