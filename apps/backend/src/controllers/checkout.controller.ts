@@ -4,8 +4,11 @@ import { apiError } from '../utils/errors';
 import * as checkoutService from '../services/checkout.service';
 import { logAudit } from '../services/audit.service';
 
+// TRIAL flow stays in service code (dormant per PLAN_BE-2.md Q5/B) but is
+// no longer exposed via this endpoint — bambooIT MVP doesn't promote free
+// trial. Re-enable by adding 'TRIAL' back to the enum below + adding a CTA.
 const createSessionSchema = z.object({
-  productType: z.enum(['TRIAL', 'START', 'FIRMA', 'FIRMA_PLUS']),
+  productType: z.enum(['START', 'FIRMA', 'FIRMA_PLUS']),
   referralCode: z.string().max(20).optional(),
 });
 
