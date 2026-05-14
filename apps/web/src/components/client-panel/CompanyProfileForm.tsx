@@ -5,6 +5,7 @@ import { Loader2, Check } from 'lucide-react';
 import { api, ApiError } from '@/lib/api';
 import { isValidNIP } from '@/lib/validators/nip';
 import type { Company } from '@/types/api';
+import { Skeleton, PanelCardSkeleton } from '@/components/ui/Skeleton';
 
 const INDUSTRY_OPTIONS = [
   'accounting',
@@ -108,8 +109,13 @@ export function CompanyProfileForm() {
 
   if (state === 'loading') {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-bamboo-deep" />
+      <div className="space-y-8">
+        <div className="space-y-2">
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-full max-w-md" />
+        </div>
+        <PanelCardSkeleton />
       </div>
     );
   }

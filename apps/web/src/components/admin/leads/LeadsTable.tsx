@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
-import { Loader2 } from 'lucide-react';
 import { api, ApiError } from '@/lib/api';
 import type { Lead, LeadStatus, LeadType } from '@/types/api';
 import { LeadStatusBadge } from './LeadStatusBadge';
+import { LeadsTableSkeleton } from '@/components/ui/Skeleton';
 
 const TYPE_LABELS: Record<LeadType, string> = {
   AUDIT: 'Audyt',
@@ -150,6 +150,9 @@ export function LeadsTable({ initialLeads, initialTotal }: LeadsTableProps) {
       )}
 
       {/* Table */}
+      {loading && leads.length === 0 ? (
+        <LeadsTableSkeleton rows={6} />
+      ) : (
       <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
         <table className="w-full min-w-[720px] border-collapse text-sm">
           <thead>
@@ -164,13 +167,6 @@ export function LeadsTable({ initialLeads, initialTotal }: LeadsTableProps) {
             </tr>
           </thead>
           <tbody>
-            {loading && leads.length === 0 && (
-              <tr>
-                <td colSpan={7} className="px-4 py-12 text-center">
-                  <Loader2 className="mx-auto h-6 w-6 animate-spin text-slate-400" />
-                </td>
-              </tr>
-            )}
             {!loading && leads.length === 0 && (
               <tr>
                 <td colSpan={7} className="px-4 py-12 text-center text-sm text-slate-500">
@@ -231,6 +227,7 @@ export function LeadsTable({ initialLeads, initialTotal }: LeadsTableProps) {
           </tbody>
         </table>
       </div>
+      )}
 
       {/* Pagination */}
       {totalPages > 1 && (

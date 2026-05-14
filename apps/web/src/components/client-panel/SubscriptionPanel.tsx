@@ -6,6 +6,7 @@ import { Loader2 } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { api, ApiError } from '@/lib/api';
 import type { Subscription } from '@/types/api';
+import { PanelCardSkeleton } from '@/components/ui/Skeleton';
 
 type State =
   | { kind: 'loading' }
@@ -73,8 +74,12 @@ export function SubscriptionPanel() {
 
   if (state.kind === 'loading') {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-bamboo-deep" />
+      <div className="space-y-8">
+        <div className="space-y-2">
+          <div className="h-3 w-24 animate-pulse rounded bg-line/70" />
+          <div className="h-8 w-64 animate-pulse rounded bg-line/70" />
+        </div>
+        <PanelCardSkeleton />
       </div>
     );
   }
