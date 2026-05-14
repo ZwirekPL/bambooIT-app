@@ -57,6 +57,7 @@ export async function OfferSection() {
         <div className="mb-12 grid grid-cols-1 items-end gap-8 md:mb-16 md:grid-cols-[1fr_1.2fr] md:gap-20">
           <h2 className="font-display text-4xl font-black leading-[0.95] tracking-[-0.03em] text-navy-deep md:text-5xl lg:text-6xl xl:text-7xl">
             {t.rich('heading', {
+              br: () => <br />,
               em: (chunks) => <em className="italic text-bamboo-deep">{chunks}</em>,
             })}
           </h2>

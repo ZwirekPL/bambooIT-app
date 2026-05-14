@@ -36,6 +36,7 @@ export function AuditFormSection() {
             </div>
             <h2 className="font-display text-4xl font-light leading-none tracking-[-0.035em] text-white md:text-5xl lg:text-6xl">
               {t.rich('intro.heading', {
+                br: () => <br />,
                 em: (chunks) => <em className="font-semibold italic text-bamboo">{chunks}</em>,
               })}
             </h2>

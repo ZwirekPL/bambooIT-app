@@ -34,7 +34,7 @@ export async function ManifestoSection() {
             Raw i18n string parsed in <ManifestoText /> client child so the
             outer section keeps its server render for the static numbers
             stack on the right. */}
-        <ManifestoText raw={t('text')} />
+        <ManifestoText raw={t.raw('text')} />
 
         {/* Numbers stack — A8 counter animation triggers when row scrolls into view */}
         <ul className="flex flex-col gap-12 pt-6">
