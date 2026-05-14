@@ -242,6 +242,67 @@ const POSTS: MockPost[] = [
       },
     ],
   },
+  {
+    slug: 'phishing-w-firmie-jak-rozpoznac',
+    title: 'Phishing w firmie — 5 sygnałów, że to oszustwo',
+    excerpt:
+      'Lorem ipsum — fałszywe maile od „banku" i „prezesa" kosztują polskie firmy miliony rocznie. Sprawdź jak rozpoznać atak.',
+    category: 'Cyberbezpieczeństwo',
+    readTime: 5,
+    publishedAt: new Date(NOW - 38 * DAY),
+    content: buildContent(
+      ['5 sygnałów alarmowych', 'Co zrobić jeśli kliknąłeś', 'Szkolenie zespołu'],
+      [['Adres nadawcy', 'Linki vs. tekst', 'Presja czasu'], [], ['Symulacje phishingowe']],
+    ),
+    faq: [
+      {
+        question: 'Czy filtr antyspamowy wystarczy?',
+        answer: 'Lorem ipsum — nie zawsze, najlepsze ataki przechodzą przez filtry.',
+      },
+    ],
+  },
+  {
+    slug: 'kopia-zapasowa-zasada-3-2-1',
+    title: 'Backup zgodnie z zasadą 3-2-1 — co to znaczy w praktyce',
+    excerpt:
+      'Lorem ipsum — 3 kopie, 2 nośniki, 1 lokalizacja offsite. Tłumaczymy z konkretnymi przykładami dla małych firm.',
+    category: 'Backup',
+    readTime: 7,
+    publishedAt: new Date(NOW - 42 * DAY),
+    content: buildContent(
+      ['Skąd zasada 3-2-1', 'Wdrożenie w małej firmie', 'Test recovery'],
+      [[], ['Dysk NAS', 'Chmura', 'Offsite'], ['Cykliczne testy']],
+    ),
+    faq: [
+      {
+        question: 'Czy OneDrive to backup?',
+        answer: 'Lorem ipsum — to synchronizacja, nie backup. Skasowane pliki znikają.',
+      },
+      {
+        question: 'Jak często testować backup?',
+        answer: 'Sed ut perspiciatis — co kwartał minimum.',
+      },
+    ],
+  },
+  {
+    slug: 'leasing-kontra-zakup-laptopow',
+    title: 'Leasing czy zakup laptopów — co się opłaca firmie 10-osobowej',
+    excerpt:
+      'Lorem ipsum — analizujemy 3-letni TCO dla obu modeli. Wnioski mogą Cię zaskoczyć.',
+    category: 'Sprzęt i sieci',
+    readTime: 8,
+    publishedAt: new Date(NOW - 50 * DAY),
+    content: buildContent(
+      ['Założenia kalkulacji', 'Leasing operacyjny', 'Zakup gotówkowy', 'Mix obu modeli'],
+      [[], ['Plusy', 'Minusy'], ['Plusy', 'Minusy'], []],
+    ),
+    faq: [
+      {
+        question: 'A subskrypcja Dell / HP / Lenovo?',
+        answer: 'Lorem ipsum — to wariant leasingu z serwisem; coraz popularniejszy.',
+      },
+    ],
+  },
 ];
 
 async function main() {
