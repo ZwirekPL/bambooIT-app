@@ -1295,6 +1295,7 @@
     "logout": "Wyloguj się",
     "nav": {
       "home": "Dashboard",
+      "leads": "Leady",
       "users": "Użytkownicy",
       "auditLog": "Logi audytu",
       "blog": "Blog",
@@ -1303,8 +1304,13 @@
       "subscriptions": "Subskrypcje",
       "payments": "Płatności",
       "accounting": "Księgowość",
+      "emailCampaigns": "Email kampanie",
       "security": "Bezpieczeństwo",
       "menu": "Menu"
+    },
+    "leads": {
+      "title": "Leady",
+      "subtitle": "Zgłoszenia z formularzy audytu i kontaktu — przejdź do statusu CONTACTED w ciągu 24h roboczych."
     },
     "subscriptions": {
       "title": "Subskrypcje i zamówienia",

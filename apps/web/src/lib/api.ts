@@ -3,7 +3,7 @@
  * Uses NEXT_PUBLIC_API_URL (client + server) for all requests.
  * Server-only auth requests use API_URL env variable.
  */
-import type { Company, Order, ProductType, CheckoutProductType, Subscription, AdminStats, UserRole, User, AdminUser, AuditLog, BlogPost, BlogListItem, BlogCategoryConfig, AccessStatus, Testimonial, TestimonialWithUser, PublicTestimonial, NotificationPreferences, SubscriptionStats, SubscriptionItem, CompanyInvoice } from '@/types/api';
+import type { Company, Order, ProductType, CheckoutProductType, Subscription, AdminStats, UserRole, User, AdminUser, AuditLog, BlogPost, BlogListItem, BlogCategoryConfig, AccessStatus, Testimonial, TestimonialWithUser, PublicTestimonial, NotificationPreferences, SubscriptionStats, SubscriptionItem, CompanyInvoice, Lead, LeadStatus, LeadType, LeadsStats, LeadsListResponse } from '@/types/api';
 import { getApiBaseUrl } from './api-url';
 
 /** Tracks whether a 401 auto-logout is already in progress to prevent multiple redirects */
@@ -265,6 +265,62 @@ export const api = {
       apiFetch<{ ok: boolean; url: string }>('/subscriptions/portal', { token }),
   },
   admin: {
+    leads: {
+      list: (
+        params: {
+          page?: number;
+          pageSize?: number;
+          status?: LeadStatus;
+          type?: LeadType;
+          source?: string;
+          search?: string;
+          dateFrom?: string;
+          dateTo?: string;
+        },
+        token?: string,
+      ) => {
+        const query = new URLSearchParams();
+        if (params.page) query.set('page', String(params.page));
+        if (params.pageSize) query.set('pageSize', String(params.pageSize));
+        if (params.status) query.set('status', params.status);
+        if (params.type) query.set('type', params.type);
+        if (params.source) query.set('source', params.source);
+        if (params.search) query.set('search', params.search);
+        if (params.dateFrom) query.set('dateFrom', params.dateFrom);
+        if (params.dateTo) query.set('dateTo', params.dateTo);
+        const qs = query.toString();
+        return apiFetch<LeadsListResponse>(`/admin/leads${qs ? `?${qs}` : ''}`, { token });
+      },
+      getStats: (token?: string) =>
+        apiFetch<{ ok: boolean; stats: LeadsStats }>('/admin/leads/stats', { token }),
+      getById: (id: string, token?: string) =>
+        apiFetch<{ ok: boolean; lead: Lead }>(`/admin/leads/${id}`, { token }),
+      updateStatus: (id: string, status: LeadStatus, token?: string) =>
+        apiFetch<{ ok: boolean; lead: Lead }>(`/admin/leads/${id}/status`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status }),
+          token,
+        }),
+      addNote: (id: string, text: string, token?: string) =>
+        apiFetch<{ ok: boolean; lead: Lead; note: { id: string } }>(`/admin/leads/${id}/notes`, {
+          method: 'POST',
+          body: JSON.stringify({ text }),
+          token,
+        }),
+      deleteNote: (id: string, noteId: string, token?: string) =>
+        apiFetch<{ ok: boolean; lead: Lead }>(`/admin/leads/${id}/notes/${noteId}`, {
+          method: 'DELETE',
+          token,
+        }),
+      exportCsvUrl: (params: { status?: LeadStatus; type?: LeadType; search?: string }) => {
+        const query = new URLSearchParams();
+        if (params.status) query.set('status', params.status);
+        if (params.type) query.set('type', params.type);
+        if (params.search) query.set('search', params.search);
+        const qs = query.toString();
+        return `/api/proxy/admin/leads/export.csv${qs ? `?${qs}` : ''}`;
+      },
+    },
     getStats: (token: string) =>
       apiFetch<{ ok: boolean; stats: AdminStats }>('/admin/stats', { token }),
     getActionItems: (token: string) =>

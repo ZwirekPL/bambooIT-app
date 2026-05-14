@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { performFullLogout } from '@/lib/logout';
-import { LayoutDashboard, Users, Building2, ScrollText, LogOut, PanelLeft, BookOpen, MessageSquareQuote, Apple, ChefHat, ShieldCheck, ClipboardList, Settings, Link2, Unlink, Cpu, Shield, Phone, CreditCard, Calculator, Repeat, Mail, Activity } from 'lucide-react';
+import { LayoutDashboard, Users, Building2, ScrollText, LogOut, PanelLeft, BookOpen, MessageSquareQuote, Apple, ChefHat, ShieldCheck, ClipboardList, Settings, Link2, Unlink, Cpu, Shield, Phone, CreditCard, Calculator, Repeat, Mail, Activity, Inbox } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
@@ -13,6 +13,7 @@ import { BRAND } from '@config/brand';
 
 const navItems = [
   { href: '/admin',              labelKey: 'nav.home',     icon: LayoutDashboard },
+  { href: '/admin/leady',        labelKey: 'nav.leads',    icon: Inbox           },
   { href: '/admin/uzytkownicy',  labelKey: 'nav.users',    icon: Users           },
   // { href: '/admin/tenants',      labelKey: 'nav.tenants',  icon: Building2       },
   { href: '/admin/audit-log',    labelKey: 'nav.auditLog', icon: ScrollText      },

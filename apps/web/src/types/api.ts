@@ -28,6 +28,65 @@ export type ProductType = 'START' | 'FIRMA' | 'FIRMA_PLUS';
 /** Extends ProductType with checkout-only virtual types (not stored in DB). */
 export type CheckoutProductType = ProductType | 'TRIAL';
 
+// ─── Leads (BE-1 model + BE-4 admin UI) ──────────────────────────────────────
+
+export type LeadType = 'AUDIT' | 'CONTACT';
+export type LeadStatus = 'NEW' | 'CONTACTED' | 'QUALIFIED' | 'CONVERTED' | 'REJECTED';
+export type LeadIndustry =
+  | 'accounting'
+  | 'law'
+  | 'medical'
+  | 'production'
+  | 'hospitality'
+  | 'other';
+
+export interface LeadNote {
+  id: string;
+  text: string;
+  authorId: string;
+  authorName: string;
+  createdAt: string;
+}
+
+export interface Lead {
+  id: string;
+  type: LeadType;
+  status: LeadStatus;
+  firstName: string;
+  lastName: string | null;
+  company: string | null;
+  nip: string | null;
+  email: string;
+  phone: string | null;
+  industry: LeadIndustry | string | null;
+  sizeRange: string | null;
+  employeesCount: number | null;
+  description: string;
+  source: string | null;
+  ipAddress: string | null;
+  userAgent: string | null;
+  notes: LeadNote[] | null;
+  rodoConsent: boolean;
+  rodoConsentAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LeadsStats {
+  total: number;
+  byStatus: Record<LeadStatus, number>;
+  byType: Record<LeadType, number>;
+  last7Days: number;
+}
+
+export interface LeadsListResponse {
+  ok: boolean;
+  leads: Lead[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
 export type OrderStatus = 'PENDING_PAYMENT' | 'PAID' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
 
 export interface Order {
