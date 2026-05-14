@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { Link } from '@/i18n/navigation';
 import { PageHeader } from '@/components/marketing/PageHeader';
 import { FinalCTASection } from '@/components/marketing/FinalCTASection';
+import { BRAND } from '@config/brand';
 
 const PAIN_IDS = ['1', '2', '3', '4'] as const;
 const VALUE_IDS = ['1', '2', '3', '4'] as const;
@@ -22,9 +23,35 @@ type Props = { industrySlug: string };
 
 export async function IndustryLanding({ industrySlug }: Props) {
   const t = await getTranslations(`branze.${industrySlug}`);
+  const baseUrl = `https://${BRAND.domain}`;
+
+  // Schema.org Service per industry — helps SERP rich results for queries
+  // like "outsourcing IT biuro rachunkowe", "IT dla kancelarii", etc.
+  const serviceLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: `Obsługa IT — ${t('header.lede').slice(0, 60)}`,
+    provider: {
+      '@type': 'Organization',
+      name: BRAND.name,
+      url: baseUrl,
+    },
+    areaServed: { '@type': 'Country', name: 'PL' },
+    audience: {
+      '@type': 'BusinessAudience',
+      audienceType: t('header.eyebrow'),
+    },
+    serviceType: 'Outsourcing IT dla MŚP',
+    url: `${baseUrl}/pl/branze/${industrySlug}`,
+  };
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceLd) }}
+      />
       <PageHeader
         eyebrow={t('header.eyebrow')}
         heading={t.rich('header.heading', {
