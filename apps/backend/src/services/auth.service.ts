@@ -101,11 +101,21 @@ interface RegisterConsents {
   emailNotifications: boolean;
 }
 
+export interface RegisterCompanyFields {
+  firstName: string;
+  lastName: string;
+  companyName: string;
+  nip: string;
+  industry: string;
+  phone: string;
+  employeesCount?: number;
+  website?: string;
+}
+
 export async function register(
   email: string,
   password: string,
-  firstName?: string,
-  lastName?: string,
+  company: RegisterCompanyFields,
   referralCode?: string,
   consents?: RegisterConsents,
   ipAddress?: string,
@@ -125,13 +135,29 @@ export async function register(
     throw new AppError(409, 'EMAIL_TAKEN', 'Email is already registered');
   }
 
+  // Reject duplicate NIPs early (unique constraint would throw P2002 otherwise)
+  const nipTaken = await prisma.company.findUnique({ where: { nip: company.nip } });
+  if (nipTaken) {
+    throw new AppError(409, 'NIP_TAKEN', 'A company with this NIP is already registered');
+  }
+
   const passwordHash = await bcrypt.hash(password, 12);
   const user = await prisma.user.create({
     data: { email, passwordHash, role: 'CLIENT' },
   });
 
   await prisma.company.create({
-    data: { userId: user.id, contactFirstName: firstName, contactLastName: lastName },
+    data: {
+      userId: user.id,
+      contactFirstName: company.firstName,
+      contactLastName: company.lastName,
+      companyName: company.companyName,
+      nip: company.nip,
+      industry: company.industry,
+      phone: company.phone,
+      employeesCount: company.employeesCount ?? null,
+      website: company.website ?? null,
+    },
   });
 
   // Save user consents with version tracking

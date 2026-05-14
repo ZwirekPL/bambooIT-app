@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { apiError } from '../utils/errors';
 import { passwordSchema } from '../utils/validation';
+import { isValidNIP, normalizeNIP } from '../utils/nip';
 import * as authService from '../services/auth.service';
 import { logAudit } from '../services/audit.service';
 import { recordFingerprint, checkFingerprintAbuse } from '../services/deviceFingerprint.service';
@@ -18,12 +19,39 @@ const consentSchema = z.object({
   emailNotifications: z.boolean().default(false),
 });
 
+const INDUSTRY_VALUES = [
+  'accounting',
+  'law',
+  'medical',
+  'production',
+  'hospitality',
+  'other',
+] as const;
+
 const registerSchema = z.object({
   email: z.string().email(),
   password: passwordSchema,
-  firstName: z.string().max(50).optional().transform(v => v?.trim() || undefined),
-  lastName: z.string().max(50).optional().transform(v => v?.trim() || undefined),
-  referralCode: z.string().optional().transform(v => v?.trim() || undefined),
+  firstName: z.string().min(1).max(50).transform((v) => v.trim()),
+  lastName: z.string().min(1).max(50).transform((v) => v.trim()),
+  companyName: z.string().min(1).max(150).transform((v) => v.trim()),
+  nip: z
+    .string()
+    .min(10)
+    .max(20)
+    .refine((v) => isValidNIP(v), { message: 'Nieprawidłowy NIP' })
+    .transform((v) => normalizeNIP(v)),
+  industry: z.enum(INDUSTRY_VALUES),
+  phone: z.string().min(6).max(30).transform((v) => v.trim()),
+  employeesCount: z.number().int().min(1).max(10000).optional(),
+  website: z
+    .string()
+    .max(200)
+    .optional()
+    .transform((v) => (v && v.trim().length > 0 ? v.trim() : undefined)),
+  referralCode: z
+    .string()
+    .optional()
+    .transform((v) => v?.trim() || undefined),
   consents: consentSchema,
   deviceFingerprint: z.string().optional(),
 });
@@ -99,8 +127,16 @@ export async function register(req: Request, res: Response, next: NextFunction) 
     const result = await authService.register(
       parsed.data.email,
       parsed.data.password,
-      parsed.data.firstName,
-      parsed.data.lastName,
+      {
+        firstName: parsed.data.firstName,
+        lastName: parsed.data.lastName,
+        companyName: parsed.data.companyName,
+        nip: parsed.data.nip,
+        industry: parsed.data.industry,
+        phone: parsed.data.phone,
+        employeesCount: parsed.data.employeesCount,
+        website: parsed.data.website,
+      },
       parsed.data.referralCode,
       parsed.data.consents,
       req.ip ?? undefined,

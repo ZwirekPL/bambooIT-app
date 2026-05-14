@@ -138,38 +138,66 @@ describe('auth.service', () => {
 
   // ── register ───────────────────────────────────────────────────────────────
   describe('register()', () => {
+    const companyFields = {
+      firstName: 'Jan',
+      lastName: 'Kowalski',
+      companyName: 'ACME Sp. z o.o.',
+      nip: '5260250274',
+      industry: 'accounting',
+      phone: '+48 600 100 200',
+    };
+
     it('throws EMAIL_TAKEN when email already registered', async () => {
       m.user.findFirst.mockResolvedValue(makeUser());
-      await expect(register('taken@example.com', 'pass'))
+      await expect(register('taken@example.com', 'pass', companyFields))
         .rejects.toMatchObject({ code: 'EMAIL_TAKEN', statusCode: 409 });
+    });
+
+    it('throws NIP_TAKEN when NIP already registered', async () => {
+      m.user.findFirst.mockResolvedValue(null);
+      m.company.findUnique.mockResolvedValue({ id: 'existing-company', nip: '5260250274' });
+      await expect(register('new@example.com', 'pass', companyFields))
+        .rejects.toMatchObject({ code: 'NIP_TAKEN', statusCode: 409 });
     });
 
     it('creates user and company on success', async () => {
       m.user.findFirst.mockResolvedValue(null);
+      m.company.findUnique.mockResolvedValue(null);
       m.bcryptHash.mockResolvedValue('hashed-pw');
       m.user.create.mockResolvedValue({ id: 'user-new', email: 'new@example.com', role: 'CLIENT' });
       m.company.create.mockResolvedValue({ id: 'company-new' });
       m.emailVerificationToken.updateMany.mockResolvedValue({ count: 0 });
       m.emailVerificationToken.create.mockResolvedValue({ id: 'tok-1' });
 
-      const result = await register('new@example.com', 'pass', 'Jan', 'Kowalski');
+      const result = await register('new@example.com', 'pass', companyFields);
 
       expect(result.user).toMatchObject({ id: 'user-new', email: 'new@example.com', role: 'CLIENT' });
       expect(m.company.create).toHaveBeenCalledWith({
-        data: { userId: 'user-new', contactFirstName: 'Jan', contactLastName: 'Kowalski' },
+        data: {
+          userId: 'user-new',
+          contactFirstName: 'Jan',
+          contactLastName: 'Kowalski',
+          companyName: 'ACME Sp. z o.o.',
+          nip: '5260250274',
+          industry: 'accounting',
+          phone: '+48 600 100 200',
+          employeesCount: null,
+          website: null,
+        },
       });
       expect(m.sendEmailVerificationEmail).toHaveBeenCalledOnce();
     });
 
     it('invalidates old verification tokens before creating new one', async () => {
       m.user.findFirst.mockResolvedValue(null);
+      m.company.findUnique.mockResolvedValue(null);
       m.bcryptHash.mockResolvedValue('hashed-pw');
       m.user.create.mockResolvedValue({ id: 'user-new', email: 'new@example.com', role: 'CLIENT' });
       m.company.create.mockResolvedValue({ id: 'company-new' });
       m.emailVerificationToken.updateMany.mockResolvedValue({ count: 1 });
       m.emailVerificationToken.create.mockResolvedValue({ id: 'tok-new' });
 
-      await register('new@example.com', 'pass');
+      await register('new@example.com', 'pass', companyFields);
 
       expect(m.emailVerificationToken.updateMany).toHaveBeenCalledWith({
         where: { userId: 'user-new', usedAt: null },
