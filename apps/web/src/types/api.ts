@@ -17,8 +17,17 @@ export interface User {
 export interface Company {
   id: string;
   userId: string;
-  contactFirstName?: string;
-  contactLastName?: string;
+  contactFirstName: string | null;
+  contactLastName: string | null;
+  companyName: string | null;
+  nip: string | null;
+  industry: string | null;
+  employeesCount: number | null;
+  city: string | null;
+  address: string | null;
+  postalCode: string | null;
+  phone: string | null;
+  website: string | null;
   createdAt: string;
   updatedAt: string;
 }

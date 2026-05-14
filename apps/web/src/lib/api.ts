@@ -180,13 +180,28 @@ export const api = {
       }),
   },
   profile: {
-    get: (token: string) =>
-      apiFetch<{ ok: boolean; company: Company }>('/profile', { token }),
-    update: (
-      data: Partial<Pick<Company, 'contactFirstName' | 'contactLastName'>>,
-      token: string
+    getCompany: (token?: string) =>
+      apiFetch<{ ok: boolean; company: Company }>('/profile/company', { token }),
+    updateCompany: (
+      data: Partial<
+        Pick<
+          Company,
+          | 'contactFirstName'
+          | 'contactLastName'
+          | 'companyName'
+          | 'nip'
+          | 'industry'
+          | 'employeesCount'
+          | 'city'
+          | 'address'
+          | 'postalCode'
+          | 'phone'
+          | 'website'
+        >
+      >,
+      token?: string,
     ) =>
-      apiFetch<{ ok: boolean; company: Company }>('/profile', {
+      apiFetch<{ ok: boolean; company: Company }>('/profile/company', {
         method: 'PATCH',
         body: JSON.stringify(data),
         token,

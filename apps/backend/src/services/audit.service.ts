@@ -32,6 +32,7 @@ export type AuditAction =
   | 'LOGOUT'
   | 'CHANGE_USER_ROLE'
   | 'CREATE_USER'
+  | 'UPDATE_PROFILE'
   | 'LEAD_CREATED'
   | 'LEAD_STATUS_UPDATED'
   | 'LEAD_NOTE_ADDED'

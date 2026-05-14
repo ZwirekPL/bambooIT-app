@@ -14,6 +14,8 @@ profileRouter.post('/consents/cookies', dsarController.syncCookieConsents);
 
 profileRouter.patch('/password', profileController.changePassword);
 profileRouter.patch('/email', profileController.changeEmail);
+profileRouter.get('/company', profileController.getMyCompany);
+profileRouter.patch('/company', profileController.updateMyCompany);
 profileRouter.get('/notifications', notifController.getNotificationPreferences);
 profileRouter.patch('/notifications', notifController.updateNotificationPreferences);
 profileRouter.delete('/account', profileController.deleteAccount);

@@ -180,6 +180,19 @@ export function SubscriptionPanel() {
           <p className="mt-6 text-xs text-navy-soft">{t('mockModeNote')}</p>
         )}
       </div>
+
+      <div className="rounded-3xl border border-line bg-white p-6">
+        <h2 className="font-display text-lg font-semibold text-navy">Dane firmy</h2>
+        <p className="mt-2 text-sm text-navy-soft">
+          Zmień NIP, adres do faktur, telefon kontaktowy lub branżę.
+        </p>
+        <Link
+          href="/panel/profil"
+          className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-bamboo-deep underline-offset-4 hover:underline"
+        >
+          Edytuj dane firmy →
+        </Link>
+      </div>
     </div>
   );
 }
