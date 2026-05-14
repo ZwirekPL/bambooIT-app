@@ -482,4 +482,52 @@ model SecurityBan {
 // ─── Patient ↔ Dietitian Chat (79.1) ────────────────────────────────────────
 
 // ─── 84.4: Email Campaign System ────────────────────────────────────────────
+
+// ─── Leads (Faza 4 — BE-1) ──────────────────────────────────────────────────
+
+enum LeadType {
+  AUDIT
+  CONTACT
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CONVERTED
+  REJECTED
+}
+
+/// Marketing-site lead submissions from /audyt and /kontakt forms.
+/// Not tied to User — anonymous prospect at submission time. If they
+/// later sign up + buy a subscription, conversion is tracked in BE-2
+/// Stripe success flow (Lead.status = CONVERTED + optional Company link).
+model Lead {
+  id             String     @id @default(cuid())
+  type           LeadType
+  firstName      String
+  lastName       String?
+  company        String?
+  nip            String?
+  email          String
+  phone          String?
+  industry       String?
+  employeesCount Int?
+  sizeRange      String?
+  description    String     @db.Text
+  status         LeadStatus @default(NEW)
+  rodoConsent    Boolean    @default(false)
+  rodoConsentAt  DateTime?
+  source         String?
+  ipAddress      String?
+  userAgent      String?
+  notes          Json?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([email])
+  @@index([type, status])
+}
 
