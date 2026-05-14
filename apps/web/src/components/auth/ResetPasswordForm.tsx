@@ -62,10 +62,10 @@ export function ResetPasswordForm() {
     return (
       <div className="space-y-4 text-center">
         <div className="flex justify-center">
-          <CheckCircle className="h-12 w-12 text-sage-500" />
+          <CheckCircle className="h-12 w-12 text-bamboo-deep" />
         </div>
-        <h2 className="text-xl font-bold text-foreground">{t('resetSuccessTitle')}</h2>
-        <p className="text-sm text-muted-foreground">{t('resetSuccessMessage')}</p>
+        <h2 className="text-xl font-bold text-navy-deep">{t('resetSuccessTitle')}</h2>
+        <p className="text-sm text-navy-soft">{t('resetSuccessMessage')}</p>
         <Button asChild variant="sage" size="lg" className="w-full">
           <Link href="/zaloguj">{t('loginLink')}</Link>
         </Button>
@@ -107,13 +107,13 @@ export function ResetPasswordForm() {
           <button
             type="button"
             onClick={() => setShowPassword((v) => !v)}
-            className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 flex items-center justify-center text-navy-soft hover:text-navy-deep transition-colors"
             aria-label={showPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
           >
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
-        <p className="text-xs text-muted-foreground">{t('errorPasswordWeak')}</p>
+        <p className="text-xs text-navy-soft">{t('errorPasswordWeak')}</p>
       </div>
 
       <div className="space-y-2">
@@ -131,7 +131,7 @@ export function ResetPasswordForm() {
           <button
             type="button"
             onClick={() => setShowConfirm((v) => !v)}
-            className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 flex items-center justify-center text-navy-soft hover:text-navy-deep transition-colors"
             aria-label={showConfirm ? 'Ukryj hasło' : 'Pokaż hasło'}
           >
             {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -150,7 +150,7 @@ export function ResetPasswordForm() {
         )}
       </Button>
 
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-center text-sm text-navy-soft">
         <Link
           href="/zaloguj"
           className="font-semibold text-sage-600 hover:text-sage-700 hover:underline"

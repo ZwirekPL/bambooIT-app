@@ -39,10 +39,10 @@ export function ForgotPasswordForm() {
     return (
       <div className="space-y-4 text-center">
         <div className="flex justify-center">
-          <CheckCircle className="h-12 w-12 text-sage-500" />
+          <CheckCircle className="h-12 w-12 text-bamboo-deep" />
         </div>
-        <h2 className="text-xl font-bold text-foreground">{t('forgotSuccessTitle')}</h2>
-        <p className="text-sm text-muted-foreground">{t('forgotSuccessMessage')}</p>
+        <h2 className="text-xl font-bold text-navy-deep">{t('forgotSuccessTitle')}</h2>
+        <p className="text-sm text-navy-soft">{t('forgotSuccessMessage')}</p>
         <Button asChild variant="sage" size="lg" className="w-full">
           <Link href="/zaloguj">{t('backToLogin')}</Link>
         </Button>
@@ -82,7 +82,7 @@ export function ForgotPasswordForm() {
         )}
       </Button>
 
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-center text-sm text-navy-soft">
         <Link
           href="/zaloguj"
           className="font-semibold text-sage-600 hover:text-sage-700 hover:underline"
