@@ -6,7 +6,6 @@ import { signIn, getSession } from 'next-auth/react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useDeviceFingerprint } from '@/hooks/useDeviceFingerprint';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Link } from '@/i18n/navigation';
@@ -118,14 +117,15 @@ export function LoginForm() {
 
       {/* Error message */}
       {error && (
-        <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive">
+        <div
+          role="alert"
+          className="rounded-2xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
           {error}
           {emailNotVerified && !resendSuccess && (
             <div className="mt-2">
-              <Button
+              <button
                 type="button"
-                variant="outline"
-                size="sm"
                 disabled={resendLoading}
                 onClick={async () => {
                   setResendLoading(true);
@@ -139,12 +139,11 @@ export function LoginForm() {
                     setResendLoading(false);
                   }
                 }}
+                className="inline-flex items-center gap-2 rounded-full border border-red-300 bg-white px-4 py-1.5 text-xs font-medium text-red-700 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {resendLoading ? (
-                  <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                ) : null}
+                {resendLoading && <Loader2 className="h-3 w-3 animate-spin" />}
                 {t('resendVerification')}
-              </Button>
+              </button>
             </div>
           )}
           {resendSuccess && (
@@ -175,7 +174,7 @@ export function LoginForm() {
           <Label htmlFor="password">{t('passwordLabel')}</Label>
           <Link
             href="/zapomnialem-hasla"
-            className="text-xs text-sage-600 hover:text-sage-700 hover:underline"
+            className="text-xs text-bamboo-deep underline-offset-4 hover:underline"
           >
             {t('forgotPassword')}
           </Link>
@@ -193,7 +192,7 @@ export function LoginForm() {
           <button
             type="button"
             onClick={() => setShowPassword((v) => !v)}
-            className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 flex items-center justify-center text-navy-soft hover:text-navy-deep transition-colors"
             aria-label={showPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
           >
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -202,26 +201,18 @@ export function LoginForm() {
       </div>
 
       {/* Submit */}
-      <Button
+      <button
         type="submit"
-        variant="sage"
-        size="lg"
         disabled={loading}
-        className="w-full"
+        className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-navy-deep px-8 py-3.5 text-base font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-bamboo hover:text-navy-deep disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:bg-navy-deep disabled:hover:text-white"
       >
-        {loading ? (
-          <>
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Ładowanie...
-          </>
-        ) : (
-          t('submitButton')
-        )}
-      </Button>
+        {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+        {loading ? 'Ładowanie...' : t('submitButton')}
+      </button>
 
       {/* Register link — preserve callbackUrl so user lands back where they
           started (e.g. /zamow?plan=FIRMA) after signup + email verify. */}
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-center text-sm text-navy-soft">
         {t('noAccount')}{' '}
         <Link
           href={
@@ -229,7 +220,7 @@ export function LoginForm() {
               ? { pathname: '/rejestracja', query: { callbackUrl } }
               : '/rejestracja'
           }
-          className="font-semibold text-sage-600 hover:text-sage-700 hover:underline"
+          className="font-semibold text-bamboo-deep underline-offset-4 hover:underline"
         >
           {t('registerLink')}
         </Link>

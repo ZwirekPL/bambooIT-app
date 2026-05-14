@@ -5,7 +5,6 @@ import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Eye, EyeOff, Loader2, CheckCircle } from 'lucide-react';
 import { useDeviceFingerprint } from '@/hooks/useDeviceFingerprint';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Link } from '@/i18n/navigation';
@@ -147,25 +146,26 @@ export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
     return (
       <div className="space-y-4 text-center">
         <div className="flex justify-center">
-          <CheckCircle className="h-12 w-12 text-sage-500" />
+          <CheckCircle className="h-12 w-12 text-bamboo-deep" />
         </div>
-        <h2 className="text-xl font-bold text-foreground">{t('registerSuccessTitle')}</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="font-display text-2xl font-semibold tracking-[-0.02em] text-navy-deep">
+          {t('registerSuccessTitle')}
+        </h2>
+        <p className="text-sm text-navy-soft">
           {t('registerSuccessMessage', { email: successEmail })}
         </p>
-        <Button asChild variant="sage" size="lg" className="w-full">
-          {/* Preserve callbackUrl so verify-email → login → original
-              checkout target chain keeps working. */}
-          <Link
-            href={
-              callbackUrl
-                ? { pathname: '/zaloguj', query: { callbackUrl } }
-                : '/zaloguj'
-            }
-          >
-            {t('loginLink')}
-          </Link>
-        </Button>
+        {/* Preserve callbackUrl so verify-email → login → original
+            checkout target chain keeps working. */}
+        <Link
+          href={
+            callbackUrl
+              ? { pathname: '/zaloguj', query: { callbackUrl } }
+              : '/zaloguj'
+          }
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-navy-deep px-7 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-bamboo hover:text-navy-deep"
+        >
+          {t('loginLink')}
+        </Link>
       </div>
     );
   }
@@ -173,7 +173,10 @@ export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-5" noValidate>
       {error && (
-        <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive">
+        <div
+          role="alert"
+          className="rounded-2xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
           {error}
         </div>
       )}
@@ -238,7 +241,7 @@ export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
 
       {/* Company section divider */}
       <div className="pt-2">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">
+        <p className="text-xs font-medium text-navy-soft uppercase tracking-wide mb-3">
           {t('companySectionTitle')}
         </p>
       </div>
@@ -296,7 +299,7 @@ export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
         <div className="space-y-2">
           <Label htmlFor="employeesCount">
             {t('employeesCountLabel')}
-            <span className="ml-1 text-xs text-muted-foreground">({t('optional')})</span>
+            <span className="ml-1 text-xs text-navy-soft">({t('optional')})</span>
           </Label>
           <Input
             id="employeesCount"
@@ -315,7 +318,7 @@ export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
       <div className="space-y-2">
         <Label htmlFor="website">
           {t('websiteLabel')}
-          <span className="ml-1 text-xs text-muted-foreground">({t('optional')})</span>
+          <span className="ml-1 text-xs text-navy-soft">({t('optional')})</span>
         </Label>
         <Input
           id="website"
@@ -344,13 +347,13 @@ export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
           <button
             type="button"
             onClick={() => setShowPassword((v) => !v)}
-            className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 flex items-center justify-center text-navy-soft hover:text-navy-deep transition-colors"
             aria-label={showPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
           >
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
-        <p className="text-xs text-muted-foreground">{t('passwordHint')}</p>
+        <p className="text-xs text-navy-soft">{t('passwordHint')}</p>
       </div>
 
       {/* Confirm Password */}
@@ -369,7 +372,7 @@ export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
           <button
             type="button"
             onClick={() => setShowConfirm((v) => !v)}
-            className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 flex items-center justify-center text-navy-soft hover:text-navy-deep transition-colors"
             aria-label={showConfirm ? 'Ukryj hasło' : 'Pokaż hasło'}
           >
             {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -390,34 +393,34 @@ export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
           maxLength={20}
           defaultValue={initialReferralCode}
         />
-        <p className="text-xs text-muted-foreground">{t('referralCodeHint')}</p>
+        <p className="text-xs text-navy-soft">{t('referralCodeHint')}</p>
       </div>
 
       {/* Consents */}
-      <div className="space-y-3 rounded-lg border border-border/50 bg-muted/30 p-4">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('consentsTitle')}</p>
+      <div className="space-y-3 rounded-2xl border border-line bg-paper p-4">
+        <p className="text-xs font-medium text-navy-soft uppercase tracking-wide">{t('consentsTitle')}</p>
 
-        <label className={`flex items-start gap-3 cursor-pointer rounded-md p-2 -m-2 transition-colors ${showConsentErrors && !consentHealth ? 'bg-destructive/10 ring-1 ring-destructive/30' : ''}`}>
+        <label className={`flex items-start gap-3 cursor-pointer rounded-md p-2 -m-2 transition-colors ${showConsentErrors && !consentHealth ? 'bg-red-50 ring-1 ring-red-300' : ''}`}>
           <input
             type="checkbox"
             checked={consentHealth}
             onChange={(e) => setConsentHealth(e.target.checked)}
-            className={`mt-0.5 h-4 w-4 rounded shrink-0 ${showConsentErrors && !consentHealth ? 'border-destructive accent-destructive' : 'border-input accent-sage-600'}`}
+            className={`mt-0.5 h-4 w-4 rounded shrink-0 ${showConsentErrors && !consentHealth ? 'border-red-400 accent-red-500' : 'border-input accent-bamboo-deep'}`}
           />
-          <span className={`text-sm leading-snug ${showConsentErrors && !consentHealth ? 'text-destructive' : 'text-foreground'}`}>
-            {t('consentHealthData')} <span className="text-destructive">*</span>
+          <span className={`text-sm leading-snug ${showConsentErrors && !consentHealth ? 'text-red-700' : 'text-navy-deep'}`}>
+            {t('consentHealthData')} <span className="text-red-600">*</span>
           </span>
         </label>
 
-        <label className={`flex items-start gap-3 cursor-pointer rounded-md p-2 -m-2 transition-colors ${showConsentErrors && !consentAi ? 'bg-destructive/10 ring-1 ring-destructive/30' : ''}`}>
+        <label className={`flex items-start gap-3 cursor-pointer rounded-md p-2 -m-2 transition-colors ${showConsentErrors && !consentAi ? 'bg-red-50 ring-1 ring-red-300' : ''}`}>
           <input
             type="checkbox"
             checked={consentAi}
             onChange={(e) => setConsentAi(e.target.checked)}
-            className={`mt-0.5 h-4 w-4 rounded shrink-0 ${showConsentErrors && !consentAi ? 'border-destructive accent-destructive' : 'border-input accent-sage-600'}`}
+            className={`mt-0.5 h-4 w-4 rounded shrink-0 ${showConsentErrors && !consentAi ? 'border-red-400 accent-red-500' : 'border-input accent-bamboo-deep'}`}
           />
-          <span className={`text-sm leading-snug ${showConsentErrors && !consentAi ? 'text-destructive' : 'text-foreground'}`}>
-            {t('consentAiDisclaimer')} <span className="text-destructive">*</span>
+          <span className={`text-sm leading-snug ${showConsentErrors && !consentAi ? 'text-red-700' : 'text-navy-deep'}`}>
+            {t('consentAiDisclaimer')} <span className="text-red-600">*</span>
           </span>
         </label>
 
@@ -426,31 +429,31 @@ export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
             type="checkbox"
             checked={consentEmail}
             onChange={(e) => setConsentEmail(e.target.checked)}
-            className="mt-0.5 h-4 w-4 rounded border-input accent-sage-600 shrink-0"
+            className="mt-0.5 h-4 w-4 rounded border-input accent-bamboo-deep shrink-0"
           />
-          <span className="text-sm text-muted-foreground leading-snug">
+          <span className="text-sm text-navy-soft leading-snug">
             {t('consentEmailNotifications')}
           </span>
         </label>
 
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-navy-soft">
           {t.rich('consentsLinks', {
             privacy: (chunks) => (
-              <Link href="/dokumenty-prawne" className="underline hover:text-foreground">{chunks}</Link>
+              <Link href="/dokumenty-prawne" className="underline hover:text-navy-deep">{chunks}</Link>
             ),
             terms: (chunks) => (
-              <Link href="/dokumenty-prawne" className="underline hover:text-foreground">{chunks}</Link>
+              <Link href="/dokumenty-prawne" className="underline hover:text-navy-deep">{chunks}</Link>
             ),
           })}
         </p>
-        <p className="text-xs text-muted-foreground">
-          <span className="text-destructive">*</span> {t('consentsRequiredNote')}
+        <p className="text-xs text-navy-soft">
+          <span className="text-red-600">*</span> {t('consentsRequiredNote')}
         </p>
       </div>
 
       {/* GDPR Art. 13 Information Clause */}
-      <details className="text-xs text-muted-foreground">
-        <summary className="cursor-pointer hover:text-foreground transition-colors">
+      <details className="text-xs text-navy-soft">
+        <summary className="cursor-pointer hover:text-navy-deep transition-colors">
           {t('gdprInfoClause')}
         </summary>
         <div className="mt-2 space-y-1 pl-2 border-l-2 border-border/50">
@@ -459,23 +462,25 @@ export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
       </details>
 
       {/* Submit */}
-      <Button type="submit" variant="sage" size="lg" disabled={loading} className="w-full">
-        {loading ? (
-          <>
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Ładowanie...
-          </>
-        ) : (
-          t('registerButton')
-        )}
-      </Button>
+      <button
+        type="submit"
+        disabled={loading}
+        className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-navy-deep px-8 py-3.5 text-base font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-bamboo hover:text-navy-deep disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:bg-navy-deep disabled:hover:text-white"
+      >
+        {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+        {loading ? 'Ładowanie...' : t('registerButton')}
+      </button>
 
-      {/* Login link */}
-      <p className="text-center text-sm text-muted-foreground">
+      {/* Login link — preserve callbackUrl on login redirect */}
+      <p className="text-center text-sm text-navy-soft">
         {t('hasAccount')}{' '}
         <Link
-          href="/zaloguj"
-          className="font-semibold text-sage-600 hover:text-sage-700 hover:underline"
+          href={
+            callbackUrl
+              ? { pathname: '/zaloguj', query: { callbackUrl } }
+              : '/zaloguj'
+          }
+          className="font-semibold text-bamboo-deep underline-offset-4 hover:underline"
         >
           {t('loginLink')}
         </Link>
