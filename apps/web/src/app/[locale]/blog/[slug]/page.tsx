@@ -24,11 +24,13 @@ export const dynamicParams = true;
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale, slug } = await params;
+  const { slug } = await params;
   try {
     const { post } = await api.blog.getBySlug(slug);
-    const title = locale === 'en' && post.titleEn ? post.titleEn : post.title;
-    const description = locale === 'en' && post.excerptEn ? post.excerptEn : post.excerpt;
+    // MVP is PL-only (K10.3); EN fields stay on the schema for future
+    // re-enable but are not branched on here.
+    const title = post.title;
+    const description = post.excerpt;
     const siteUrl = `https://${BRAND.domain}`;
     const imageUrl = post.imageSrc ? `${siteUrl}${post.imageSrc}` : undefined;
     return {
@@ -70,11 +72,11 @@ export default async function BlogPostPage({ params }: Props) {
     notFound();
   }
 
-  const title = locale === 'en' && post.titleEn ? post.titleEn : post.title;
-  const excerpt = locale === 'en' && post.excerptEn ? post.excerptEn : post.excerpt;
-  const imageAlt = locale === 'en' && post.imageAltEn ? post.imageAltEn : (post.imageAlt ?? title);
+  const title = post.title;
+  const excerpt = post.excerpt;
+  const imageAlt = post.imageAlt ?? title;
   const category = post.category as BlogCategory;
-  const content = locale === 'en' && post.contentEn ? post.contentEn : post.content;
+  const content = post.content;
   const faq = Array.isArray(post.faq) && post.faq.length > 0 ? (post.faq as BlogFaqItem[]) : null;
   const categoryBadge = getCategoryStyle(category);
 
@@ -262,7 +264,7 @@ export default async function BlogPostPage({ params }: Props) {
         {faq && <FaqSection faq={faq} />}
 
         {/* Author */}
-        <AuthorBox name={post.author} locale={locale} aboutLabel={t('aboutAuthor')} />
+        <AuthorBox name={post.author} aboutLabel={t('aboutAuthor')} />
 
         {/* CTA */}
         <BlogCTA />

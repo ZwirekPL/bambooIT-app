@@ -5,12 +5,12 @@ import { User } from 'lucide-react';
 
 interface AuthorBoxProps {
   name: string;
-  locale: string;
   aboutLabel: string;
 }
 
-export function AuthorBox({ name, locale, aboutLabel }: AuthorBoxProps) {
-  const bio = locale === 'en' ? BRAND.author.bioEn : BRAND.author.bio;
+export function AuthorBox({ name, aboutLabel }: AuthorBoxProps) {
+  // MVP is PL-only (K10.3); BRAND.author.bioEn stays for future re-enable.
+  const bio = BRAND.author.bio;
 
   return (
     <div className="mt-12 flex gap-5 rounded-2xl border border-line bg-paper p-6">

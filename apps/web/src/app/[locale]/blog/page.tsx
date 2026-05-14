@@ -12,18 +12,20 @@ export const revalidate = 60;
 
 type Props = { params: Promise<{ locale: string }> };
 
-function toLocalizedPost(post: ApiBlogListItem, locale: string): BlogListItem {
+// MVP is PL-only (K10.3). EN fields on Post stay in the schema for a
+// future re-enable but are not branched on here.
+function toLocalizedPost(post: ApiBlogListItem): BlogListItem {
   return {
     id: post.id,
     slug: post.slug,
-    title: locale === 'en' && post.titleEn ? post.titleEn : post.title,
-    excerpt: locale === 'en' && post.excerptEn ? post.excerptEn : post.excerpt,
+    title: post.title,
+    excerpt: post.excerpt,
     category: post.category,
     author: post.author,
     publishedAt: post.publishedAt,
     readTime: post.readTime,
     imageSrc: post.imageSrc ?? undefined,
-    imageAlt: locale === 'en' && post.imageAltEn ? post.imageAltEn : (post.imageAlt ?? undefined),
+    imageAlt: post.imageAlt ?? undefined,
   };
 }
 
@@ -50,7 +52,7 @@ export default async function BlogPage({ params }: Props) {
       api.blog.list({ limit: 50 }),
       api.blog.categories().catch(() => ({ categories: [] })),
     ]);
-    posts = postsResult.posts.map((p) => toLocalizedPost(p, locale));
+    posts = postsResult.posts.map((p) => toLocalizedPost(p));
     categoryNames = categoriesResult.categories.map((c) => c.name);
   } catch {
     // Show empty state on error — blog is not critical

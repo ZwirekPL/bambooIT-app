@@ -10,17 +10,10 @@ import path from 'path';
 
 type Props = { params: Promise<{ locale: string }> };
 
-async function loadLegalDoc(locale: string, slug: string): Promise<string> {
-  const supportedLocale = locale === 'en' ? 'en' : 'pl';
-  const filePath = path.join(process.cwd(), 'content', 'legal', supportedLocale, `${slug}.md`);
-
-  try {
-    return await fs.readFile(filePath, 'utf-8');
-  } catch {
-    // Fallback to Polish if English not available
-    const fallbackPath = path.join(process.cwd(), 'content', 'legal', 'pl', `${slug}.md`);
-    return await fs.readFile(fallbackPath, 'utf-8');
-  }
+async function loadLegalDoc(slug: string): Promise<string> {
+  // MVP is PL-only (K10.3) — read directly from content/legal/pl.
+  const filePath = path.join(process.cwd(), 'content', 'legal', 'pl', `${slug}.md`);
+  return await fs.readFile(filePath, 'utf-8');
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -40,10 +33,10 @@ export default async function LegalPage({ params }: Props) {
   const t = await getTranslations('legal');
 
   const [privacy, terms, cookies, ai] = await Promise.all([
-    loadLegalDoc(locale, 'polityka-prywatnosci'),
-    loadLegalDoc(locale, 'regulamin'),
-    loadLegalDoc(locale, 'polityka-cookies'),
-    loadLegalDoc(locale, 'informacja-ai'),
+    loadLegalDoc('polityka-prywatnosci'),
+    loadLegalDoc('regulamin'),
+    loadLegalDoc('polityka-cookies'),
+    loadLegalDoc('informacja-ai'),
   ]);
 
   return (
