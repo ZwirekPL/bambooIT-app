@@ -93,7 +93,7 @@ export async function stripeWebhook(req: Request, res: Response): Promise<void> 
           }
         }
 
-        // Handle dietitian subscription checkout (has subscription)
+        // Handle subscription checkout (Stripe Checkout session has subscription)
         if (subscriptionId) {
           await handleCheckoutCompleted({
             customer: typeof session.customer === 'string' ? session.customer : null,

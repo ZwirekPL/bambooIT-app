@@ -254,12 +254,6 @@ export interface BlogPost {
 
 export type BlogListItem = Omit<BlogPost, 'content'>;
 
-// ── Body Measurements (79.3) ─────────────────────────────────────────────────
-
-// ─── Dietitian Alerts (20.1) ──────────────────────────────────────────────────
-
-// ─── Note Templates (20.3) ──────────────────────────────────────────────────
-
 export interface BlogCategoryConfig {
   id: string;
   name: string;

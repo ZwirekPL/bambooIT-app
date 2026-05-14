@@ -86,17 +86,18 @@ export const SCORING_WEIGHT_KEYS = Object.keys(DEFAULT_SCORING_WEIGHTS) as (keyo
 
 /**
  * Get scoring weights from AppSettings, merged with defaults.
- * Optionally applies per-dietitian overrides on top.
+ * Optionally applies a per-call override (kept generic for bambooIT;
+ * was named `dietitianOverride` in the e-dietetyk era).
  */
 export async function getScoringWeights(
-  dietitianOverride?: Partial<ScoringWeights> | null,
+  override?: Partial<ScoringWeights> | null,
 ): Promise<ScoringWeights> {
   const stored = await getSetting<Partial<ScoringWeights>>(SETTING_SCORING_WEIGHTS, {});
   const merged = { ...DEFAULT_SCORING_WEIGHTS, ...stored };
-  if (dietitianOverride) {
+  if (override) {
     for (const key of SCORING_WEIGHT_KEYS) {
-      if (dietitianOverride[key] !== undefined) {
-        merged[key] = dietitianOverride[key]!;
+      if (override[key] !== undefined) {
+        merged[key] = override[key]!;
       }
     }
   }
