@@ -2,6 +2,7 @@ import { prisma } from '@db';
 import { AppError } from '../utils/errors';
 import { isStripeConfigured, createCheckoutSession, createPortalSession } from './stripe.service';
 import { sendSubscriptionWelcomeEmail, sendPaymentFailedEmail } from '../utils/email';
+import { logAudit } from './audit.service';
 import * as Sentry from '@sentry/node';
 import type { SubscriptionPlan } from '@prisma/client';
 
@@ -218,6 +219,55 @@ export async function handleCheckoutCompleted(session: {
       status: 'ACTIVE',
     },
   });
+
+  // Lead → Subscription conversion tracking (BE-1 ↔ BE-2 loop close).
+  // If this user originally came in via /audyt or /kontakt form, mark
+  // all of their leads (matched by email) as CONVERTED. Audit log entry
+  // per converted lead so we can attribute "first touch source" later.
+  await markLeadsConvertedForUser(userId).catch((err) => {
+    console.error('[subscription] lead conversion tracking failed:', err);
+    // Non-blocking — subscription is created, conversion attribution is
+    // best-effort and can be re-run manually if needed.
+  });
+}
+
+async function markLeadsConvertedForUser(userId: string): Promise<void> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { email: true },
+  });
+  if (!user?.email) return;
+
+  const eligible = await prisma.lead.findMany({
+    where: {
+      email: user.email,
+      status: { notIn: ['CONVERTED', 'REJECTED'] },
+    },
+    select: { id: true, status: true, type: true, source: true },
+  });
+
+  if (eligible.length === 0) return;
+
+  await prisma.lead.updateMany({
+    where: { id: { in: eligible.map((l) => l.id) } },
+    data: { status: 'CONVERTED' },
+  });
+
+  for (const lead of eligible) {
+    logAudit({
+      userId,
+      action: 'LEAD_STATUS_UPDATED',
+      resourceType: 'LEAD',
+      resourceId: lead.id,
+      metadata: {
+        from: lead.status,
+        to: 'CONVERTED',
+        trigger: 'stripe_checkout_completed',
+        leadType: lead.type,
+        source: lead.source,
+      },
+    });
+  }
 }
 
 export async function handleInvoicePaid(invoice: {
