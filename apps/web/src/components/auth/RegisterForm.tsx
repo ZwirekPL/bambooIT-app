@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Eye, EyeOff, Loader2, CheckCircle } from 'lucide-react';
 import { useDeviceFingerprint } from '@/hooks/useDeviceFingerprint';
@@ -10,6 +11,16 @@ import { Label } from '@/components/ui/label';
 import { Link } from '@/i18n/navigation';
 import { api, ApiError } from '@/lib/api';
 import { isValidNIP } from '@/lib/validators/nip';
+
+/**
+ * Same callbackUrl sanitizer as LoginForm — accept only same-origin paths.
+ */
+function safeCallback(raw: string | null): string | null {
+  if (!raw) return null;
+  if (raw.startsWith('//') || /^[a-z][a-z0-9+.-]*:/i.test(raw)) return null;
+  if (!raw.startsWith('/')) return null;
+  return raw;
+}
 
 const INDUSTRY_OPTIONS = [
   'accounting',
@@ -28,6 +39,8 @@ interface RegisterFormProps {
 export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
   const t = useTranslations('auth');
   const deviceFingerprint = useDeviceFingerprint();
+  const searchParams = useSearchParams();
+  const callbackUrl = safeCallback(searchParams?.get('callbackUrl') ?? null);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -141,7 +154,17 @@ export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
           {t('registerSuccessMessage', { email: successEmail })}
         </p>
         <Button asChild variant="sage" size="lg" className="w-full">
-          <Link href="/zaloguj">{t('loginLink')}</Link>
+          {/* Preserve callbackUrl so verify-email → login → original
+              checkout target chain keeps working. */}
+          <Link
+            href={
+              callbackUrl
+                ? { pathname: '/zaloguj', query: { callbackUrl } }
+                : '/zaloguj'
+            }
+          >
+            {t('loginLink')}
+          </Link>
         </Button>
       </div>
     );

@@ -18,7 +18,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   const role = session?.user?.role;
   if (role !== 'ADMIN') {
-    redirect({ href: '/dashboard', locale });
+    // Non-admin clients land on their subscription panel — /dashboard never
+    // existed in bambooIT (legacy e-dietetyk route).
+    redirect({ href: '/panel/subskrypcja', locale });
   }
 
   const email = session?.user?.email ?? '';

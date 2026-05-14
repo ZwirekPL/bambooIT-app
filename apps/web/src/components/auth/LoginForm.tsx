@@ -12,12 +12,30 @@ import { Label } from '@/components/ui/label';
 import { Link } from '@/i18n/navigation';
 import { api } from '@/lib/api';
 
+/**
+ * Sanitize the post-login redirect target.
+ *
+ * Accepts only same-origin paths (starting with "/"). Anything that looks
+ * like a protocol-relative URL ("//evil.com") or absolute external URL
+ * gets rejected. Returns null if the input is unsafe — caller falls back
+ * to role-based default route.
+ */
+function safeCallback(raw: string | null): string | null {
+  if (!raw) return null;
+  // Reject protocol-relative and absolute URLs
+  if (raw.startsWith('//') || /^[a-z][a-z0-9+.-]*:/i.test(raw)) return null;
+  // Must start with single slash
+  if (!raw.startsWith('/')) return null;
+  return raw;
+}
+
 export function LoginForm() {
   const t = useTranslations('auth');
   const locale = useLocale();
   const deviceFingerprint = useDeviceFingerprint();
   const searchParams = useSearchParams();
   const reason = searchParams?.get('reason');
+  const callbackUrl = safeCallback(searchParams?.get('callbackUrl') ?? null);
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -72,10 +90,15 @@ export function LoginForm() {
     const session = await getSession();
 
     const role = (session?.user as { role?: string } | undefined)?.role;
-    if (role === 'ADMIN') {
+
+    // 1. Honor explicit ?callbackUrl= (e.g. user landed here from /zamow)
+    // 2. Otherwise role-based default: ADMIN → /admin, CLIENT → /panel/subskrypcja
+    if (callbackUrl) {
+      window.location.href = callbackUrl;
+    } else if (role === 'ADMIN') {
       window.location.href = `/${locale}/admin`;
     } else {
-      window.location.href = `/${locale}/dashboard`;
+      window.location.href = `/${locale}/panel/subskrypcja`;
     }
   }
 
@@ -196,11 +219,16 @@ export function LoginForm() {
         )}
       </Button>
 
-      {/* Register link */}
+      {/* Register link — preserve callbackUrl so user lands back where they
+          started (e.g. /zamow?plan=FIRMA) after signup + email verify. */}
       <p className="text-center text-sm text-muted-foreground">
         {t('noAccount')}{' '}
         <Link
-          href="/rejestracja"
+          href={
+            callbackUrl
+              ? { pathname: '/rejestracja', query: { callbackUrl } }
+              : '/rejestracja'
+          }
           className="font-semibold text-sage-600 hover:text-sage-700 hover:underline"
         >
           {t('registerLink')}

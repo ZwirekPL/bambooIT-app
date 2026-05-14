@@ -103,7 +103,7 @@ describe('LoginForm', () => {
     });
   });
 
-  it('redirects to /pl/dashboard on successful login', async () => {
+  it('redirects to /pl/panel/subskrypcja on successful client login', async () => {
     mockSignIn.mockResolvedValue({ error: null });
     const user = userEvent.setup();
     render(React.createElement(LoginForm));
@@ -113,7 +113,7 @@ describe('LoginForm', () => {
     await user.click(screen.getByRole('button', { name: /submitButton/i }));
 
     await waitFor(() => {
-      expect(window.location.href).toBe('/pl/dashboard');
+      expect(window.location.href).toBe('/pl/panel/subskrypcja');
     });
   });
 
