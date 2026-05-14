@@ -99,14 +99,33 @@ describe('api.health', () => {
 describe('api.auth.register', () => {
   afterEach(() => vi.unstubAllGlobals());
 
+  const baseCompanyFields = {
+    firstName: 'Jan',
+    lastName: 'Kowalski',
+    companyName: 'ACME Sp. z o.o.',
+    nip: '5260250274',
+    industry: 'accounting' as const,
+    phone: '+48 600 100 200',
+  };
+
   it('POSTs to /auth/register with correct body', async () => {
     const fetchMock = mockFetch(201, { ok: true, user: { id: '1', email: 'a@b.com', role: 'CLIENT' } });
-    await api.auth.register({ email: 'a@b.com', password: 'secret123', consents: { healthDataProcessing: true, aiDisclaimer: true, emailNotifications: false } });
+    await api.auth.register({
+      email: 'a@b.com',
+      password: 'secret123',
+      ...baseCompanyFields,
+      consents: { healthDataProcessing: true, aiDisclaimer: true, emailNotifications: false },
+    });
 
     const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit];
     expect(url).toContain('/auth/register');
     expect(options.method).toBe('POST');
-    expect(JSON.parse(options.body as string)).toMatchObject({ email: 'a@b.com', password: 'secret123' });
+    expect(JSON.parse(options.body as string)).toMatchObject({
+      email: 'a@b.com',
+      password: 'secret123',
+      companyName: 'ACME Sp. z o.o.',
+      nip: '5260250274',
+    });
   });
 
   it('includes optional fields when provided', async () => {
@@ -114,8 +133,9 @@ describe('api.auth.register', () => {
     await api.auth.register({
       email: 'a@b.com',
       password: 'secret123',
-      firstName: 'Jan',
-      lastName: 'Kowalski',
+      ...baseCompanyFields,
+      employeesCount: 12,
+      website: 'https://acme.pl',
       referralCode: 'BAMBOO-A1B2C3',
       consents: { healthDataProcessing: true, aiDisclaimer: true, emailNotifications: false },
     });
@@ -123,6 +143,8 @@ describe('api.auth.register', () => {
     const [, options] = fetchMock.mock.calls[0] as [string, RequestInit];
     const body = JSON.parse(options.body as string);
     expect(body.firstName).toBe('Jan');
+    expect(body.employeesCount).toBe(12);
+    expect(body.website).toBe('https://acme.pl');
     expect(body.referralCode).toBe('BAMBOO-A1B2C3');
   });
 });

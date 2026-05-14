@@ -11,15 +11,18 @@ let logoutInProgress = false;
 
 export class ApiError extends Error {
   public fields?: Array<{ field: string; code: string; minimum?: number }>;
+  public code?: string;
 
   constructor(
     public status: number,
     message: string,
-    fields?: Array<{ field: string; code: string; minimum?: number }>
+    fields?: Array<{ field: string; code: string; minimum?: number }>,
+    code?: string
   ) {
     super(message);
     this.name = 'ApiError';
     this.fields = fields;
+    this.code = code;
   }
 }
 
@@ -79,7 +82,7 @@ export async function apiFetch<T>(
       });
     }
 
-    throw new ApiError(res.status, message, fields);
+    throw new ApiError(res.status, message, fields, errorCode);
   }
 
   return res.json() as Promise<T>;
@@ -94,8 +97,14 @@ export const api = {
     register: (data: {
       email: string;
       password: string;
-      firstName?: string;
-      lastName?: string;
+      firstName: string;
+      lastName: string;
+      companyName: string;
+      nip: string;
+      industry: 'accounting' | 'law' | 'medical' | 'production' | 'hospitality' | 'other';
+      phone: string;
+      employeesCount?: number;
+      website?: string;
       referralCode?: string;
       consents: {
         healthDataProcessing: boolean;

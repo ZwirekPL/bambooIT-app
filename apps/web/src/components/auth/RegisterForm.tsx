@@ -9,6 +9,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Link } from '@/i18n/navigation';
 import { api, ApiError } from '@/lib/api';
+import { isValidNIP } from '@/lib/validators/nip';
+
+const INDUSTRY_OPTIONS = [
+  'accounting',
+  'law',
+  'medical',
+  'production',
+  'hospitality',
+  'other',
+] as const;
+type IndustryValue = (typeof INDUSTRY_OPTIONS)[number];
 
 interface RegisterFormProps {
   initialReferralCode?: string;
@@ -38,6 +49,12 @@ export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
     const email = (form.elements.namedItem('email') as HTMLInputElement).value.trim();
     const password = (form.elements.namedItem('password') as HTMLInputElement).value;
     const confirmPassword = (form.elements.namedItem('confirmPassword') as HTMLInputElement).value;
+    const companyName = (form.elements.namedItem('companyName') as HTMLInputElement).value.trim();
+    const nipRaw = (form.elements.namedItem('nip') as HTMLInputElement).value.trim();
+    const industry = (form.elements.namedItem('industry') as HTMLSelectElement).value as IndustryValue;
+    const phone = (form.elements.namedItem('phone') as HTMLInputElement).value.trim();
+    const employeesCountRaw = (form.elements.namedItem('employeesCount') as HTMLInputElement).value.trim();
+    const website = (form.elements.namedItem('website') as HTMLInputElement).value.trim() || undefined;
     const referralCode = (form.elements.namedItem('referralCode') as HTMLInputElement).value.trim() || undefined;
 
     const hasLetter = /[a-zA-Z]/.test(password);
@@ -50,6 +67,22 @@ export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
 
     if (password !== confirmPassword) {
       setError(t('errorPasswordMismatch'));
+      return;
+    }
+
+    if (!isValidNIP(nipRaw)) {
+      setError(t('errorNipInvalid'));
+      return;
+    }
+
+    if (!INDUSTRY_OPTIONS.includes(industry)) {
+      setError(t('errorIndustryRequired'));
+      return;
+    }
+
+    const employeesCount = employeesCountRaw ? Number(employeesCountRaw) : undefined;
+    if (employeesCount !== undefined && (!Number.isFinite(employeesCount) || employeesCount < 1)) {
+      setError(t('errorEmployeesCountInvalid'));
       return;
     }
 
@@ -69,6 +102,12 @@ export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
         password,
         firstName,
         lastName,
+        companyName,
+        nip: nipRaw.replace(/[\s-]/g, ''),
+        industry,
+        phone,
+        employeesCount,
+        website,
         referralCode,
         consents: {
           healthDataProcessing: consentHealth,
@@ -80,7 +119,7 @@ export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
       setSuccessEmail(email);
     } catch (err) {
       if (err instanceof ApiError && err.status === 409) {
-        setError(t('errorEmailTaken'));
+        setError(err.code === 'NIP_TAKEN' ? t('errorNipTaken') : t('errorEmailTaken'));
       } else if (err instanceof ApiError && err.status === 400) {
         setError(t('errorValidation'));
       } else {
@@ -154,6 +193,114 @@ export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
           placeholder={t('emailPlaceholder')}
           autoComplete="email"
           required
+          className="h-11"
+        />
+      </div>
+
+      {/* Phone */}
+      <div className="space-y-2">
+        <Label htmlFor="phone">{t('phoneLabel')}</Label>
+        <Input
+          id="phone"
+          name="phone"
+          type="tel"
+          placeholder={t('phonePlaceholder')}
+          autoComplete="tel"
+          required
+          minLength={6}
+          maxLength={30}
+          className="h-11"
+        />
+      </div>
+
+      {/* Company section divider */}
+      <div className="pt-2">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">
+          {t('companySectionTitle')}
+        </p>
+      </div>
+
+      {/* Company name + NIP */}
+      <div className="grid grid-cols-1 sm:grid-cols-[1.4fr_1fr] gap-3">
+        <div className="space-y-2">
+          <Label htmlFor="companyName">{t('companyNameLabel')}</Label>
+          <Input
+            id="companyName"
+            name="companyName"
+            type="text"
+            placeholder={t('companyNamePlaceholder')}
+            autoComplete="organization"
+            required
+            className="h-11"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="nip">{t('nipLabel')}</Label>
+          <Input
+            id="nip"
+            name="nip"
+            type="text"
+            placeholder={t('nipPlaceholder')}
+            autoComplete="off"
+            required
+            inputMode="numeric"
+            className="h-11"
+          />
+        </div>
+      </div>
+
+      {/* Industry + employees count */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="space-y-2">
+          <Label htmlFor="industry">{t('industryLabel')}</Label>
+          <select
+            id="industry"
+            name="industry"
+            required
+            defaultValue=""
+            className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          >
+            <option value="" disabled hidden>
+              {t('industryPlaceholder')}
+            </option>
+            {INDUSTRY_OPTIONS.map((value) => (
+              <option key={value} value={value}>
+                {t(`industryOptions.${value}`)}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="employeesCount">
+            {t('employeesCountLabel')}
+            <span className="ml-1 text-xs text-muted-foreground">({t('optional')})</span>
+          </Label>
+          <Input
+            id="employeesCount"
+            name="employeesCount"
+            type="number"
+            min={1}
+            max={10000}
+            placeholder={t('employeesCountPlaceholder')}
+            autoComplete="off"
+            className="h-11"
+          />
+        </div>
+      </div>
+
+      {/* Website */}
+      <div className="space-y-2">
+        <Label htmlFor="website">
+          {t('websiteLabel')}
+          <span className="ml-1 text-xs text-muted-foreground">({t('optional')})</span>
+        </Label>
+        <Input
+          id="website"
+          name="website"
+          type="url"
+          placeholder={t('websitePlaceholder')}
+          autoComplete="url"
+          maxLength={200}
           className="h-11"
         />
       </div>
