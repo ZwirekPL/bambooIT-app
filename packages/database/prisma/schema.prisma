@@ -84,8 +84,21 @@ model Company {
   contactFirstName String?
   contactLastName  String?
 
+  // Business fields (Faza 4 — Migration 12)
+  nip             String?  @unique           // 10-digit Polish tax ID (mod 11 checksum)
+  companyName     String?                     // legal name (different from contact name)
+  industry        String?                     // same enum string as Lead.industry
+  employeesCount  Int?
+  city            String?
+  address         String?                     // street + number
+  postalCode      String?                     // "XX-XXX"
+  phone           String?
+  website         String?
+
   user             User              @relation("CompanyUser", fields: [userId], references: [id], onDelete: Cascade)
   orders           Order[]
+
+  @@index([nip])
 }
 
 model AuditLog {
