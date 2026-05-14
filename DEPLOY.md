@@ -1,364 +1,500 @@
-# Jak uruchomić DietetykAI na serwerze — instrukcja krok po kroku
+# Jak uruchomić bambooIT na serwerze — instrukcja krok po kroku
 
-Instrukcja napisana tak, żebyś mógł ją wykonać nawet bez doświadczenia z serwerami.
-Każdy krok to gotowa komenda do skopiowania — nic nie musisz pisać od zera.
+> **Status:** Draft prepared during BE-4. Wymaga przetestowania na żywym VPS (BE-5).
+> Niektóre kroki mogą wymagać korekty po pierwszym deploy'u.
 
----
-
-## Co będziesz potrzebować
-
-Zanim zaczniesz, przygotuj:
-
-| Co | Gdzie to zdobyć | Uwagi |
-|----|------------------|-------|
-| **VPS (serwer)** | Hostinger, OVH, Hetzner, DigitalOcean | Min. 2 GB RAM, Ubuntu 22.04 lub 24.04 |
-| **Domena** | Twój dostawca domen | Np. `dietetyk-ai.pl` |
-| **Konto Stripe** | [stripe.com](https://stripe.com) | Do płatności — potrzebne klucze API |
-| **Konto OpenAI** | [platform.openai.com](https://platform.openai.com) | Do generowania diet — potrzebny klucz API |
-| **Skrzynka email / SMTP** | Twój dostawca lub [mailtrap.io](https://mailtrap.io) | Do wysyłania maili (weryfikacja, reset hasła) |
-| **Terminal SSH** | Windows: [Termius](https://termius.com) lub wbudowany terminal | Aby połączyć się z serwerem |
+Instrukcja prowadzi przez deploy bambooIT na VPS Ubuntu 24.04 z Nginx jako reverse proxy i PM2 do zarządzania procesami Node.js. Każdy krok to gotowa komenda do skopiowania.
 
 ---
 
-## CZĘŚĆ 1: Kupno i przygotowanie serwera
+## 1. Co będziesz potrzebować
 
-### Krok 1 — Kup VPS
-
-Przykład na Hostinger (podobnie wygląda u innych):
-1. Wejdź na stronę hostingu (np. hostinger.pl)
-2. Wybierz VPS z minimum **2 GB RAM** i **Ubuntu 22.04** lub **24.04**
-3. Po zakupie dostaniesz:
-   - **Adres IP** serwera (np. `185.123.45.67`)
-   - **Hasło root** (lub klucz SSH)
-   - Ewentualnie **port SSH** (domyślnie `22`)
-
-Zapisz te dane — będą potrzebne do połączenia.
-
-### Krok 2 — Podepnij domenę
-
-Wejdź w panel DNS swojej domeny i dodaj rekord:
-
-| Typ | Nazwa | Wartość |
-|-----|-------|---------|
-| A | @ | `185.123.45.67` ← tu wstaw IP swojego VPS |
-| A | www | `185.123.45.67` ← to samo IP |
-
-Po zapisaniu poczekaj do 30 minut — DNS musi się rozpropagować.
-
-**Jak sprawdzić czy działa?** Otwórz terminal na komputerze i wpisz:
-```
-ping twoja-domena.pl
-```
-Jeśli odpowiada z IP Twojego serwera — DNS działa.
+| Co | Gdzie | Uwagi |
+|----|-------|-------|
+| **VPS** | Hostinger / OVH / Hetzner / DigitalOcean | Min. 2 GB RAM, Ubuntu 22.04+ |
+| **Domena** | Dowolny rejestrator | `bambooit.pl` (per CLAUDE.md) |
+| **Konto Stripe** | [stripe.com](https://stripe.com) | Sekret klucza, publishable key, webhook secret, 3 Price IDs |
+| **SMTP** | Mailtrap (dev) / Postmark / Resend (prod) | Hostowanie maili transakcyjnych |
+| **Sentry** | [sentry.io](https://sentry.io) | DSN dla web + backend (osobne projekty) |
+| **Konto GitHub** | github.com | Repo `bambooIT` (prywatne) |
+| **SSH klient** | Termius / wbudowany terminal | Połączenie z VPS |
 
 ---
 
-## CZĘŚĆ 2: Pierwsze uruchomienie serwera
+## 2. Pierwsze kroki na VPS
 
-### Krok 3 — Połącz się z serwerem
-
-Otwórz terminal (Termius, Windows Terminal, lub PowerShell) i wpisz:
-
+### 2.1 Połączenie SSH
 ```bash
-ssh root@185.123.45.67
+ssh root@<TWÓJ_VPS_IP>
 ```
-*(zamień na swoje IP)*
 
-Wpisz hasło gdy zapyta. Po zalogowaniu zobaczysz coś jak:
-```
-root@vps-12345:~#
-```
-To znaczy, że jesteś na serwerze. Wszystkie kolejne komendy wpisujesz tutaj.
-
-### Krok 4 — Pobierz kod aplikacji
-
-Skopiuj i wklej te komendy **jedną po drugiej**:
-
+### 2.2 Stwórz dedykowanego usera (NIE root do appki)
 ```bash
-mkdir -p /opt/dietetyk
+adduser bambooit
+usermod -aG sudo bambooit
+# Klucz SSH dla nowego usera:
+rsync --archive --chown=bambooit:bambooit ~/.ssh /home/bambooit
 ```
+
+### 2.3 Zaktualizuj system
 ```bash
-cd /opt/dietetyk
+apt update && apt upgrade -y
 ```
+
+### 2.4 Zainstaluj Node.js 22, nginx, PostgreSQL, Redis, git, certbot
 ```bash
-git clone https://github.com/TWOJ_USER/DietetykDEV.git .
+# Node.js 22 via NodeSource
+curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+apt install -y nodejs
+
+# Reszta
+apt install -y nginx postgresql postgresql-contrib redis-server git certbot python3-certbot-nginx
 ```
-*(zamień `TWOJ_USER` na swój login GitHub)*
 
-Jeśli repo jest prywatne, Git zapyta o login i hasło (użyj Personal Access Token z GitHub).
-
-### Krok 5 — Uruchom automatyczny setup
-
-Ta komenda zainstaluje wszystko co potrzebne:
-
+### 2.5 PM2 globally
 ```bash
-sudo bash infra/setup-vps.sh twoja-domena.pl
-```
-*(zamień `twoja-domena.pl` na swoją domenę)*
-
-**Co ta komenda robi automatycznie:**
-- Instaluje Docker (silnik kontenerów)
-- Instaluje zabezpieczenia (firewall — blokuje wszystko oprócz portów 80, 443 i SSH)
-- Pobiera certyfikat SSL (zielona kłódka w przeglądarce)
-- Generuje hasła i klucze szyfrowania
-- Ustawia automatyczny backup bazy co noc o 2:00
-- Ustawia automatyczne sprawdzanie zdrowia aplikacji co 5 minut
-
-Zajmie to 2-5 minut. Na końcu zobaczysz podsumowanie.
-
----
-
-## CZĘŚĆ 3: Konfiguracja
-
-### Krok 6 — Uzupełnij dane w pliku konfiguracyjnym
-
-Setup wygenerował plik `.env.prod` z gotowymi hasłami. Musisz ręcznie uzupełnić kilka rzeczy.
-
-Otwórz plik do edycji:
-```bash
-nano /opt/dietetyk/.env.prod
-```
-
-Zobaczysz plik z wieloma liniami. Poruszaj się strzałkami ↑↓. Znajdź i uzupełnij:
-
-**Email (SMTP) — żeby aplikacja mogła wysyłać maile:**
-```
-SMTP_HOST=smtp.gmail.com          ← adres serwera pocztowego
-SMTP_PORT=587                     ← port (587 to standard)
-SMTP_USER=twoj@email.com          ← login do poczty
-SMTP_PASS=haslo-aplikacji          ← hasło (dla Gmail: "hasło aplikacji")
-SMTP_FROM="DietetykAI <twoj@email.com>"
-```
-
-**Stripe — żeby działały płatności:**
-```
-STRIPE_SECRET_KEY=sk_live_...     ← ze Stripe Dashboard → Developers → API keys
-STRIPE_WEBHOOK_SECRET=whsec_...   ← uzupełnisz po kroku 10
-```
-
-**OpenAI — żeby działało generowanie diet:**
-```
-OPENAI_API_KEY=sk-...             ← z platform.openai.com → API Keys
-```
-
-**Jak zapisać plik w nano:**
-1. Naciśnij `Ctrl + O` (litera O, nie zero)
-2. Naciśnij `Enter` (potwierdź nazwę pliku)
-3. Naciśnij `Ctrl + X` (wyjdź z edytora)
-
-### Krok 7 — Uruchom aplikację
-
-Skopiuj i wklej tę komendę (buduje i uruchamia wszystko):
-
-```bash
-cd /opt/dietetyk && docker compose -f docker-compose.prod.yml up -d --build
-```
-
-**To potrwa 5-10 minut** przy pierwszym uruchomieniu (pobiera obrazy, kompiluje kod).
-Zobaczysz postęp na ekranie. Poczekaj aż się skończy.
-
-### Krok 8 — Uruchom migracje bazy danych
-
-```bash
-docker compose -f docker-compose.prod.yml exec backend npx prisma migrate deploy --schema=/app/packages/database/prisma/schema.prisma
-```
-
-Zobaczysz listę migracji i komunikat o sukcesie.
-
-### Krok 9 — Sprawdź czy wszystko działa
-
-```bash
-bash infra/status.sh
-```
-
-Powinieneś zobaczyć coś takiego:
-```
-── Services ──────────────────────────────────
-dietetyk_postgres   Up (healthy)
-dietetyk_redis      Up (healthy)
-dietetyk_backend    Up (healthy)
-dietetyk_web        Up (healthy)
-dietetyk_nginx      Up
-
-── Health Checks ─────────────────────────────
-dietetyk_postgres   healthy
-dietetyk_redis      healthy
-dietetyk_backend    healthy
-dietetyk_web        healthy
-```
-
-Jeśli wszystko jest `healthy` — **aplikacja działa!**
-
-Otwórz przeglądarkę i wejdź na:
-```
-https://twoja-domena.pl
-```
-
-Powinieneś zobaczyć stronę DietetykAI z zieloną kłódką SSL.
-
-### Krok 10 — Skonfiguruj Stripe Webhook
-
-Żeby Stripe informował aplikację o płatnościach:
-
-1. Wejdź na [dashboard.stripe.com](https://dashboard.stripe.com)
-2. Kliknij: **Developers** → **Webhooks** → **Add endpoint**
-3. Wpisz URL: `https://twoja-domena.pl/webhooks/stripe`
-4. Kliknij **Select events** i zaznacz:
-   - `checkout.session.completed`
-   - `invoice.paid`
-   - `invoice.payment_failed`
-   - `customer.subscription.updated`
-   - `customer.subscription.deleted`
-5. Kliknij **Add endpoint**
-6. Skopiuj **Signing secret** (zaczyna się od `whsec_...`)
-7. Wklej go do pliku konfiguracyjnego:
-   ```bash
-   nano /opt/dietetyk/.env.prod
-   ```
-   Znajdź linię `STRIPE_WEBHOOK_SECRET=` i wklej za znakiem `=`
-8. Zrestartuj backend:
-   ```bash
-   cd /opt/dietetyk && docker compose -f docker-compose.prod.yml restart backend
-   ```
-
----
-
-## CZĘŚĆ 4: Codzienne zarządzanie
-
-### Sprawdź czy wszystko działa
-
-Wpisujesz jedną komendę i dostajesz pełny raport:
-```bash
-bash /opt/dietetyk/infra/status.sh
-```
-
-### Jeśli coś nie działa — zobacz logi
-
-```bash
-bash /opt/dietetyk/infra/logs.sh backend
-```
-To pokaże logi backendu (gdzie zwykle jest problem). Naciśnij `Ctrl + C` żeby wyjść.
-
-### Restart gdy coś się zawiesi
-
-```bash
-cd /opt/dietetyk && docker compose -f docker-compose.prod.yml restart
-```
-
-Lub restart konkretnego serwisu:
-```bash
-cd /opt/dietetyk && docker compose -f docker-compose.prod.yml restart backend
-```
-
-### Ręczny backup bazy
-
-Automatyczny działa co noc, ale możesz zrobić ręczny:
-```bash
-bash /opt/dietetyk/infra/backup.sh
+npm install -g pm2
 ```
 
 ---
 
-## CZĘŚĆ 5: Aktualizacja aplikacji
+## 3. PostgreSQL — osobna baza dla bambooIT
 
-### Sposób 1 — Automatycznie (rekomendowany)
+VPS współdzielony z e-dietetyk (ADR-003). Osobny user, osobna baza.
 
-Gdy wypchniesz zmiany na GitHub (`git push`), serwer sam:
-1. Pobierze nowy kod
-2. Zrobi backup bazy
-3. Zbuduje nową wersję
-4. Sprawdzi czy działa (smoke test)
-
-Nie musisz nic robić na serwerze.
-
-### Sposób 2 — Ręcznie na serwerze
-
-Jeśli chcesz zaktualizować ręcznie:
 ```bash
-cd /opt/dietetyk
-git pull origin master
-docker compose -f docker-compose.prod.yml up -d --build
-docker compose -f docker-compose.prod.yml exec backend npx prisma migrate deploy --schema=/app/packages/database/prisma/schema.prisma
-bash infra/status.sh
+sudo -u postgres psql
+```
+
+```sql
+CREATE USER bambooit_user WITH PASSWORD 'PRZYZNAJ_SILNE_HASLO';
+CREATE DATABASE bambooit_prod OWNER bambooit_user;
+GRANT ALL PRIVILEGES ON DATABASE bambooit_prod TO bambooit_user;
+\q
+```
+
+Verify connection:
+```bash
+psql -h localhost -U bambooit_user -d bambooit_prod -c '\dt'
+# (powinna być pusta — migracje wgramy dalej)
 ```
 
 ---
 
-## CZĘŚĆ 6: Gdy coś się zepsuje
+## 4. Klonowanie repo
 
-### Problem: Strona nie działa po aktualizacji
-
-Cofnij do poprzedniej wersji:
 ```bash
-bash /opt/dietetyk/infra/rollback.sh
+su - bambooit
+cd ~
+git clone git@github.com:<USERNAME>/bambooIT.git
+cd bambooIT
+npm ci
 ```
-Skrypt zapyta o potwierdzenie, wpisujesz `y` i Enter.
-
-### Problem: Baza danych uszkodzona
-
-Przywróć z backupu (najpierw sprawdź jakie masz):
-```bash
-ls /opt/dietetyk-backups/
-```
-Zobaczysz pliki jak `dietetyk_2026-03-17_0200.sql.gz`. Wybierz najnowszy i przywróć:
-```bash
-gunzip -c /opt/dietetyk-backups/dietetyk_2026-03-17_0200.sql.gz | docker compose -f /opt/dietetyk/docker-compose.prod.yml exec -T postgres psql -U dietetyk dietetyk_ai
-```
-
-### Problem: Nie wiem co jest nie tak
-
-Wyślij mi (do Claude Code) wynik tych dwóch komend:
-```bash
-bash /opt/dietetyk/infra/status.sh
-```
-```bash
-bash /opt/dietetyk/infra/logs.sh backend 200
-```
-Skopiuj output i wklej mi — znajdę przyczynę i napiszę fix.
 
 ---
 
-## CZĘŚĆ 7: Ważne informacje bezpieczeństwa
+## 5. Zmienne środowiskowe
 
-### Klucz szyfrowania (`ENCRYPTION_KEY`)
+Backend `apps/backend/.env`:
+```bash
+cp apps/backend/.env.example apps/backend/.env
+nano apps/backend/.env
+```
 
-To najważniejszy sekret w całej aplikacji. Szyfruje dane medyczne pacjentów.
+Wypełnij:
+```ini
+# Database
+DATABASE_URL=postgresql://bambooit_user:HASLO@localhost:5432/bambooit_prod?schema=public
 
-**Jeśli go zgubisz — stracisz dostęp do wszystkich zaszyfrowanych danych. Nie da się ich odzyskać.**
+# JWT (min 32 chars)
+JWT_SECRET=WYGENERUJ_SILNY_SEKRET_64_CHARS
 
-Skopiuj go z `.env.prod` i zapisz w bezpiecznym miejscu:
-- Menedżer haseł (1Password, Bitwarden)
-- Wydrukuj i schowaj w sejfie
-- Nigdy nie wysyłaj mailem ani na czacie
+# App URLs
+APP_URL=https://bambooit.pl
+CORS_ORIGIN=https://bambooit.pl
+PORT=4001                                  # 4000 zajęty przez e-dietetyk
 
-### Backupy
+# Encryption (32 bytes hex)
+ENCRYPTION_KEY=WYGENERUJ_32_BYTE_HEX
 
-- Automatyczne co noc o 2:00
-- Przechowywane 14 dni
-- Lokalizacja: `/opt/dietetyk-backups/`
-- Rozważ kopiowanie backupów na zewnętrzny dysk/chmurę (np. rclone do Google Drive)
+# Redis (współdzielony, klucze prefix-owane "bambooit:")
+REDIS_URL=redis://localhost:6379/1         # osobna baza Redis
 
-### Monitoring
+# SMTP (Mailtrap dev / prod email)
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_USER=...
+SMTP_PASS=...
+SMTP_FROM=bambooIT <hello@bambooit.pl>
+NOTIFICATIONS_TO_EMAIL=hello@bambooit.pl
 
-- Co 5 minut skrypt sprawdza czy wszystkie serwisy żyją
-- Jeśli coś padnie — automatycznie restartuje
-- Logi monitora: `/var/log/dietetyk-monitor.log`
+# Stripe
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_PRICE_START=price_...
+STRIPE_PRICE_FIRMA=price_...
+STRIPE_PRICE_FIRMA_PLUS=price_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# Sentry
+SENTRY_DSN=https://...@sentry.io/...
+NODE_ENV=production
+```
+
+Frontend `apps/web/.env.production`:
+```bash
+cp apps/web/.env.example apps/web/.env.production
+nano apps/web/.env.production
+```
+
+```ini
+NEXT_PUBLIC_API_URL=https://bambooit.pl
+API_URL=http://localhost:4001
+NEXTAUTH_URL=https://bambooit.pl
+NEXTAUTH_SECRET=WYGENERUJ_SILNY_SEKRET
+NEXT_PUBLIC_SENTRY_DSN=https://...@sentry.io/...
+SENTRY_AUTH_TOKEN=...
+```
 
 ---
 
-## Ściągawka — najczęstsze komendy
+## 6. Build + migracje
 
-| Co chcesz zrobić | Komenda |
-|-----------------|---------|
-| Połącz się z serwerem | `ssh root@TWOJ_IP` |
-| Sprawdź status | `bash /opt/dietetyk/infra/status.sh` |
-| Zobacz logi | `bash /opt/dietetyk/infra/logs.sh backend` |
-| Restart wszystkiego | `cd /opt/dietetyk && docker compose -f docker-compose.prod.yml restart` |
-| Restart backendu | `cd /opt/dietetyk && docker compose -f docker-compose.prod.yml restart backend` |
-| Aktualizuj aplikację | `cd /opt/dietetyk && git pull && docker compose -f docker-compose.prod.yml up -d --build` |
-| Cofnij aktualizację | `bash /opt/dietetyk/infra/rollback.sh` |
-| Zrób backup | `bash /opt/dietetyk/infra/backup.sh` |
-| Zobacz backupy | `ls /opt/dietetyk-backups/` |
-| Edytuj konfigurację | `nano /opt/dietetyk/.env.prod` |
-| Wyłącz wszystko | `cd /opt/dietetyk && docker compose -f docker-compose.prod.yml down` |
-| Włącz z powrotem | `cd /opt/dietetyk && docker compose -f docker-compose.prod.yml up -d` |
+```bash
+cd ~/bambooIT
+
+# Generate Prisma client + build database package
+npm run generate --workspace=database
+npm run build --workspace=database
+
+# Apply migrations to production DB
+npx --workspace=database prisma migrate deploy
+
+# Build backend
+npm run build --workspace=backend
+
+# Build frontend (production)
+npm run build --workspace=web
+```
+
+---
+
+## 7. PM2 — uruchamianie procesów
+
+Stwórz `ecosystem.config.cjs` w root:
+```bash
+nano ecosystem.config.cjs
+```
+
+```javascript
+module.exports = {
+  apps: [
+    {
+      name: 'bambooit-backend',
+      cwd: '/home/bambooit/bambooIT/apps/backend',
+      script: 'dist/server.js',
+      instances: 1,
+      autorestart: true,
+      max_memory_restart: '512M',
+      env: { NODE_ENV: 'production' },
+      error_file: '/home/bambooit/logs/backend-error.log',
+      out_file: '/home/bambooit/logs/backend-out.log',
+      time: true,
+    },
+    {
+      name: 'bambooit-web',
+      cwd: '/home/bambooit/bambooIT/apps/web',
+      script: 'npm',
+      args: 'start',
+      instances: 1,
+      autorestart: true,
+      max_memory_restart: '512M',
+      env: { NODE_ENV: 'production', PORT: '3001' },
+      error_file: '/home/bambooit/logs/web-error.log',
+      out_file: '/home/bambooit/logs/web-out.log',
+      time: true,
+    },
+  ],
+};
+```
+
+Stwórz katalog logów + start:
+```bash
+mkdir -p ~/logs
+pm2 start ecosystem.config.cjs
+pm2 save
+sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u bambooit --hp /home/bambooit
+```
+
+Sprawdź:
+```bash
+pm2 status
+pm2 logs bambooit-backend --lines 30
+```
+
+---
+
+## 8. Nginx reverse proxy
+
+`/etc/nginx/sites-available/bambooit.pl`:
+```nginx
+# Redirect HTTP → HTTPS (certbot doda po SSL)
+server {
+    listen 80;
+    server_name bambooit.pl www.bambooit.pl;
+    return 301 https://bambooit.pl$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name www.bambooit.pl;
+    # SSL certs filled by certbot
+    return 301 https://bambooit.pl$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name bambooit.pl;
+
+    # SSL certs filled by certbot
+
+    # Stripe webhook — raw body, no JSON parsing
+    location /webhooks/ {
+        proxy_pass http://localhost:4001/webhooks/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+
+    # API routes proxied to backend
+    location ~ ^/(auth|users|profile|admin|checkout|orders|subscriptions|posts|testimonials|referrals|leads|health) {
+        proxy_pass http://localhost:4001;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_read_timeout 60s;
+    }
+
+    # Everything else → Next.js
+    location / {
+        proxy_pass http://localhost:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_read_timeout 60s;
+    }
+
+    # Static caching for /public
+    location ~* \.(jpg|jpeg|png|gif|svg|webp|ico|css|js|woff2)$ {
+        proxy_pass http://localhost:3001;
+        proxy_cache_valid 200 30d;
+        add_header Cache-Control "public, max-age=2592000, immutable";
+    }
+
+    client_max_body_size 10M;
+}
+```
+
+Aktywacja:
+```bash
+sudo ln -s /etc/nginx/sites-available/bambooit.pl /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+---
+
+## 9. SSL z Let's Encrypt
+
+DNS musi już wskazywać na VPS (A record `bambooit.pl` + `www.bambooit.pl` → IP VPS):
+```bash
+sudo certbot --nginx -d bambooit.pl -d www.bambooit.pl
+```
+
+Certbot zmodyfikuje config Nginx automatycznie. Verify:
+```bash
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+Auto-renewal (cron przez certbot):
+```bash
+sudo certbot renew --dry-run
+```
+
+---
+
+## 10. Stripe webhook
+
+W Stripe Dashboard → Webhooks → Add endpoint:
+- URL: `https://bambooit.pl/webhooks`
+- Events: `checkout.session.completed`, `invoice.paid`, `invoice.payment_failed`, `customer.subscription.updated`, `customer.subscription.deleted`
+
+Skopiuj `Signing secret` → wklej do `STRIPE_WEBHOOK_SECRET` w `apps/backend/.env`.
+
+Restart backend:
+```bash
+pm2 restart bambooit-backend
+```
+
+---
+
+## 11. Verify smoke test
+
+Z VPS:
+```bash
+curl https://bambooit.pl/health
+# → {"status":"ok"}
+
+curl -X POST https://bambooit.pl/leads/contact -H "content-type: application/json" -d '{"name":"Test","email":"test@example.com","message":"Test message ok","rodo":true}'
+# → {"ok":true,"leadId":"..."}
+```
+
+W przeglądarce:
+- `https://bambooit.pl` — strona główna ładuje się
+- `https://bambooit.pl/pakiety` — pricing widoczny
+- `https://bambooit.pl/audyt` — formularz submit działa
+- `https://bambooit.pl/zaloguj` — formularz, rejestracja → faktyczne konto w DB
+
+---
+
+## 12. Automated deploy (BE-5)
+
+Po pierwszym manual deploy, dodaj `.github/workflows/deploy.yml`:
+
+```yaml
+name: Deploy to VPS
+
+on:
+  workflow_run:
+    workflows: ['CI']
+    types: [completed]
+    branches: [main]
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH deploy
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: bambooit
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd ~/bambooIT
+            git pull origin main
+            npm ci
+            npm run generate --workspace=database
+            npm run build --workspace=database
+            npx --workspace=database prisma migrate deploy
+            npm run build --workspace=backend
+            npm run build --workspace=web
+            pm2 reload ecosystem.config.cjs
+```
+
+Sekrety w GitHub repo Settings → Secrets:
+- `VPS_HOST` — IP serwera
+- `VPS_SSH_KEY` — prywatny klucz SSH dla user `bambooit`
+
+---
+
+## 13. Monitoring + alerty
+
+### Sentry
+DSN-y już w `.env`. Pierwsze błędy pojawią się w Sentry dashboard w ciągu kilku minut po deploy.
+
+### Healthcheck endpoint
+`https://bambooit.pl/health/db` zwraca status DB. Dodaj uptime monitor (np. BetterStack / UptimeRobot / Pingdom) — alert email/SMS przy 502.
+
+### Logi PM2
+```bash
+pm2 logs --lines 100      # ostatnie 100 linii obu apps
+pm2 logs bambooit-backend  # tylko backend
+```
+
+Rotacja logów:
+```bash
+pm2 install pm2-logrotate
+pm2 set pm2-logrotate:max_size 10M
+pm2 set pm2-logrotate:retain 7
+```
+
+---
+
+## 14. Backup
+
+### Database
+Cron job (jako `bambooit` user):
+```bash
+crontab -e
+```
+
+```cron
+# Codzienny backup o 3:00 (rotacja 14 dni)
+0 3 * * * pg_dump -h localhost -U bambooit_user bambooit_prod | gzip > ~/backups/bambooit_$(date +\%Y\%m\%d).sql.gz && find ~/backups -name "bambooit_*.sql.gz" -mtime +14 -delete
+```
+
+Test restore (na osobnej bazie):
+```bash
+gunzip -c ~/backups/bambooit_20260514.sql.gz | psql -h localhost -U bambooit_user -d bambooit_test
+```
+
+---
+
+## 15. Co dalej
+
+Po pierwszym successful deploy:
+1. Cron job: `npx --workspace=database prisma generate` po każdym `git pull` (jeśli automated deploy)
+2. Pre-launch checklist:
+   - [ ] Test rejestracji końcówka-do-końcówki
+   - [ ] Test Stripe Checkout w trybie test mode → flip do live
+   - [ ] Test cookie banner → sprawdź czy zapisuje do DB
+   - [ ] Test maili (rejestracja, reset hasła, subscription welcome)
+   - [ ] Sprawdź Sentry — jakieś errory po pierwszej godzinie?
+   - [ ] Lighthouse audit z prod URL (powinno wycelować w 90+)
+3. Pierwszy klient — Remigiusz uruchamia outreach
+
+---
+
+## Troubleshooting
+
+### Backend startup failed: "Missing DATABASE_URL"
+Sprawdź `apps/backend/.env` — czy wszystko wpisane. PM2 musi widzieć `.env`:
+```bash
+pm2 restart bambooit-backend --update-env
+```
+
+### Nginx 502 Bad Gateway
+Backend lub frontend nie działa. Sprawdź:
+```bash
+pm2 status
+pm2 logs --err --lines 50
+```
+
+### Stripe webhook 400 — INVALID_SIGNATURE
+Webhook secret nie zgadza się. Sprawdź:
+1. Stripe Dashboard → Webhooks → kopia signing secret
+2. `STRIPE_WEBHOOK_SECRET` w `apps/backend/.env`
+3. `pm2 restart bambooit-backend --update-env`
+
+### Prisma migrate deploy fails
+Sprawdź `DATABASE_URL` + uprawnienia user:
+```sql
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO bambooit_user;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO bambooit_user;
+```
+
+---
+
+*Ten dokument jest draftem. Aktualizuj w trakcie pierwszego deploy — każdy "tu się zacięło" → zapisz krok jak go naprawiłeś.*
