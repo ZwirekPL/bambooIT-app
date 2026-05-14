@@ -34,13 +34,13 @@ describe('createAuditLead', () => {
     m.sendLeadNotifications.mockResolvedValue(undefined);
   });
 
-  it('maps size="4-10" to employeesCount=10 and preserves sizeRange', async () => {
+  it('maps size="6-15" to employeesCount=15 and preserves sizeRange', async () => {
     await createAuditLead(
       {
         name: 'Jan Kowalski',
         company: 'ACME Sp. z o.o.',
         email: 'jan@firma.pl',
-        size: '4-10',
+        size: '6-15',
         industry: 'accounting',
         rodo: true,
       },
@@ -49,8 +49,8 @@ describe('createAuditLead', () => {
 
     expect(m.lead.create).toHaveBeenCalledOnce();
     const data = m.lead.create.mock.calls[0][0].data;
-    expect(data.sizeRange).toBe('4-10');
-    expect(data.employeesCount).toBe(10);
+    expect(data.sizeRange).toBe('6-15');
+    expect(data.employeesCount).toBe(15);
     expect(data.type).toBe('AUDIT');
     expect(data.rodoConsent).toBe(true);
     expect(data.rodoConsentAt).toBeInstanceOf(Date);
@@ -81,7 +81,7 @@ describe('createAuditLead', () => {
         name: 'Anna Maria Kowalska',
         company: 'X',
         email: 'a@x.pl',
-        size: '1-3',
+        size: '1-5',
         industry: 'other',
         rodo: true,
       },
@@ -99,7 +99,7 @@ describe('createAuditLead', () => {
         name: 'Jan',
         company: 'X',
         email: 'a@x.pl',
-        size: '1-3',
+        size: '1-5',
         industry: 'other',
         rodo: true,
       },
@@ -119,7 +119,7 @@ describe('createAuditLead', () => {
           name: 'Jan',
           company: 'X',
           email: 'a@x.pl',
-          size: '1-3',
+          size: '1-5',
           industry: 'other',
           rodo: true,
         },
@@ -134,7 +134,7 @@ describe('createAuditLead', () => {
         name: 'Jan',
         company: 'X',
         email: 'a@x.pl',
-        size: '1-3',
+        size: '1-5',
         industry: 'other',
         rodo: true,
       },

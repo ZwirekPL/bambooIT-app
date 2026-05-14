@@ -10,7 +10,7 @@ import * as leadsService from '../services/leads.service';
  * failure → still 200 (lead jest w bazie, admin fallback).
  */
 
-const SIZE_VALUES = ['1-3', '4-10', '11-30', '30+'] as const;
+const SIZE_VALUES = ['1-5', '6-15', '16-30', '30+'] as const;
 const INDUSTRY_VALUES = [
   'accounting',
   'law',

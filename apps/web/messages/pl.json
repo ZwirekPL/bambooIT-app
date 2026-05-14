@@ -285,10 +285,16 @@
         "rodo": "Wyrażam zgodę na przetwarzanie danych osobowych w celu kontaktu zgodnie z Polityką prywatności. Administratorem danych jest bambooIT."
       },
       "submitBtn": "Wyślij zgłoszenie",
+      "submittingBtn": "Wysyłanie...",
       "success": {
         "title": "Dziękujemy!",
         "message": "Skontaktujemy się z Tobą w ciągu 24 godzin roboczych. W międzyczasie możesz nas złapać na hello@bambooit.pl.",
         "resetCta": "Wyślij kolejne zgłoszenie"
+      },
+      "errors": {
+        "generic": "Coś poszło nie tak. Spróbuj ponownie za chwilę.",
+        "rateLimit": "Zbyt wiele zgłoszeń z tego adresu. Spróbuj ponownie za 15 minut.",
+        "validation": "Sprawdź wypełnione pola i spróbuj ponownie."
       }
     },
     "faq": {
@@ -514,10 +520,16 @@
         "rodo": "Wyrażam zgodę na przetwarzanie danych osobowych w celu kontaktu zgodnie z Polityką prywatności. Administratorem danych jest bambooIT."
       },
       "submitBtn": "Wyślij wiadomość",
+      "submittingBtn": "Wysyłanie...",
       "success": {
         "title": "Dziękujemy!",
         "message": "Otrzymaliśmy Twoją wiadomość. Odpowiemy w ciągu 4 godzin roboczych. Jeśli sprawa jest pilna, zadzwoń bezpośrednio.",
         "resetCta": "Wyślij kolejną wiadomość"
+      },
+      "errors": {
+        "generic": "Coś poszło nie tak. Spróbuj ponownie za chwilę.",
+        "rateLimit": "Zbyt wiele wiadomości z tego adresu. Spróbuj ponownie za 15 minut.",
+        "validation": "Sprawdź wypełnione pola i spróbuj ponownie."
       },
       "info": {
         "phoneLabel": "Telefon",

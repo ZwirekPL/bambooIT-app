@@ -10,9 +10,9 @@ import { logAudit } from './audit.service';
  */
 
 const SIZE_RANGE_TO_COUNT: Record<string, number> = {
-  '1-3': 3,
-  '4-10': 10,
-  '11-30': 30,
+  '1-5': 5,
+  '6-15': 15,
+  '16-30': 30,
   '30+': 30,
 };
 
@@ -21,7 +21,7 @@ export interface AuditLeadInput {
   company: string;
   email: string;
   phone?: string;
-  size: '1-3' | '4-10' | '11-30' | '30+';
+  size: '1-5' | '6-15' | '16-30' | '30+';
   industry: 'accounting' | 'law' | 'medical' | 'production' | 'hospitality' | 'other';
   message?: string;
   rodo: true;

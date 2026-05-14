@@ -3,22 +3,80 @@
 import { useState, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
 
+type FormState = 'idle' | 'submitting' | 'success' | 'error';
+
+const SIZE_OPTIONS = [
+  { value: '1-5', labelKey: '1' },
+  { value: '6-15', labelKey: '2' },
+  { value: '16-30', labelKey: '3' },
+  { value: '30+', labelKey: '4' },
+] as const;
+
+const INDUSTRY_OPTIONS = [
+  'accounting',
+  'law',
+  'medical',
+  'production',
+  'hospitality',
+  'other',
+] as const;
+
 /**
- * Audit form UI per mockup §audit.
- *
- * UI-only stub: submission is a local preventDefault() that flips a
- * `submitted` state to show a thank-you panel. Real backend wiring
- * (POST /api/leads/audit → Lead model row + Resend notification) lands
- * in BE-1 per D-069. The form fields here match the schema planned in
- * TODO.md §6 Migration 11 so the swap is one component refactor.
+ * Audit form per mockup §audit, wired to backend POST /leads/audit
+ * via /api/proxy/leads/audit (BE-1).
  */
 export function AuditFormSection() {
   const t = useTranslations('home.auditForm');
-  const [submitted, setSubmitted] = useState(false);
+  const [state, setState] = useState<FormState>('idle');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitted(true);
+    if (state === 'submitting') return;
+
+    const formData = new FormData(event.currentTarget);
+    const payload = {
+      name: String(formData.get('name') ?? '').trim(),
+      company: String(formData.get('company') ?? '').trim(),
+      email: String(formData.get('email') ?? '').trim(),
+      phone: String(formData.get('phone') ?? '').trim() || undefined,
+      size: String(formData.get('size') ?? ''),
+      industry: String(formData.get('industry') ?? ''),
+      message: String(formData.get('message') ?? '').trim() || undefined,
+      rodo: formData.get('rodo') === 'on',
+      website: String(formData.get('website') ?? ''), // honeypot
+    };
+
+    setState('submitting');
+    setErrorMessage(null);
+
+    try {
+      const res = await fetch('/api/proxy/leads/audit', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        if (res.status === 429) {
+          throw new Error(t('errors.rateLimit'));
+        }
+        if (res.status === 400) {
+          throw new Error(t('errors.validation'));
+        }
+        throw new Error(t('errors.generic'));
+      }
+
+      setState('success');
+    } catch (err) {
+      setState('error');
+      setErrorMessage(err instanceof Error ? err.message : t('errors.generic'));
+    }
+  }
+
+  function reset() {
+    setState('idle');
+    setErrorMessage(null);
   }
 
   return (
@@ -27,7 +85,6 @@ export function AuditFormSection() {
       className="relative bg-navy-deep px-5 py-24 text-white md:px-12 md:py-32 lg:py-40"
     >
       <div className="mx-auto w-full max-w-[1100px]">
-        {/* Intro */}
         <div className="mb-16 grid grid-cols-1 items-end gap-8 md:grid-cols-2 md:gap-16">
           <div>
             <div className="mb-8 flex items-center gap-3.5 font-mono text-xs uppercase tracking-[0.2em] text-bamboo">
@@ -46,18 +103,18 @@ export function AuditFormSection() {
           </p>
         </div>
 
-        {/* Form / success panel */}
-        {submitted ? (
+        {state === 'success' ? (
           <SuccessPanel
             title={t('success.title')}
             message={t('success.message')}
             ctaReset={t('success.resetCta')}
-            onReset={() => setSubmitted(false)}
+            onReset={reset}
           />
         ) : (
           <form
             onSubmit={handleSubmit}
             className="rounded-3xl border border-white/10 bg-white/[0.04] p-8 md:p-12"
+            noValidate
           >
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <Field label={t('fields.name')} name="name" type="text" required />
@@ -67,24 +124,20 @@ export function AuditFormSection() {
               <SelectField
                 label={t('fields.size')}
                 name="size"
-                options={[
-                  t('fields.sizeOptions.1'),
-                  t('fields.sizeOptions.2'),
-                  t('fields.sizeOptions.3'),
-                  t('fields.sizeOptions.4'),
-                ]}
+                required
+                options={SIZE_OPTIONS.map((o) => ({
+                  value: o.value,
+                  label: t(`fields.sizeOptions.${o.labelKey}`),
+                }))}
               />
               <SelectField
                 label={t('fields.industry')}
                 name="industry"
-                options={[
-                  t('fields.industryOptions.accounting'),
-                  t('fields.industryOptions.law'),
-                  t('fields.industryOptions.medical'),
-                  t('fields.industryOptions.production'),
-                  t('fields.industryOptions.hospitality'),
-                  t('fields.industryOptions.other'),
-                ]}
+                required
+                options={INDUSTRY_OPTIONS.map((value) => ({
+                  value,
+                  label: t(`fields.industryOptions.${value}`),
+                }))}
               />
               <div className="md:col-span-2">
                 <TextareaField
@@ -94,6 +147,8 @@ export function AuditFormSection() {
                 />
               </div>
             </div>
+
+            <Honeypot />
 
             <label className="mt-7 flex items-start gap-3 text-sm leading-[1.5] text-white/70">
               <input
@@ -107,21 +162,33 @@ export function AuditFormSection() {
 
             <button
               type="submit"
-              className="mt-8 inline-flex items-center gap-3 rounded-full bg-bamboo px-9 py-4 text-base font-bold text-navy-deep transition-all hover:-translate-y-0.5 hover:bg-white"
+              disabled={state === 'submitting'}
+              className="mt-8 inline-flex items-center gap-3 rounded-full bg-bamboo px-9 py-4 text-base font-bold text-navy-deep transition-all hover:-translate-y-0.5 hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:bg-bamboo"
             >
-              {t('submitBtn')}
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                aria-hidden="true"
-              >
-                <path d="M5 12h14M13 6l6 6-6 6" />
-              </svg>
+              {state === 'submitting' ? t('submittingBtn') : t('submitBtn')}
+              {state !== 'submitting' && (
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              )}
             </button>
+
+            {state === 'error' && errorMessage && (
+              <p
+                role="alert"
+                className="mt-6 rounded-2xl border border-red-400/30 bg-red-500/10 px-5 py-4 text-sm text-red-200"
+              >
+                {errorMessage}
+              </p>
+            )}
           </form>
         )}
       </div>
@@ -160,10 +227,12 @@ function SelectField({
   label,
   name,
   options,
+  required,
 }: {
   label: string;
   name: string;
-  options: string[];
+  options: Array<{ value: string; label: string }>;
+  required?: boolean;
 }) {
   return (
     <div className="flex flex-col gap-2">
@@ -173,10 +242,15 @@ function SelectField({
       <select
         id={name}
         name={name}
+        required={required}
+        defaultValue=""
         className="border-b border-white/20 bg-transparent py-3 text-base text-white outline-none transition-colors focus:border-bamboo [&>option]:bg-navy-deep"
       >
+        <option value="" disabled hidden></option>
         {options.map((option) => (
-          <option key={option}>{option}</option>
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
         ))}
       </select>
     </div>
@@ -203,6 +277,26 @@ function TextareaField({
         placeholder={placeholder}
         rows={3}
         className="resize-y border-b border-white/20 bg-transparent py-3 text-base text-white placeholder:text-white/30 outline-none transition-colors focus:border-bamboo"
+      />
+    </div>
+  );
+}
+
+/**
+ * Honeypot — CSS-hidden field that legitimate users can't see/tab to.
+ * Bots auto-fill all fields; backend rejects requests where this is set.
+ */
+function Honeypot() {
+  return (
+    <div className="pointer-events-none absolute left-[-9999px] top-[-9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
+      <label htmlFor="website">Website (leave empty)</label>
+      <input
+        type="text"
+        id="website"
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        defaultValue=""
       />
     </div>
   );
