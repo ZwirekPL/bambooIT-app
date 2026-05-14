@@ -1,10 +1,27 @@
 import nodemailer from 'nodemailer';
 
+/**
+ * Transactional email templates — bambooIT branding (Neo-Swiss palette,
+ * Polish copy). All templates share emailLayout() for consistency.
+ *
+ * Transport: nodemailer/SMTP (Mailtrap in dev, real SMTP in prod).
+ * Resend migration is a future task — current bottleneck is plain SMTP
+ * config in .env, not the abstraction.
+ */
+
 const PRODUCT_LABELS: Record<string, string> = {
   START: 'Pakiet Start',
   FIRMA: 'Pakiet Firma',
   FIRMA_PLUS: 'Pakiet Firma Plus',
 };
+
+const BAMBOO_DEEP = '#7A9B2E'; // bamboo-deep accent
+const NAVY_DEEP = '#1F2A44';
+const NAVY_SOFT = '#5C6378';
+const LINE = '#E5E7EB';
+const PAPER = '#F8F6F0';
+const SUPPORT_EMAIL = 'hello@bambooit.pl';
+const BRAND_NAME = 'bambooIT';
 
 function createTransporter() {
   return nodemailer.createTransport({
@@ -18,172 +35,341 @@ function createTransporter() {
   });
 }
 
-export async function sendPasswordResetEmail(to: string, resetUrl: string): Promise<void> {
-  const transporter = createTransporter();
+interface EmailLayoutOpts {
+  /** Optional emphasized heading at the top (above the body). */
+  heading?: string;
+  /** Main body — already rendered HTML. */
+  bodyHtml: string;
+  /** Optional callout block (e.g. amber warning or green success). */
+  callout?: { variant: 'info' | 'warning' | 'success' | 'danger'; html: string };
+  /** Optional CTA button. */
+  cta?: { label: string; url: string };
+  /** Optional small print at the bottom (e.g. "if this wasn't you..."). */
+  footnoteHtml?: string;
+}
 
+function emailLayout(opts: EmailLayoutOpts): string {
+  const calloutBlock = opts.callout
+    ? `<div style="background-color:${
+        opts.callout.variant === 'warning'
+          ? '#FEF3C7'
+          : opts.callout.variant === 'success'
+            ? '#ECFDF5'
+            : opts.callout.variant === 'danger'
+              ? '#FEF2F2'
+              : '#EFF6FF'
+      };border-left:4px solid ${
+        opts.callout.variant === 'warning'
+          ? '#F59E0B'
+          : opts.callout.variant === 'success'
+            ? '#10B981'
+            : opts.callout.variant === 'danger'
+              ? '#EF4444'
+              : '#3B82F6'
+      };padding:16px;margin:24px 0;border-radius:0 8px 8px 0;font-size:14px;color:${NAVY_DEEP};">
+        ${opts.callout.html}
+      </div>`
+    : '';
+
+  const ctaBlock = opts.cta
+    ? `<p style="margin:32px 0;">
+        <a href="${opts.cta.url}"
+           style="display:inline-block;background-color:${BAMBOO_DEEP};color:${NAVY_DEEP};padding:14px 28px;border-radius:9999px;text-decoration:none;font-weight:700;font-size:15px;">
+          ${opts.cta.label}
+        </a>
+      </p>`
+    : '';
+
+  const footnoteBlock = opts.footnoteHtml
+    ? `<hr style="border:none;border-top:1px solid ${LINE};margin:32px 0 16px;" />
+       <p style="color:#9CA3AF;font-size:12px;line-height:1.5;">${opts.footnoteHtml}</p>`
+    : '';
+
+  const headingBlock = opts.heading
+    ? `<h2 style="color:${NAVY_DEEP};font-size:24px;font-weight:600;margin:0 0 16px;letter-spacing:-0.01em;">${opts.heading}</h2>`
+    : '';
+
+  return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background-color:${PAPER};padding:32px 16px;">
+  <div style="max-width:600px;margin:0 auto;background-color:#FFFFFF;border:1px solid ${LINE};border-radius:16px;padding:32px 28px;color:${NAVY_DEEP};line-height:1.6;">
+    <div style="margin-bottom:24px;">
+      <span style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:${NAVY_DEEP};letter-spacing:-0.02em;">bamboo</span><span style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:${BAMBOO_DEEP};letter-spacing:-0.02em;">it</span>
+    </div>
+    ${headingBlock}
+    <div style="font-size:15px;color:${NAVY_SOFT};">
+      ${opts.bodyHtml}
+    </div>
+    ${calloutBlock}
+    ${ctaBlock}
+    ${footnoteBlock}
+  </div>
+  <p style="text-align:center;color:#9CA3AF;font-size:11px;margin-top:16px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+    ${BRAND_NAME} · bambooit.pl
+  </p>
+</div>`;
+}
+
+function smtpConfigured(): boolean {
+  return Boolean(
+    process.env.SMTP_HOST &&
+      process.env.SMTP_PORT &&
+      process.env.SMTP_USER &&
+      process.env.SMTP_PASS,
+  );
+}
+
+async function send(to: string, subject: string, text: string, html: string): Promise<void> {
+  if (!smtpConfigured()) {
+    console.warn(`[email] SMTP not configured — skipping send to ${to} (subject: ${subject})`);
+    return;
+  }
+  const transporter = createTransporter();
   await transporter.sendMail({
-    from: process.env.SMTP_FROM,
+    from: process.env.SMTP_FROM ?? `${BRAND_NAME} <${SUPPORT_EMAIL}>`,
     to,
-    subject: 'Reset hasła — e-dietetyk.com',
-    text: `Otrzymaliśmy prośbę o reset hasła do Twojego konta.\n\nKliknij poniższy link, aby ustawić nowe hasło (link wygasa po 1 godzinie):\n${resetUrl}\n\nJeśli nie prosiłeś o reset hasła, zignoruj tę wiadomość.`,
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #1a1a1a;">Reset hasła</h2>
-        <p>Otrzymaliśmy prośbę o reset hasła do Twojego konta w e-dietetyk.com.</p>
-        <p>Kliknij poniższy przycisk, aby ustawić nowe hasło. Link wygasa po <strong>1 godzinie</strong>.</p>
-        <p style="margin: 32px 0;">
-          <a href="${resetUrl}"
-             style="background-color: #16a34a; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;">
-            Resetuj hasło
-          </a>
-        </p>
-        <p style="color: #6b7280; font-size: 14px;">
-          Jeśli przycisk nie działa, skopiuj ten link do przeglądarki:<br>
-          <span style="color: #374151;">${resetUrl}</span>
-        </p>
-        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
-        <p style="color: #9ca3af; font-size: 12px;">
-          Jeśli nie prosiłeś o reset hasła, zignoruj tę wiadomość — Twoje konto pozostaje bezpieczne.
-        </p>
-      </div>
-    `,
+    subject,
+    text,
+    html,
   });
 }
+
+// ─── Password reset ───────────────────────────────────────────────────────────
+
+export async function sendPasswordResetEmail(to: string, resetUrl: string): Promise<void> {
+  const subject = `Reset hasła — ${BRAND_NAME}`;
+  const text = `Otrzymaliśmy prośbę o reset hasła do Twojego konta w ${BRAND_NAME}.
+
+Kliknij poniższy link, aby ustawić nowe hasło (link wygasa po 1 godzinie):
+${resetUrl}
+
+Jeśli nie prosiłeś o reset hasła, zignoruj tę wiadomość — Twoje konto pozostaje bezpieczne.
+
+Zespół ${BRAND_NAME}`;
+
+  const html = emailLayout({
+    heading: 'Reset hasła',
+    bodyHtml: `<p>Otrzymaliśmy prośbę o reset hasła do Twojego konta w ${BRAND_NAME}.</p>
+      <p>Kliknij poniższy przycisk, aby ustawić nowe hasło. Link wygasa po <strong>1 godzinie</strong>.</p>`,
+    cta: { label: 'Resetuj hasło', url: resetUrl },
+    footnoteHtml: `Jeśli przycisk nie działa, skopiuj ten link do przeglądarki:<br/>
+      <span style="color:${NAVY_DEEP};word-break:break-all;">${resetUrl}</span><br/><br/>
+      Jeśli nie prosiłeś o reset hasła, zignoruj tę wiadomość — Twoje konto pozostaje bezpieczne.`,
+  });
+
+  await send(to, subject, text, html);
+}
+
+// ─── Order / subscription confirmation ────────────────────────────────────────
 
 export async function sendOrderConfirmationEmail(
   to: string,
   order: { id: string; productType: string; createdAt: Date | string },
 ): Promise<void> {
-  const transporter = createTransporter();
   const productLabel = PRODUCT_LABELS[order.productType] ?? order.productType;
+  const orderRef = order.id.slice(-8).toUpperCase();
   const dateStr = new Date(order.createdAt).toLocaleDateString('pl-PL', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   });
+  const subject = `Potwierdzenie zamówienia #${orderRef} — ${BRAND_NAME}`;
+  const text = `Dziękujemy za zamówienie!
 
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM,
-    to,
-    subject: `Potwierdzenie zamówienia #${order.id.slice(-8).toUpperCase()} — e-dietetyk.com`,
-    text: `Dziękujemy za zamówienie!\n\nNumer zamówienia: ${order.id.slice(-8).toUpperCase()}\nProdukt: ${productLabel}\nData: ${dateStr}\n\nZespół e-dietetyk.com`,
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #1a1a1a;">Potwierdzenie zamówienia</h2>
-        <p>Dziękujemy! Twoje zamówienie zostało przyjęte i opłacone.</p>
-        <table style="width: 100%; border-collapse: collapse; margin: 24px 0;">
-          <tr style="border-bottom: 1px solid #e5e7eb;">
-            <td style="padding: 10px 0; color: #6b7280; font-size: 14px;">Numer zamówienia</td>
-            <td style="padding: 10px 0; font-weight: bold; text-align: right;">#${order.id.slice(-8).toUpperCase()}</td>
-          </tr>
-          <tr style="border-bottom: 1px solid #e5e7eb;">
-            <td style="padding: 10px 0; color: #6b7280; font-size: 14px;">Produkt</td>
-            <td style="padding: 10px 0; font-weight: bold; text-align: right;">${productLabel}</td>
-          </tr>
-          <tr>
-            <td style="padding: 10px 0; color: #6b7280; font-size: 14px;">Data zamówienia</td>
-            <td style="padding: 10px 0; text-align: right;">${dateStr}</td>
-          </tr>
-        </table>
-        <p style="color: #6b7280; font-size: 14px;">
-          Skontaktujemy się z Tobą wkrótce w celu uruchomienia usługi.
-        </p>
-        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
-        <p style="color: #9ca3af; font-size: 12px;">e-dietetyk.com</p>
-      </div>
-    `,
+Numer zamówienia: ${orderRef}
+Pakiet: ${productLabel}
+Data: ${dateStr}
+
+Skontaktujemy się z Tobą w ciągu 24h roboczych, żeby uruchomić usługę.
+
+Zespół ${BRAND_NAME}`;
+
+  const html = emailLayout({
+    heading: 'Zamówienie przyjęte',
+    bodyHtml: `<p>Dziękujemy! Twoje zamówienie zostało przyjęte i opłacone. Skontaktujemy się z Tobą w ciągu 24h roboczych, żeby uruchomić usługę.</p>
+      <table style="width:100%;border-collapse:collapse;margin:24px 0;">
+        <tr style="border-bottom:1px solid ${LINE};">
+          <td style="padding:10px 0;color:${NAVY_SOFT};font-size:14px;">Numer zamówienia</td>
+          <td style="padding:10px 0;font-weight:700;text-align:right;color:${NAVY_DEEP};">#${orderRef}</td>
+        </tr>
+        <tr style="border-bottom:1px solid ${LINE};">
+          <td style="padding:10px 0;color:${NAVY_SOFT};font-size:14px;">Pakiet</td>
+          <td style="padding:10px 0;font-weight:700;text-align:right;color:${NAVY_DEEP};">${productLabel}</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 0;color:${NAVY_SOFT};font-size:14px;">Data zamówienia</td>
+          <td style="padding:10px 0;text-align:right;color:${NAVY_DEEP};">${dateStr}</td>
+        </tr>
+      </table>`,
   });
+
+  await send(to, subject, text, html);
 }
+
+// ─── Email verification ───────────────────────────────────────────────────────
 
 export async function sendEmailVerificationEmail(to: string, verifyUrl: string): Promise<void> {
-  const transporter = createTransporter();
+  const subject = `Potwierdź adres email — ${BRAND_NAME}`;
+  const text = `Witaj w ${BRAND_NAME}!
 
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM,
-    to,
-    subject: 'Potwierdź adres email — e-dietetyk.com',
-    text: `Witaj w e-dietetyk.com!\n\nKliknij poniższy link, aby potwierdzić swój adres email (link wygasa po 48 godzinach):\n${verifyUrl}\n\nJeśli nie zakładałeś konta w e-dietetyk.com, zignoruj tę wiadomość.`,
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #1a1a1a;">Potwierdź adres email</h2>
-        <p>Witaj w e-dietetyk.com!</p>
-        <p>Kliknij poniższy przycisk, aby potwierdzić swój adres email. Link wygasa po <strong>48 godzinach</strong>.</p>
-        <p style="margin: 32px 0;">
-          <a href="${verifyUrl}"
-             style="background-color: #16a34a; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;">
-            Potwierdź email
-          </a>
-        </p>
-        <p style="color: #6b7280; font-size: 14px;">
-          Jeśli przycisk nie działa, skopiuj ten link do przeglądarki:<br>
-          <span style="color: #374151;">${verifyUrl}</span>
-        </p>
-        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
-        <p style="color: #9ca3af; font-size: 12px;">
-          Jeśli nie zakładałeś konta w e-dietetyk.com, zignoruj tę wiadomość.
-        </p>
-      </div>
-    `,
+Kliknij poniższy link, aby potwierdzić swój adres email (link wygasa po 48 godzinach):
+${verifyUrl}
+
+Jeśli nie zakładałeś konta w ${BRAND_NAME}, zignoruj tę wiadomość.
+
+Zespół ${BRAND_NAME}`;
+
+  const html = emailLayout({
+    heading: 'Potwierdź adres email',
+    bodyHtml: `<p>Witaj w ${BRAND_NAME}!</p>
+      <p>Kliknij poniższy przycisk, aby potwierdzić swój adres email. Link wygasa po <strong>48 godzinach</strong>.</p>`,
+    cta: { label: 'Potwierdź email', url: verifyUrl },
+    footnoteHtml: `Jeśli przycisk nie działa, skopiuj ten link do przeglądarki:<br/>
+      <span style="color:${NAVY_DEEP};word-break:break-all;">${verifyUrl}</span><br/><br/>
+      Jeśli nie zakładałeś konta w ${BRAND_NAME}, zignoruj tę wiadomość.`,
   });
+
+  await send(to, subject, text, html);
 }
 
-/** Subscription cancellation confirmation email (Dyrektywa Omnibus). */
+// ─── Subscription cancellation confirmation ───────────────────────────────────
+
 export async function sendSubscriptionCancelEmail(
   to: string,
   periodEndDate: string,
 ): Promise<void> {
-  const transporter = createTransporter();
   const endDateStr = new Date(periodEndDate).toLocaleDateString('pl-PL', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   });
+  const subject = `Potwierdzenie anulowania subskrypcji — ${BRAND_NAME}`;
+  const text = `Potwierdzamy anulowanie Twojej subskrypcji w ${BRAND_NAME}.
 
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM,
-    to,
-    subject: 'Potwierdzenie anulowania subskrypcji — e-dietetyk.com',
-    text: `Potwierdzamy anulowanie Twojej subskrypcji w e-dietetyk.com.\n\nTwoja subskrypcja pozostanie aktywna do: ${endDateStr}.\nPo tej dacie dostęp do usług płatnych zostanie wyłączony.\n\nJeśli zmienisz zdanie, możesz wznowić subskrypcję w dowolnym momencie z poziomu panelu użytkownika.\n\nZespół e-dietetyk.com`,
-    html: `
-      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
-        <h2 style="color:#1a1a1a;">Subskrypcja anulowana</h2>
-        <p>Potwierdzamy anulowanie Twojej subskrypcji w e-dietetyk.com.</p>
-        <table style="width:100%;border-collapse:collapse;margin:24px 0;">
-          <tr style="border-bottom:1px solid #e5e7eb;">
-            <td style="padding:10px 0;color:#6b7280;font-size:14px;">Aktywna do</td>
-            <td style="padding:10px 0;font-weight:bold;text-align:right;">${endDateStr}</td>
-          </tr>
-        </table>
-        <p>Po tej dacie dostęp do usług płatnych zostanie wyłączony.</p>
-        <div style="background-color:#f0fdf4;border-left:4px solid #22c55e;padding:16px;margin:16px 0;border-radius:0 8px 8px 0;">
-          <p style="margin:0;font-size:14px;color:#166534;">Jeśli zmienisz zdanie, możesz wznowić subskrypcję w dowolnym momencie z poziomu panelu użytkownika.</p>
-        </div>
-        <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0;" />
-        <p style="color:#9ca3af;font-size:12px;">e-dietetyk.com</p>
-      </div>
-    `,
+Twoja subskrypcja pozostanie aktywna do: ${endDateStr}.
+Po tej dacie dostęp do usług płatnych zostanie wyłączony.
+
+Jeśli zmienisz zdanie, możesz wznowić subskrypcję z poziomu panelu klienta.
+
+Zespół ${BRAND_NAME}`;
+
+  const html = emailLayout({
+    heading: 'Subskrypcja anulowana',
+    bodyHtml: `<p>Potwierdzamy anulowanie Twojej subskrypcji w ${BRAND_NAME}.</p>
+      <table style="width:100%;border-collapse:collapse;margin:24px 0;">
+        <tr style="border-bottom:1px solid ${LINE};">
+          <td style="padding:10px 0;color:${NAVY_SOFT};font-size:14px;">Aktywna do</td>
+          <td style="padding:10px 0;font-weight:700;text-align:right;color:${NAVY_DEEP};">${endDateStr}</td>
+        </tr>
+      </table>
+      <p>Po tej dacie dostęp do usług płatnych zostanie wyłączony.</p>`,
+    callout: {
+      variant: 'success',
+      html: 'Jeśli zmienisz zdanie, możesz wznowić subskrypcję w dowolnym momencie z poziomu panelu klienta.',
+    },
   });
+
+  await send(to, subject, text, html);
 }
 
-/** RODO account deletion confirmation email (66.2). */
+// ─── Account deletion confirmation ────────────────────────────────────────────
+
 export async function sendAccountDeletionEmail(to: string): Promise<void> {
-  const transporter = createTransporter();
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM,
-    to,
-    subject: 'Konto zostało usunięte — e-dietetyk.com',
-    text: 'Twoje konto w e-dietetyk.com zostało usunięte zgodnie z Twoją prośbą.\n\nDane osobowe zostały zanonimizowane. Jeśli to nie Ty zainicjowałeś usunięcie, skontaktuj się natychmiast pod adresem kontakt@e-dietetyk.com.\n\nZespół e-dietetyk.com',
-    html: `
-      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
-        <h2 style="color:#1a1a1a;">Konto usunięte</h2>
-        <p>Twoje konto w e-dietetyk.com zostało usunięte zgodnie z Twoją prośbą.</p>
-        <p>Dane osobowe zostały zanonimizowane zgodnie z RODO (art. 17).</p>
-        <div style="background-color:#fef2f2;border-left:4px solid #ef4444;padding:16px;margin:16px 0;border-radius:0 8px 8px 0;">
-          <p style="margin:0;font-size:14px;color:#991b1b;font-weight:bold;">Jeśli to nie Ty zainicjowałeś usunięcie konta, skontaktuj się natychmiast pod adresem kontakt@e-dietetyk.com.</p>
-        </div>
-        <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0;" />
-        <p style="color:#9ca3af;font-size:12px;">e-dietetyk.com</p>
-      </div>
-    `,
+  const subject = `Konto zostało usunięte — ${BRAND_NAME}`;
+  const text = `Twoje konto w ${BRAND_NAME} zostało usunięte zgodnie z Twoją prośbą.
+
+Dane osobowe zostały zanonimizowane zgodnie z RODO (art. 17).
+Jeśli to nie Ty zainicjowałeś usunięcie, skontaktuj się natychmiast pod adresem ${SUPPORT_EMAIL}.
+
+Zespół ${BRAND_NAME}`;
+
+  const html = emailLayout({
+    heading: 'Konto usunięte',
+    bodyHtml: `<p>Twoje konto w ${BRAND_NAME} zostało usunięte zgodnie z Twoją prośbą.</p>
+      <p>Dane osobowe zostały zanonimizowane zgodnie z RODO (art. 17).</p>`,
+    callout: {
+      variant: 'danger',
+      html: `<strong>Jeśli to nie Ty zainicjowałeś usunięcie konta, skontaktuj się natychmiast pod adresem <a href="mailto:${SUPPORT_EMAIL}" style="color:${NAVY_DEEP};">${SUPPORT_EMAIL}</a>.</strong>`,
+    },
   });
+
+  await send(to, subject, text, html);
+}
+
+// ─── BE-4: subscription welcome + payment failed ──────────────────────────────
+
+export async function sendSubscriptionWelcomeEmail(
+  to: string,
+  args: {
+    productLabel: string;
+    amountPerMonth: number;
+    panelUrl: string;
+    remoteHelpUrl: string;
+  },
+): Promise<void> {
+  const { productLabel, amountPerMonth, panelUrl, remoteHelpUrl } = args;
+  const subject = `Witaj w ${BRAND_NAME} — Twój ${productLabel} jest aktywny`;
+  const text = `Witaj w ${BRAND_NAME}!
+
+Twój ${productLabel} (${amountPerMonth} zł netto/mies.) jest aktywny.
+
+Co dalej:
+1. Pobierz oprogramowanie do pomocy zdalnej: ${remoteHelpUrl}
+2. Zarządzaj subskrypcją w panelu: ${panelUrl}
+
+Skontaktujemy się z Tobą w ciągu 24h roboczych, żeby umówić pierwsze logowanie.
+
+Pozdrawiamy,
+Remigiusz + Wirgiliusz
+${BRAND_NAME}`;
+
+  const html = emailLayout({
+    heading: `Witaj w ${BRAND_NAME}!`,
+    bodyHtml: `<p>Twój <strong>${productLabel}</strong> (${amountPerMonth} zł netto/mies.) jest aktywny. Dziękujemy za zaufanie.</p>
+      <p style="margin-top:24px;font-weight:600;color:${NAVY_DEEP};">Co dalej:</p>
+      <ol style="padding-left:18px;margin:8px 0;">
+        <li style="margin:8px 0;">Skontaktujemy się z Tobą w ciągu 24h roboczych, żeby umówić pierwsze logowanie i przejść przez konfigurację.</li>
+        <li style="margin:8px 0;">Pobierz <a href="${remoteHelpUrl}" style="color:${BAMBOO_DEEP};font-weight:600;">oprogramowanie do pomocy zdalnej</a> — będziemy z niego korzystać przy każdym zgłoszeniu.</li>
+        <li style="margin:8px 0;">Pamiętaj — po drugiej stronie siedzi konkretny człowiek. Nie infolinia, nie korporacja.</li>
+      </ol>`,
+    cta: { label: 'Otwórz panel klienta', url: panelUrl },
+    footnoteHtml: `Pozdrawiamy,<br/>Remigiusz + Wirgiliusz`,
+  });
+
+  await send(to, subject, text, html);
+}
+
+export async function sendPaymentFailedEmail(
+  to: string,
+  args: {
+    productLabel: string;
+    portalUrl: string;
+  },
+): Promise<void> {
+  const { productLabel, portalUrl } = args;
+  const subject = `Problem z płatnością — ${BRAND_NAME}`;
+  const text = `Cześć,
+
+Nie udało nam się pobrać opłaty za Twój ${productLabel}. Zwykle oznacza to wygasłą kartę lub niedostateczne saldo.
+
+Sprawdź i zaktualizuj metodę płatności w panelu Stripe:
+${portalUrl}
+
+Stripe automatycznie ponowi próbę za 3 dni. Jeśli płatność dalej się nie powiedzie, subskrypcja zostanie zawieszona.
+
+Pytania? Napisz na ${SUPPORT_EMAIL}.
+
+Zespół ${BRAND_NAME}`;
+
+  const html = emailLayout({
+    heading: 'Problem z płatnością',
+    bodyHtml: `<p>Nie udało nam się pobrać opłaty za Twój <strong>${productLabel}</strong>. Zwykle oznacza to wygasłą kartę lub niedostateczne saldo na koncie.</p>
+      <p>Sprawdź i zaktualizuj metodę płatności w panelu Stripe — kliknij przycisk poniżej.</p>`,
+    callout: {
+      variant: 'warning',
+      html: 'Stripe automatycznie ponowi próbę za 3 dni. Jeśli płatność dalej się nie powiedzie, subskrypcja zostanie zawieszona, a dostęp do usługi wstrzymany do momentu uregulowania.',
+    },
+    cta: { label: 'Zaktualizuj kartę', url: portalUrl },
+    footnoteHtml: `Pytania? Napisz na <a href="mailto:${SUPPORT_EMAIL}" style="color:${NAVY_DEEP};">${SUPPORT_EMAIL}</a>.`,
+  });
+
+  await send(to, subject, text, html);
 }
