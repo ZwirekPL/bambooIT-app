@@ -20,14 +20,16 @@ const variantStyles: Record<Variant, string> = {
 /**
  * A6 — Pinned-scroll word reveal.
  *
- * Outer section is 130vh tall to give scroll room. Inner content is
+ * Outer section is 170vh tall to give scroll room. Inner content is
  * position: sticky top:0 height:100vh, so it stays pinned while the
  * scroll progress 0→1 plays out across the second viewport-worth of
- * scroll. Each word animates in / holds / animates out as mockup did:
- *   - progress 0..0.4: words fade in + slide up from y:40 (staggered
- *     by word index via wp * 0.5 offset)
- *   - progress 0.4..0.6: hold at opacity:1 y:0
- *   - progress 0.6..1: fade out + slide up to y:-40
+ * scroll. Each word animates in / holds / animates out as mockup did.
+ * The hold window is deliberately wide (40% of scroll) so the phrase
+ * stays fully legible long enough to actually read it:
+ *   - progress 0..0.3: words fade in + slide up from y:40 (staggered
+ *     by word index via wp * 0.4 offset)
+ *   - progress 0.3..0.7: hold at opacity:1 y:0
+ *   - progress 0.7..1: fade out + slide up to y:-40
  *
  * prefers-reduced-motion: words render static at rest, section height
  * collapses to 60vh so the user doesn't have to scroll-trap through
@@ -69,7 +71,7 @@ export function NarrativeSection({ children, variant = 'navy' }: Props) {
   return (
     <section
       ref={ref}
-      className={`relative h-[130vh] ${variantStyles[variant]}`}
+      className={`relative h-[170vh] ${variantStyles[variant]}`}
     >
       <div className="sticky top-0 flex h-screen items-center justify-center overflow-hidden px-5 md:px-12">
         <p className="max-w-[18ch] text-center font-display text-4xl font-light italic leading-[1] tracking-[-0.04em] md:text-5xl lg:text-6xl xl:text-7xl">
@@ -103,24 +105,24 @@ function Word({
   // Identical algorithm to mockup's onUpdate handler.
   const opacity = useTransform(progress, (p) => {
     const wp = index / totalWords;
-    if (p < 0.4) {
-      const local = Math.max(0, p / 0.4 - wp * 0.5);
+    if (p < 0.3) {
+      const local = Math.max(0, p / 0.3 - wp * 0.4);
       return Math.min(1, local * 2);
     }
-    if (p < 0.6) return 1;
-    const local = (p - 0.6) / 0.4;
+    if (p < 0.7) return 1;
+    const local = (p - 0.7) / 0.3;
     return Math.max(0, 1 - local * 2);
   });
 
   const y = useTransform(progress, (p) => {
     const wp = index / totalWords;
-    if (p < 0.4) {
-      const local = Math.max(0, p / 0.4 - wp * 0.5);
+    if (p < 0.3) {
+      const local = Math.max(0, p / 0.3 - wp * 0.4);
       const op = Math.min(1, local * 2);
       return (1 - op) * 40;
     }
-    if (p < 0.6) return 0;
-    const local = (p - 0.6) / 0.4;
+    if (p < 0.7) return 0;
+    const local = (p - 0.7) / 0.3;
     const op = Math.max(0, 1 - local * 2);
     return (1 - op) * -40;
   });
