@@ -11,6 +11,7 @@ import { IndustriesSection } from '@/components/marketing/IndustriesSection';
 import { AuditFormSection } from '@/components/marketing/AuditFormSection';
 import { FAQSection } from '@/components/marketing/FAQSection';
 import { FinalCTASection } from '@/components/marketing/FinalCTASection';
+import { PandaHelper } from '@/components/marketing/PandaHelper';
 import { BRAND } from '@config/brand';
 
 type Props = {
@@ -70,6 +71,7 @@ export default async function HomePage({ params }: Props) {
       <AuditFormSection />
       <FAQSection />
       <FinalCTASection />
+      <PandaHelper />
     </>
   );
 }

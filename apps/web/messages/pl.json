@@ -1098,6 +1098,22 @@
     "categoryMarketing": "Marketingowe",
     "categoryMarketingDesc": "Obecnie nie używamy żadnych cookies marketingowych ani reklamowych."
   },
+  "pandaHelper": {
+    "name": "Bambi",
+    "intro": "Cześć! Jestem Bambi 🐼 Przewiń stronę w dół — pokażę Ci, co tu mamy.",
+    "scrollHint": "Jest więcej niżej — przewiń, żeby zobaczyć ↓",
+    "backToTop": "To już koniec strony. Kliknij mnie, żeby wrócić na górę ↑",
+    "help": "Zgubiłeś się? Przewijaj w dół — prowadzę Cię przez całą stronę. Na końcu znajdziesz formularz kontaktu.",
+    "tips": {
+      "services": "Tę sekcję przewijasz scrollem w bok → tak zobaczysz wszystkie nasze usługi.",
+      "pricing": "Tutaj wybierzesz pakiet opieki IT dla swojej firmy 👇",
+      "audit": "Zostaw dane w formularzu — oddzwonimy i zrobimy bezpłatny audyt Twojego IT."
+    },
+    "openAria": "Pokaż podpowiedź od Bambi",
+    "closeAria": "Schowaj pomocnika Bambi",
+    "reopenAria": "Pokaż pomocnika Bambi",
+    "backToTopAria": "Przewiń na górę strony"
+  },
   "auth": {
     "loginTitle": "Zaloguj się",
     "loginSubtitle": "Wróć do swojego panelu",
