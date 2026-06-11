@@ -275,7 +275,7 @@ export function PandaHelper() {
         type="button"
         onClick={reopen}
         aria-label={t('reopenAria')}
-        className="fixed bottom-4 right-4 z-40 bg-transparent md:bottom-6 md:right-6"
+        className="fixed bottom-[222px] right-4 z-40 bg-transparent md:bottom-[230px] md:right-6"
         whileHover={shouldReduceMotion ? undefined : { scale: 1.08, rotate: -4 }}
         whileTap={shouldReduceMotion ? undefined : { scale: 0.92 }}
       >
@@ -285,7 +285,7 @@ export function PandaHelper() {
   }
 
   return (
-    <div className="pointer-events-none fixed bottom-5 right-5 z-40 flex max-w-[min(82vw,320px)] flex-col items-end gap-2 md:bottom-6 md:right-6">
+    <div className="pointer-events-none fixed bottom-[222px] right-4 z-40 flex max-w-[min(82vw,320px)] flex-col items-end gap-2 md:bottom-[230px] md:right-6">
       <AnimatePresence>
         {bubble && (
           <motion.div
@@ -381,6 +381,22 @@ function PandaCharacter({
       }
     : {};
 
+  // Idle "chewing" loop: every ~6.5s Bambi leans toward the bamboo and takes a
+  // few nibbles — head tilts, jaw works, the top leaf gets bitten — all phased
+  // to the same keyframe times so they read as one motion.
+  const chewTimes = [0, 0.5, 0.58, 0.66, 0.74, 0.82, 1];
+  const chew = (
+    animate: Record<string, number[]>,
+    origin = 'center',
+  ) =>
+    idle
+      ? {
+          animate,
+          transition: { duration: 6.5, repeat: Infinity, times: chewTimes, ease: 'easeInOut' as const },
+          style: { transformBox: 'fill-box', transformOrigin: origin } as const,
+        }
+      : {};
+
   return (
     <svg
       width={size}
@@ -410,8 +426,11 @@ function PandaCharacter({
           <rect x="24" y="58" width="7" height="56" rx="3.5" fill={BAMBOO} />
           <line x1="24" y1="76" x2="31" y2="76" stroke={NAVY} strokeWidth="1.4" opacity="0.5" />
           <line x1="24" y1="94" x2="31" y2="94" stroke={NAVY} strokeWidth="1.4" opacity="0.5" />
-          <path d="M27 60 q-16 -6 -19 -20 q16 2 19 20 z" fill={BAMBOO_BRIGHT} />
-          <path d="M30 66 q16 -4 20 -16 q-15 0 -20 16 z" fill={BAMBOO_BRIGHT} />
+          {/* leafy top — nibbled on the chew loop */}
+          <motion.g {...chew({ scale: [1, 1, 0.8, 1, 0.8, 1, 1] })}>
+            <path d="M27 60 q-16 -6 -19 -20 q16 2 19 20 z" fill={BAMBOO_BRIGHT} />
+            <path d="M30 66 q16 -4 20 -16 q-15 0 -20 16 z" fill={BAMBOO_BRIGHT} />
+          </motion.g>
         </g>
         {/* left paw over the stalk */}
         <ellipse cx="30" cy="96" rx="9.5" ry="8" fill={NAVY} />
@@ -426,48 +445,51 @@ function PandaCharacter({
           <ellipse cx="93" cy="70" rx="4.5" ry="3.3" fill={BAMBOO} opacity="0.55" />
         </motion.g>
 
-        {/* ---- head ---- */}
-        {/* ears */}
-        <circle cx="37" cy="20" r="12.5" fill={NAVY} />
-        <circle cx="83" cy="20" r="12.5" fill={NAVY} />
-        <circle cx="37" cy="20" r="5.5" fill="#37485a" />
-        <circle cx="83" cy="20" r="5.5" fill="#37485a" />
-        {/* head shape */}
-        <circle cx="60" cy="46" r="34" fill="#fff" stroke={NAVY} strokeWidth="2.5" />
-        {/* cheek blush */}
-        <circle cx="39" cy="56" r="6.5" fill={BAMBOO_BRIGHT} opacity="0.32" />
-        <circle cx="81" cy="56" r="6.5" fill={BAMBOO_BRIGHT} opacity="0.32" />
-        {/* eye patches */}
-        <ellipse cx="47" cy="44" rx="8.5" ry="11.5" fill={NAVY} transform="rotate(-20 47 44)" />
-        <ellipse cx="73" cy="44" rx="8.5" ry="11.5" fill={NAVY} transform="rotate(20 73 44)" />
+        {/* ---- head ---- tilts toward the bamboo on the chew loop */}
+        <motion.g {...chew({ rotate: [0, 0, -3.5, -1.5, -3.5, -1.5, 0] }, 'center bottom')}>
+          {/* ears */}
+          <circle cx="37" cy="20" r="12.5" fill={NAVY} />
+          <circle cx="83" cy="20" r="12.5" fill={NAVY} />
+          <circle cx="37" cy="20" r="5.5" fill="#37485a" />
+          <circle cx="83" cy="20" r="5.5" fill="#37485a" />
+          {/* head shape */}
+          <circle cx="60" cy="46" r="34" fill="#fff" stroke={NAVY} strokeWidth="2.5" />
+          {/* cheek blush */}
+          <circle cx="39" cy="56" r="6.5" fill={BAMBOO_BRIGHT} opacity="0.32" />
+          <circle cx="81" cy="56" r="6.5" fill={BAMBOO_BRIGHT} opacity="0.32" />
+          {/* eye patches */}
+          <ellipse cx="47" cy="44" rx="8.5" ry="11.5" fill={NAVY} transform="rotate(-20 47 44)" />
+          <ellipse cx="73" cy="44" rx="8.5" ry="11.5" fill={NAVY} transform="rotate(20 73 44)" />
 
-        {/* eyes — whites + cursor-tracking pupils, wrapped for the blink */}
-        <motion.g {...blink}>
-          <circle cx="47" cy="45" r="5.2" fill="#fff" />
-          <circle cx="73" cy="45" r="5.2" fill="#fff" />
-          <motion.circle
-            cx="47" cy="45" r="2.8" fill={NAVY}
-            animate={{ x: pupil.x, y: pupil.y }}
-            transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+          {/* eyes — whites + cursor-tracking pupils, wrapped for the blink */}
+          <motion.g {...blink}>
+            <circle cx="47" cy="45" r="5.2" fill="#fff" />
+            <circle cx="73" cy="45" r="5.2" fill="#fff" />
+            <motion.circle
+              cx="47" cy="45" r="2.8" fill={NAVY}
+              animate={{ x: pupil.x, y: pupil.y }}
+              transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+            />
+            <motion.circle
+              cx="73" cy="45" r="2.8" fill={NAVY}
+              animate={{ x: pupil.x, y: pupil.y }}
+              transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+            />
+            <circle cx="48.4" cy="43.4" r="1" fill="#fff" />
+            <circle cx="74.4" cy="43.4" r="1" fill="#fff" />
+          </motion.g>
+
+          {/* nose + chewing jaw */}
+          <ellipse cx="60" cy="55" rx="4.6" ry="3.2" fill={NAVY} />
+          <motion.path
+            {...chew({ scaleY: [1, 1, 0.5, 1, 0.5, 1, 1] }, 'center top')}
+            d="M60 58 v3 M60 61 q-6 5 -11 1 M60 61 q6 5 11 1"
+            stroke={NAVY}
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            fill="none"
           />
-          <motion.circle
-            cx="73" cy="45" r="2.8" fill={NAVY}
-            animate={{ x: pupil.x, y: pupil.y }}
-            transition={{ type: 'spring', stiffness: 260, damping: 22 }}
-          />
-          <circle cx="48.4" cy="43.4" r="1" fill="#fff" />
-          <circle cx="74.4" cy="43.4" r="1" fill="#fff" />
         </motion.g>
-
-        {/* nose + mouth */}
-        <ellipse cx="60" cy="55" rx="4.6" ry="3.2" fill={NAVY} />
-        <path
-          d="M60 58 v3 M60 61 q-6 5 -11 1 M60 61 q6 5 11 1"
-          stroke={NAVY}
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          fill="none"
-        />
       </g>
     </svg>
   );
