@@ -421,20 +421,6 @@ function PandaCharacter({
         <ellipse cx="43" cy="118" rx="5" ry="3.6" fill={BAMBOO} opacity="0.55" />
         <ellipse cx="77" cy="118" rx="5" ry="3.6" fill={BAMBOO} opacity="0.55" />
 
-        {/* ---- bamboo sprig, held in the left paw ---- */}
-        <g transform="rotate(-12 28 92)">
-          <rect x="24" y="58" width="7" height="56" rx="3.5" fill={BAMBOO} />
-          <line x1="24" y1="76" x2="31" y2="76" stroke={NAVY} strokeWidth="1.4" opacity="0.5" />
-          <line x1="24" y1="94" x2="31" y2="94" stroke={NAVY} strokeWidth="1.4" opacity="0.5" />
-          {/* leafy top — nibbled on the chew loop */}
-          <motion.g {...chew({ scale: [1, 1, 0.8, 1, 0.8, 1, 1] })}>
-            <path d="M27 60 q-16 -6 -19 -20 q16 2 19 20 z" fill={BAMBOO_BRIGHT} />
-            <path d="M30 66 q16 -4 20 -16 q-15 0 -20 16 z" fill={BAMBOO_BRIGHT} />
-          </motion.g>
-        </g>
-        {/* left paw over the stalk */}
-        <ellipse cx="30" cy="96" rx="9.5" ry="8" fill={NAVY} />
-
         {/* ---- waving right paw ---- */}
         <motion.g
           style={{ transformBox: 'fill-box', transformOrigin: 'center bottom' }}
@@ -445,8 +431,8 @@ function PandaCharacter({
           <ellipse cx="93" cy="70" rx="4.5" ry="3.3" fill={BAMBOO} opacity="0.55" />
         </motion.g>
 
-        {/* ---- head ---- tilts toward the bamboo on the chew loop */}
-        <motion.g {...chew({ rotate: [0, 0, -3.5, -1.5, -3.5, -1.5, 0] }, 'center bottom')}>
+        {/* ---- head ---- dips down onto the bamboo on the chew loop ---- */}
+        <motion.g {...chew({ y: [0, 0, 2.6, 1, 2.6, 1, 0] })}>
           {/* ears */}
           <circle cx="37" cy="20" r="12.5" fill={NAVY} />
           <circle cx="83" cy="20" r="12.5" fill={NAVY} />
@@ -482,7 +468,7 @@ function PandaCharacter({
           {/* nose + chewing jaw */}
           <ellipse cx="60" cy="55" rx="4.6" ry="3.2" fill={NAVY} />
           <motion.path
-            {...chew({ scaleY: [1, 1, 0.5, 1, 0.5, 1, 1] }, 'center top')}
+            {...chew({ scaleY: [1, 1, 0.35, 1, 0.35, 1, 1] }, 'center top')}
             d="M60 58 v3 M60 61 q-6 5 -11 1 M60 61 q6 5 11 1"
             stroke={NAVY}
             strokeWidth="2.2"
@@ -490,6 +476,23 @@ function PandaCharacter({
             fill="none"
           />
         </motion.g>
+
+        {/* ---- bamboo shoot held up to the mouth (in front of the face) ----
+             nudges up to meet the dipping head so the bite lands on the tip. */}
+        <motion.g {...chew({ y: [0, 0, -1.6, -0.6, -1.6, -0.6, 0] })}>
+          <g transform="rotate(11 59 82)">
+            <rect x="56" y="64" width="6" height="34" rx="3" fill={BAMBOO} />
+            <line x1="56" y1="78" x2="62" y2="78" stroke={NAVY} strokeWidth="1.3" opacity="0.5" />
+            <line x1="56" y1="90" x2="62" y2="90" stroke={NAVY} strokeWidth="1.3" opacity="0.5" />
+          </g>
+          {/* top tip — the soft shoot end Bambi nibbles off */}
+          <motion.g {...chew({ scale: [1, 1, 0.5, 1, 0.5, 1, 1] }, 'bottom center')}>
+            <ellipse cx="58.5" cy="63.5" rx="3.6" ry="2.8" fill={BAMBOO_BRIGHT} />
+          </motion.g>
+        </motion.g>
+        {/* left paw raised, gripping the shoot */}
+        <ellipse cx="55" cy="96" rx="9" ry="7.5" fill={NAVY} />
+        <ellipse cx="55" cy="94" rx="4.2" ry="3" fill={BAMBOO} opacity="0.55" />
       </g>
     </svg>
   );
