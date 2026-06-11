@@ -15,8 +15,8 @@ const CARD_IDS = ['1', '2', '3', '4', '5', '6'] as const;
 /**
  * A9 — Horizontal pinned-scroll services section.
  *
- * Outer container is 600vh tall to give 6 cards × 100vh of scroll
- * distance. Inner content is sticky top:0 h-screen — pins to viewport
+ * Outer container is 300vh tall to give 6 cards ~50vh of scroll
+ * distance each. Inner content is sticky top:0 h-screen — pins to viewport
  * while the user scrolls through the outer container. The horizontal
  * track inside the pinned area translates left (x: 0 → -trackOffset)
  * driven by scrollYProgress. As cards pass the viewport center the
@@ -112,7 +112,7 @@ export function HorizontalServicesSection() {
           </div>
         </div>
       ) : (
-        <div ref={outerRef} className="relative h-[600vh]">
+        <div ref={outerRef} className="relative h-[300vh]">
           {/* justify-center: vertically center the cards row in the sticky
               viewport so they sit at the eye line instead of being pinned
               to the top of the section (which left a large empty area below
