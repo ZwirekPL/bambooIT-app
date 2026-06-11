@@ -50,7 +50,6 @@ export function PandaHelper() {
   const [mounted, setMounted] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const [position, setPosition] = useState<Position>('top');
-  const [scrollDir, setScrollDir] = useState<'up' | 'down'>('down');
   const [activeSection, setActiveSection] = useState<TipSection | null>(null);
   const [idleAtTop, setIdleAtTop] = useState(false);
   const [introVisible, setIntroVisible] = useState(true);
@@ -58,9 +57,15 @@ export function PandaHelper() {
   // otherwise hide the bubble; cleared on auto-hide.
   const [manualText, setManualText] = useState<string | null>(null);
 
+  // Eyes follow the cursor (offset clamped to a couple of px) for interactivity.
+  const [pupil, setPupil] = useState({ x: 0, y: 0 });
+  const [hovered, setHovered] = useState(false);
+
   const lastYRef = useRef(0);
+  const introClearedRef = useRef(false);
   const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const manualTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pandaRef = useRef<HTMLButtonElement>(null);
 
   // Read persisted dismissal once on the client (avoids SSR hydration mismatch).
   useEffect(() => {
@@ -86,12 +91,12 @@ export function PandaHelper() {
       const atBottom = y + vh >= docH - BOTTOM_THRESHOLD_PX;
       setPosition(atBottom ? 'bottom' : atTop ? 'top' : 'middle');
 
-      if (Math.abs(y - lastYRef.current) > 4) {
-        setScrollDir(y > lastYRef.current ? 'down' : 'up');
-        lastYRef.current = y;
-      }
+      lastYRef.current = y;
 
-      if (y > TOP_THRESHOLD_PX) setIntroVisible(false);
+      if (y > TOP_THRESHOLD_PX && !introClearedRef.current) {
+        introClearedRef.current = true;
+        setIntroVisible(false);
+      }
 
       if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
       if (atTop) {
@@ -153,6 +158,37 @@ export function PandaHelper() {
     targets.forEach((el) => io.observe(el));
     return () => io.disconnect();
   }, [dismissed]);
+
+  // Pupils glance toward the cursor. rAF-throttled; disabled for reduced motion.
+  useEffect(() => {
+    if (shouldReduceMotion || dismissed) return;
+    let frame = 0;
+    let nextX = 0;
+    let nextY = 0;
+    const apply = () => {
+      frame = 0;
+      setPupil({ x: nextX, y: nextY });
+    };
+    const onMove = (e: MouseEvent) => {
+      const el = pandaRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const dx = e.clientX - cx;
+      const dy = e.clientY - cy;
+      const dist = Math.hypot(dx, dy) || 1;
+      const max = 2.4; // px of pupil travel in SVG units
+      nextX = (dx / dist) * max;
+      nextY = (dy / dist) * max;
+      if (!frame) frame = requestAnimationFrame(apply);
+    };
+    window.addEventListener('mousemove', onMove, { passive: true });
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [shouldReduceMotion, dismissed]);
 
   const scrollToTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: shouldReduceMotion ? 'auto' : 'smooth' });
@@ -224,14 +260,16 @@ export function PandaHelper() {
   // Collapsed: just a small re-open button.
   if (dismissed) {
     return (
-      <button
+      <motion.button
         type="button"
         onClick={reopen}
         aria-label={t('reopenAria')}
-        className="fixed bottom-5 right-5 z-40 flex h-12 w-12 items-center justify-center rounded-full border border-line bg-white shadow-[0_8px_24px_-8px_rgba(44,62,80,0.35)] transition-transform hover:scale-105 md:bottom-6 md:right-6"
+        className="fixed bottom-4 right-4 z-40 bg-transparent md:bottom-6 md:right-6"
+        whileHover={shouldReduceMotion ? undefined : { scale: 1.08, rotate: -4 }}
+        whileTap={shouldReduceMotion ? undefined : { scale: 0.92 }}
       >
-        <PandaFace size={30} scrollDir="down" idle={false} />
-      </button>
+        <PandaCharacter size={62} pupil={{ x: 0, y: 0 }} idle={false} hovered={false} />
+      </motion.button>
     );
   }
 
@@ -260,111 +298,166 @@ export function PandaHelper() {
         )}
       </AnimatePresence>
 
-      <div className="pointer-events-auto flex items-center gap-1.5">
+      <div className="pointer-events-auto group relative">
+        {/* dismiss — subtle, fades in on hover */}
         <button
           type="button"
           onClick={dismiss}
           aria-label={t('closeAria')}
-          className="flex h-6 w-6 items-center justify-center rounded-full border border-line bg-white/90 text-navy-soft shadow-sm transition-colors hover:bg-paper hover:text-navy"
+          className="absolute -left-1 -top-1 z-10 flex h-6 w-6 items-center justify-center rounded-full border border-line bg-white/90 text-navy-soft opacity-0 shadow-sm transition-opacity hover:text-navy focus-visible:opacity-100 group-hover:opacity-100"
         >
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" aria-hidden="true">
             <path d="M6 6l12 12M18 6L6 18" />
           </svg>
         </button>
 
+        {/* Bambi — floating, no background plate */}
         <motion.button
+          ref={pandaRef}
           type="button"
           onClick={handlePandaClick}
+          onHoverStart={() => setHovered(true)}
+          onHoverEnd={() => setHovered(false)}
           aria-label={bubble?.action === 'scrollTop' ? t('backToTopAria') : t('openAria')}
-          className="flex h-16 w-16 items-center justify-center rounded-full border border-line bg-white shadow-[0_10px_28px_-8px_rgba(44,62,80,0.4)] md:h-[72px] md:w-[72px]"
-          animate={
-            shouldReduceMotion
-              ? undefined
-              : { y: [0, -5, 0] }
-          }
+          className="bg-transparent"
+          animate={shouldReduceMotion ? undefined : { y: [0, -6, 0] }}
           transition={
             shouldReduceMotion
               ? undefined
-              : { duration: 3.2, repeat: Infinity, ease: 'easeInOut' }
+              : { duration: 3.4, repeat: Infinity, ease: 'easeInOut' }
           }
-          whileHover={shouldReduceMotion ? undefined : { scale: 1.06 }}
-          whileTap={shouldReduceMotion ? undefined : { scale: 0.94 }}
+          whileHover={shouldReduceMotion ? undefined : { scale: 1.07, rotate: -3 }}
+          whileTap={shouldReduceMotion ? undefined : { scale: 0.9, rotate: 4 }}
         >
-          <PandaFace size={44} scrollDir={scrollDir} idle={!shouldReduceMotion} />
+          <PandaCharacter
+            size={92}
+            pupil={pupil}
+            idle={!shouldReduceMotion}
+            hovered={hovered}
+          />
         </motion.button>
       </div>
     </div>
   );
 }
 
+const NAVY = '#1A2735';
+const BAMBOO = '#6FA336';
+const BAMBOO_BRIGHT = '#9ec956';
+
 /**
- * Compact Bambi face — navy head + ears, white eye-patches, bamboo nose.
- * Pupils translate a touch in the scroll direction so Bambi "looks" where the
- * page is going. Blinks on an idle loop unless reduced motion is requested.
+ * Bambi — a full sitting panda character that floats without a background
+ * plate. Holds a bamboo sprig, breathes, blinks on an idle loop, glances its
+ * pupils toward the cursor (`pupil`), and waves its right paw on `hovered`.
+ * All motion is gated by `idle` (false under prefers-reduced-motion).
  */
-function PandaFace({
+function PandaCharacter({
   size,
-  scrollDir,
+  pupil,
   idle,
+  hovered,
 }: {
   size: number;
-  scrollDir: 'up' | 'down';
+  pupil: { x: number; y: number };
   idle: boolean;
+  hovered: boolean;
 }) {
-  const pupilDy = scrollDir === 'down' ? 1.5 : -1.5;
+  const blink = idle
+    ? {
+        animate: { scaleY: [1, 1, 0.1, 1, 1] as number[] },
+        transition: { duration: 4.2, repeat: Infinity, times: [0, 0.9, 0.94, 0.98, 1] },
+        style: { transformBox: 'fill-box', transformOrigin: 'center' } as const,
+      }
+    : {};
+
   return (
     <svg
       width={size}
-      height={size}
-      viewBox="0 0 100 100"
+      height={Math.round(size * 1.12)}
+      viewBox="0 0 120 134"
       fill="none"
       aria-hidden="true"
     >
-      {/* ears */}
-      <circle cx="26" cy="24" r="13" fill="#1A2735" />
-      <circle cx="74" cy="24" r="13" fill="#1A2735" />
-      {/* head */}
-      <circle cx="50" cy="54" r="34" fill="#fff" stroke="#1A2735" strokeWidth="3" />
-      {/* eye patches */}
-      <ellipse cx="38" cy="50" rx="9" ry="11" fill="#1A2735" transform="rotate(-12 38 50)" />
-      <ellipse cx="62" cy="50" rx="9" ry="11" fill="#1A2735" transform="rotate(12 62 50)" />
-      {/* eyes (white) + pupils */}
-      <circle cx="38" cy="50" r="3.6" fill="#fff" />
-      <circle cx="62" cy="50" r="3.6" fill="#fff" />
-      <motion.circle
-        cx="38"
-        cy="50"
-        r="1.8"
-        fill="#1A2735"
-        animate={idle ? { cy: 50 + pupilDy } : undefined}
-        transition={{ duration: 0.4, ease: 'easeOut' }}
-      />
-      <motion.circle
-        cx="62"
-        cy="50"
-        r="1.8"
-        fill="#1A2735"
-        animate={idle ? { cy: 50 + pupilDy } : undefined}
-        transition={{ duration: 0.4, ease: 'easeOut' }}
-      />
-      {/* nose + mouth */}
-      <ellipse cx="50" cy="64" rx="4" ry="3" fill="#6FA336" />
-      <path d="M50 67 v3 M50 70 q-5 4 -9 1 M50 70 q5 4 9 1" stroke="#1A2735" strokeWidth="2" strokeLinecap="round" />
-      {/* blink overlay — lids drop on an idle loop */}
-      {idle && (
-        <>
-          <motion.rect
-            x="33" y="44" width="10" height="0" rx="2" fill="#1A2735"
-            animate={{ height: [0, 0, 7, 0, 0] }}
-            transition={{ duration: 4, repeat: Infinity, times: [0, 0.88, 0.93, 0.98, 1] }}
+      <defs>
+        <filter id="bambi-shadow" x="-30%" y="-25%" width="160%" height="165%">
+          <feDropShadow dx="0" dy="6" stdDeviation="5" floodColor={NAVY} floodOpacity="0.26" />
+        </filter>
+      </defs>
+
+      <g filter="url(#bambi-shadow)">
+        {/* ---- body ---- */}
+        <ellipse cx="60" cy="94" rx="35" ry="31" fill={NAVY} />
+        <ellipse cx="60" cy="98" rx="24" ry="23" fill="#fff" />
+        {/* feet */}
+        <ellipse cx="43" cy="118" rx="12" ry="8.5" fill={NAVY} />
+        <ellipse cx="77" cy="118" rx="12" ry="8.5" fill={NAVY} />
+        <ellipse cx="43" cy="118" rx="5" ry="3.6" fill={BAMBOO} opacity="0.55" />
+        <ellipse cx="77" cy="118" rx="5" ry="3.6" fill={BAMBOO} opacity="0.55" />
+
+        {/* ---- bamboo sprig, held in the left paw ---- */}
+        <g transform="rotate(-12 28 92)">
+          <rect x="24" y="58" width="7" height="56" rx="3.5" fill={BAMBOO} />
+          <line x1="24" y1="76" x2="31" y2="76" stroke={NAVY} strokeWidth="1.4" opacity="0.5" />
+          <line x1="24" y1="94" x2="31" y2="94" stroke={NAVY} strokeWidth="1.4" opacity="0.5" />
+          <path d="M27 60 q-16 -6 -19 -20 q16 2 19 20 z" fill={BAMBOO_BRIGHT} />
+          <path d="M30 66 q16 -4 20 -16 q-15 0 -20 16 z" fill={BAMBOO_BRIGHT} />
+        </g>
+        {/* left paw over the stalk */}
+        <ellipse cx="30" cy="96" rx="9.5" ry="8" fill={NAVY} />
+
+        {/* ---- waving right paw ---- */}
+        <motion.g
+          style={{ transformBox: 'fill-box', transformOrigin: 'center bottom' }}
+          animate={idle && hovered ? { rotate: [0, -24, -6, -24, 0] } : { rotate: 0 }}
+          transition={{ duration: 0.7, ease: 'easeInOut' }}
+        >
+          <ellipse cx="93" cy="72" rx="9.5" ry="8" fill={NAVY} />
+          <ellipse cx="93" cy="70" rx="4.5" ry="3.3" fill={BAMBOO} opacity="0.55" />
+        </motion.g>
+
+        {/* ---- head ---- */}
+        {/* ears */}
+        <circle cx="37" cy="20" r="12.5" fill={NAVY} />
+        <circle cx="83" cy="20" r="12.5" fill={NAVY} />
+        <circle cx="37" cy="20" r="5.5" fill="#37485a" />
+        <circle cx="83" cy="20" r="5.5" fill="#37485a" />
+        {/* head shape */}
+        <circle cx="60" cy="46" r="34" fill="#fff" stroke={NAVY} strokeWidth="2.5" />
+        {/* cheek blush */}
+        <circle cx="39" cy="56" r="6.5" fill={BAMBOO_BRIGHT} opacity="0.32" />
+        <circle cx="81" cy="56" r="6.5" fill={BAMBOO_BRIGHT} opacity="0.32" />
+        {/* eye patches */}
+        <ellipse cx="47" cy="44" rx="8.5" ry="11.5" fill={NAVY} transform="rotate(-20 47 44)" />
+        <ellipse cx="73" cy="44" rx="8.5" ry="11.5" fill={NAVY} transform="rotate(20 73 44)" />
+
+        {/* eyes — whites + cursor-tracking pupils, wrapped for the blink */}
+        <motion.g {...blink}>
+          <circle cx="47" cy="45" r="5.2" fill="#fff" />
+          <circle cx="73" cy="45" r="5.2" fill="#fff" />
+          <motion.circle
+            cx="47" cy="45" r="2.8" fill={NAVY}
+            animate={{ x: pupil.x, y: pupil.y }}
+            transition={{ type: 'spring', stiffness: 260, damping: 22 }}
           />
-          <motion.rect
-            x="57" y="44" width="10" height="0" rx="2" fill="#1A2735"
-            animate={{ height: [0, 0, 7, 0, 0] }}
-            transition={{ duration: 4, repeat: Infinity, times: [0, 0.88, 0.93, 0.98, 1] }}
+          <motion.circle
+            cx="73" cy="45" r="2.8" fill={NAVY}
+            animate={{ x: pupil.x, y: pupil.y }}
+            transition={{ type: 'spring', stiffness: 260, damping: 22 }}
           />
-        </>
-      )}
+          <circle cx="48.4" cy="43.4" r="1" fill="#fff" />
+          <circle cx="74.4" cy="43.4" r="1" fill="#fff" />
+        </motion.g>
+
+        {/* nose + mouth */}
+        <ellipse cx="60" cy="55" rx="4.6" ry="3.2" fill={NAVY} />
+        <path
+          d="M60 58 v3 M60 61 q-6 5 -11 1 M60 61 q6 5 11 1"
+          stroke={NAVY}
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          fill="none"
+        />
+      </g>
     </svg>
   );
 }
