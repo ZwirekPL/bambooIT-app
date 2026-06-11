@@ -1105,9 +1105,14 @@
     "backToTop": "To już koniec strony. Kliknij mnie, żeby wrócić na górę ↑",
     "help": "Zgubiłeś się? Przewijaj w dół — prowadzę Cię przez całą stronę. Na końcu znajdziesz formularz kontaktu.",
     "tips": {
+      "offer": "Tu w skrócie to, czym się zajmujemy: opieka IT, strony, aplikacje i automatyzacje. Przewiń dalej 👇",
+      "manifesto": "Te liczby pokazują, ile realnie zyskujesz na stałej opiece IT.",
       "services": "Tę sekcję przewijasz scrollem w bok → tak zobaczysz wszystkie nasze usługi.",
       "pricing": "Tutaj wybierzesz pakiet opieki IT dla swojej firmy 👇",
-      "audit": "Zostaw dane w formularzu — oddzwonimy i zrobimy bezpłatny audyt Twojego IT."
+      "process": "Tak wygląda nasza współpraca krok po kroku — od pierwszego kontaktu po stałą opiekę.",
+      "industries": "Obsługujemy konkretne branże. Znajdź swoją — mamy dla niej osobną stronę.",
+      "audit": "Zostaw dane w formularzu — oddzwonimy i zrobimy bezpłatny audyt Twojego IT.",
+      "faq": "Masz wątpliwości? Tu są odpowiedzi na najczęstsze pytania. Kliknij, żeby rozwinąć."
     },
     "openAria": "Pokaż podpowiedź od Bambi",
     "closeAria": "Schowaj pomocnika Bambi",

@@ -25,9 +25,18 @@ import { useTranslations } from 'next-intl';
 
 const DISMISS_KEY = 'bambi-helper-dismissed';
 
-// Section ids on the homepage that carry a contextual tip. Order is the
-// document order so the most-relevant visible one wins.
-const TIP_SECTIONS = ['services', 'pricing', 'audit'] as const;
+// Section ids on the homepage that carry a contextual tip, in document order
+// so the most-relevant visible one wins.
+const TIP_SECTIONS = [
+  'offer',
+  'manifesto',
+  'services',
+  'pricing',
+  'process',
+  'industries',
+  'audit',
+  'faq',
+] as const;
 type TipSection = (typeof TIP_SECTIONS)[number];
 
 const TOP_THRESHOLD_PX = 140; // within this of the top counts as "at top"
@@ -142,7 +151,7 @@ export function PandaHelper() {
           ratios.set(entry.target.id as TipSection, entry.isIntersecting ? entry.intersectionRatio : 0);
         }
         let best: TipSection | null = null;
-        let bestRatio = 0.15; // require a meaningful slice on screen
+        let bestRatio = 0.12; // require a meaningful slice on screen
         for (const id of TIP_SECTIONS) {
           const r = ratios.get(id) ?? 0;
           if (r > bestRatio) {
@@ -150,7 +159,9 @@ export function PandaHelper() {
             best = id;
           }
         }
-        setActiveSection(best);
+        // Sticky: only advance to a new section, never blank out between them,
+        // so Bambi keeps talking continuously while scrolling.
+        if (best) setActiveSection(best);
       },
       { threshold: [0, 0.15, 0.35, 0.6, 0.85] },
     );

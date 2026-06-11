@@ -28,7 +28,7 @@ export async function ManifestoSection() {
   ];
 
   return (
-    <section className="relative border-t border-line bg-paper px-5 py-24 md:px-12 md:py-32 lg:py-40">
+    <section id="manifesto" className="relative border-t border-line bg-paper px-5 py-24 md:px-12 md:py-32 lg:py-40">
       <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 items-start gap-16 md:grid-cols-[1.2fr_1fr] md:gap-24">
         {/* Manifesto sentence — A7 char-by-char color reveal driven by scroll.
             Raw i18n string parsed in <ManifestoText /> client child so the
