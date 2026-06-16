@@ -6,13 +6,24 @@ import { Loader2 } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { api, ApiError } from '@/lib/api';
 import type { Subscription } from '@/types/api';
+import type { OpsHoursView } from '@/types/ops';
 import { PanelCardSkeleton } from '@/components/ui/Skeleton';
 
 type State =
   | { kind: 'loading' }
   | { kind: 'empty'; stripeConfigured: boolean }
   | { kind: 'ready'; subscription: Subscription; stripeConfigured: boolean }
+  | { kind: 'managed'; hours: OpsHoursView }
   | { kind: 'error'; message: string };
+
+/** Minutes → "5 h 20 min". */
+function fmtMinutes(min: number): string {
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  if (h === 0) return `${m} min`;
+  if (m === 0) return `${h} h`;
+  return `${h} h ${m} min`;
+}
 
 const PLAN_LABELS: Record<string, string> = {
   START: 'Start',
@@ -38,14 +49,22 @@ export function SubscriptionPanel() {
     (async () => {
       try {
         const res = await api.subscription.getMy('');
-        if (!res.subscription || !res.subscription.stripeSubscriptionId) {
-          setState({ kind: 'empty', stripeConfigured: res.stripeConfigured });
-        } else {
+        if (res.subscription && res.subscription.stripeSubscriptionId) {
           setState({
             kind: 'ready',
             subscription: res.subscription,
             stripeConfigured: res.stripeConfigured,
           });
+          return;
+        }
+        // No Stripe subscription yet (Stripe is deferred). Fall back to the
+        // admin-managed service plan (Company.servicePlan) so a client whose
+        // package the team set manually still sees their active service.
+        const hoursRes = await api.orders.getMyHours({}, '');
+        if (hoursRes.hours) {
+          setState({ kind: 'managed', hours: hoursRes.hours });
+        } else {
+          setState({ kind: 'empty', stripeConfigured: res.stripeConfigured });
         }
       } catch (err) {
         const msg = err instanceof Error ? err.message : t('errorLoad');
@@ -89,6 +108,74 @@ export function SubscriptionPanel() {
       <div className="rounded-3xl border border-red-300 bg-red-50 p-8 text-center">
         <h1 className="font-display text-2xl font-semibold text-navy">{t('errorTitle')}</h1>
         <p className="mt-3 text-sm text-red-700">{state.message}</p>
+      </div>
+    );
+  }
+
+  if (state.kind === 'managed') {
+    const h = state.hours;
+    const planLabel = PLAN_LABELS[h.plan] ?? h.plan;
+    const overage = Number(h.overageHours) > 0;
+    const pct =
+      h.availableMinutes > 0
+        ? Math.min(100, Math.round((h.consumedMinutes / h.availableMinutes) * 100))
+        : 0;
+    return (
+      <div className="space-y-8">
+        <header>
+          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-bamboo-deep">
+            Twoja obsługa IT
+          </p>
+          <h1 className="mt-2 font-display text-3xl font-light leading-tight tracking-[-0.02em] text-navy md:text-4xl">
+            Pakiet {planLabel}
+          </h1>
+          <p className="mt-2 max-w-prose text-sm text-navy-soft">
+            Obsługą Twojej firmy zajmuje się zespół bambooIT. Poniżej zużycie godzin w tym
+            miesiącu — szczegóły i historię znajdziesz w zakładce Godziny.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-4">
+            <Link href="/panel/godziny" className="text-sm text-navy-soft hover:text-bamboo-deep">
+              Godziny →
+            </Link>
+            <Link href="/panel/zgloszenia" className="text-sm text-navy-soft hover:text-bamboo-deep">
+              Zgłoszenia →
+            </Link>
+          </div>
+        </header>
+
+        <div className="rounded-3xl border border-line bg-white p-8 md:p-10">
+          <div className="flex items-baseline justify-between">
+            <span className="text-sm text-navy-soft">Wykorzystane w tym miesiącu</span>
+            <span className="font-display text-2xl font-bold text-navy">
+              {fmtMinutes(h.consumedMinutes)}
+              <span className="ml-1 text-base font-normal text-navy-soft">
+                / {fmtMinutes(h.availableMinutes)}
+              </span>
+            </span>
+          </div>
+          <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-line">
+            <div
+              className={overage ? 'h-full bg-red-500' : 'h-full bg-bamboo-deep'}
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+          {overage && (
+            <p className="mt-3 text-sm font-medium text-red-600">
+              Przekroczenie: {String(h.overageHours).replace('.', ',')} h ({h.overageAmountNet} zł
+              netto)
+            </p>
+          )}
+          <dl className="mt-6 grid grid-cols-2 gap-4 text-sm sm:grid-cols-3">
+            <div>
+              <dt className="text-xs text-navy-soft">Godziny w pakiecie</dt>
+              <dd className="mt-1 font-semibold text-navy">{h.hoursIncluded} h / mies.</dd>
+            </div>
+            <div>
+              <dt className="text-xs text-navy-soft">Przeniesione</dt>
+              <dd className="mt-1 font-semibold text-navy">{fmtMinutes(h.carryoverInMinutes)}</dd>
+            </div>
+          </dl>
+        </div>
       </div>
     );
   }

@@ -39,10 +39,34 @@ export async function setServicePlan(
 ) {
   const company = await prisma.company.findUnique({ where: { id: companyId } });
   if (!company) throw new AppError(404, 'NOT_FOUND', 'Company not found');
-  return prisma.company.update({
+  const updated = await prisma.company.update({
     where: { id: companyId },
     data: { servicePlan: plan, serviceSince },
   });
+
+  // Changing the plan mid-month must re-snapshot the CURRENT open period to the
+  // new tier's hours/rate (historical/closed periods keep their snapshot). Then
+  // recalc so the carryover/overage reflect the new package immediately.
+  if (plan) {
+    const { year, month } = periodKey(new Date());
+    const current = await prisma.servicePeriod.findUnique({
+      where: { companyId_year_month: { companyId, year, month } },
+    });
+    if (current && current.status === 'OPEN') {
+      const pkg = await getPackageOrThrow(plan);
+      await prisma.servicePeriod.update({
+        where: { id: current.id },
+        data: {
+          plan,
+          hoursIncluded: pkg.hoursIncluded,
+          overageRatePerHour: pkg.overageRatePerHour,
+        },
+      });
+      await recalcChain(companyId, year, month);
+    }
+  }
+
+  return updated;
 }
 
 // ─── Period math (minute precision) ───────────────────────────────────────
