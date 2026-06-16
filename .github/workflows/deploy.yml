@@ -1,0 +1,66 @@
+name: Deploy
+
+# Runs only after the CI workflow succeeds on main. The actual server work
+# happens over SSH using a deploy key stored in GitHub Secrets — no human (and
+# no third party) needs interactive SSH access. Set these repo secrets first:
+#   VPS_HOST      — server IP / hostname
+#   VPS_USERNAME  — SSH user that owns the bambooIT checkout (e.g. bambooit)
+#   VPS_SSH_KEY   — PRIVATE deploy key (its public half in ~/.ssh/authorized_keys)
+#   VPS_APP_DIR   — absolute path to the repo on the VPS (e.g. /home/bambooit/bambooIT)
+#   VPS_PORT      — optional, SSH port (defaults to 22)
+on:
+  workflow_run:
+    workflows: ['CI']
+    types: [completed]
+    branches: [main]
+  # Allow a manual re-deploy from the Actions tab.
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to VPS (Docker Compose)
+    runs-on: ubuntu-latest
+    # Skip when the CI run failed (workflow_dispatch has no workflow_run payload).
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: SSH deploy
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+            cd "${{ secrets.VPS_APP_DIR }}"
+
+            echo "→ Pulling latest main"
+            git fetch --prune origin
+            git checkout main
+            git pull --ff-only origin main
+
+            COMPOSE="docker compose -f docker-compose.prod.yml"
+
+            echo "→ Building images"
+            $COMPOSE build
+
+            echo "→ Starting database + cache"
+            $COMPOSE up -d postgres redis
+
+            echo "→ Applying Prisma migrations"
+            $COMPOSE run --rm backend \
+              npx prisma migrate deploy --schema /app/packages/database/prisma/schema.prisma
+
+            echo "→ Starting / updating app containers (nginx stays disabled on shared host)"
+            $COMPOSE up -d
+
+            echo "→ Pruning dangling images"
+            docker image prune -f
+
+            echo "→ Container status"
+            $COMPOSE ps

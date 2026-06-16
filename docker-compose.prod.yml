@@ -66,6 +66,10 @@ services:
       - blog_images:/app/shared/blog/images
     expose:
       - "4000"
+    # Shared VPS: publish on loopback so e-dietetyk's host reverse proxy can
+    # reach the backend (e.g. /webhooks) without exposing it to the internet.
+    ports:
+      - "127.0.0.1:4001:4000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -101,6 +105,9 @@ services:
       - blog_images:/app/apps/web/public/blog/images
     expose:
       - "3000"
+    # Shared VPS: host reverse proxy (e-dietetyk's) forwards bambooit.pl here.
+    ports:
+      - "127.0.0.1:3001:3000"
     depends_on:
       backend:
         condition: service_healthy
@@ -142,9 +149,15 @@ services:
           memory: 128M
 
   # ── Nginx reverse proxy ────────────────────────────────────────────────────
+  # SHARED VPS: this binds host 80/443 and WOULD COLLIDE with e-dietetyk's proxy.
+  # It is gated behind the "standalone-proxy" profile, so it does NOT start by
+  # default. On the shared host, e-dietetyk's existing reverse proxy forwards
+  # bambooit.pl → 127.0.0.1:3001 (web). Run with `--profile standalone-proxy`
+  # ONLY on a dedicated VPS where bambooIT owns ports 80/443.
   nginx:
     image: nginx:alpine
     container_name: bambooit_nginx
+    profiles: ["standalone-proxy"]
     restart: always
     logging: *default-logging
     ports:
