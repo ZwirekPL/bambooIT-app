@@ -105,6 +105,7 @@ model Company {
   timeEntries      TimeEntry[]
   servicePeriods   ServicePeriod[]
   onboarding       CompanyOnboarding?
+  accessEntries    ClientAccessEntry[]
 
   @@index([nip])
 }
@@ -191,6 +192,32 @@ model CompanyOnboarding {
   updatedAt       DateTime  @updatedAt
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+enum AccessKind {
+  REMOTE  // AnyDesk / TeamViewer / RustDesk
+  SYSTEM  // app / system login
+  NETWORK // router / NAS / VPN
+  OTHER
+}
+
+// Internal access vault per client — connection details + credentials the team
+// needs on hand (remote-access IDs, system logins). `secret` is encrypted at
+// rest (encryption.ts); identifier/notes are plain. ADMIN-only.
+model ClientAccessEntry {
+  id         String     @id @default(cuid())
+  companyId  String
+  kind       AccessKind @default(SYSTEM)
+  label      String     // "TeamViewer", "Serwer NAS", "Poczta admin"
+  identifier String?    // AnyDesk ID / login / URL (plain)
+  secret     String?    // password / session code — ENCRYPTED at rest
+  notes      String?    @db.Text
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
 }
 
 model AuditLog {
