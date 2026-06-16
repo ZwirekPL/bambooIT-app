@@ -53,7 +53,6 @@ model User {
   role          UserRole  @default(CLIENT)
   emailVerified       DateTime?
   lastLoginAt         DateTime?
-  grantedAccessUntil  DateTime?
   deletedAt           DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
