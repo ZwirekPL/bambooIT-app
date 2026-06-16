@@ -15,6 +15,13 @@ export default async function ClientPanelLayout({ children }: { children: React.
     redirect({ href: '/zaloguj', locale });
   }
 
+  // The client panel is for CLIENT accounts. Admins have their own area —
+  // send them there so they don't hit CLIENT-only endpoints (403). Mirrors
+  // the admin/layout guard that redirects clients to /panel.
+  if (session?.user?.role === 'ADMIN') {
+    redirect({ href: '/admin', locale });
+  }
+
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-paper">
       <main className="mx-auto w-full max-w-[1100px] px-5 py-12 md:px-10 md:py-16">
