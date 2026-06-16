@@ -92,7 +92,7 @@ export function Header() {
         <nav className="hidden lg:flex items-center gap-7" aria-label="Main navigation">
           {navItems.map((item) =>
             item.type === 'menu' ? (
-              <DropdownMenu key={item.labelKey}>
+              <DropdownMenu key={item.labelKey} modal={false}>
                 <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium py-1.5 outline-none transition-colors hover:text-bamboo-deep data-[state=open]:text-bamboo-deep">
                   {t(item.labelKey)}
                   <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
