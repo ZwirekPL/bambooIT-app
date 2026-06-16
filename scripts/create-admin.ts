@@ -49,8 +49,6 @@ async function main() {
       email,
       passwordHash,
       role: 'ADMIN',
-      firstName: 'Admin',
-      lastName: 'DietetykAI',
       emailVerified: new Date(),
     },
   });
