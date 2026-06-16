@@ -44,7 +44,9 @@ jobs:
             git checkout main
             git pull --ff-only origin main
 
-            COMPOSE="docker compose -f docker-compose.prod.yml"
+            # --env-file makes compose read .env.prod for ${VAR} interpolation
+            # in the YAML (env_file: only injects into containers, not the YAML).
+            COMPOSE="docker compose --env-file .env.prod -f docker-compose.prod.yml"
 
             echo "→ Building images"
             $COMPOSE build
