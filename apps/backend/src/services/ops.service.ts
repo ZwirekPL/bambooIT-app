@@ -383,13 +383,14 @@ export async function listClients() {
   const year = now.getUTCFullYear();
   const month = now.getUTCMonth() + 1;
 
+  // All client companies (active and not) so admins can activate a fresh
+  // client by setting their plan. Inactive ones simply have servicePlan=null.
   const companies = await prisma.company.findMany({
-    where: { servicePlan: { not: null } },
     include: {
       onboarding: true,
       user: { select: { email: true } },
     },
-    orderBy: { serviceSince: 'desc' },
+    orderBy: { createdAt: 'desc' },
   });
 
   const currentPeriods = await prisma.servicePeriod.findMany({

@@ -4,6 +4,7 @@
  * Server-only auth requests use API_URL env variable.
  */
 import type { Company, Order, ProductType, CheckoutProductType, Subscription, AdminStats, UserRole, User, AdminUser, AuditLog, BlogPost, BlogListItem, BlogCategoryConfig, AccessStatus, Testimonial, TestimonialWithUser, PublicTestimonial, NotificationPreferences, SubscriptionStats, SubscriptionItem, CompanyInvoice, Lead, LeadStatus, LeadType, LeadsStats, LeadsListResponse, EmailCampaign, EmailCampaignAudience, AudienceCounts } from '@/types/api';
+import type { Plan, ServicePackage, OpsClientSummary, OpsHoursView, OpsPeriod, OpsOnboarding, OpsTimeEntry } from '@/types/ops';
 import { getApiBaseUrl } from './api-url';
 
 /** Tracks whether a 401 auto-logout is already in progress to prevent multiple redirects */
@@ -178,6 +179,16 @@ export const api = {
         method: 'POST',
         token,
       }),
+    getMyHours: (params?: { year?: number; month?: number }, token?: string) => {
+      const qs = new URLSearchParams();
+      if (params?.year) qs.set('year', String(params.year));
+      if (params?.month) qs.set('month', String(params.month));
+      const q = qs.toString();
+      return apiFetch<{ ok: boolean; hours: OpsHoursView | null }>(
+        `/orders/my/hours${q ? `?${q}` : ''}`,
+        { token },
+      );
+    },
   },
   profile: {
     getCompany: (token?: string) =>
@@ -376,6 +387,78 @@ export const api = {
         apiFetch<{ ok: boolean; campaign: EmailCampaign; transportConfigured: boolean }>(
           `/admin/email-campaigns/${id}/send`,
           { method: 'POST', token },
+        ),
+    },
+    ops: {
+      listPackages: (token?: string) =>
+        apiFetch<{ ok: boolean; packages: ServicePackage[] }>('/admin/ops/packages', { token }),
+      listClients: (token?: string) =>
+        apiFetch<{ ok: boolean; clients: OpsClientSummary[] }>('/admin/ops/clients', { token }),
+      setServicePlan: (
+        companyId: string,
+        data: { plan: Plan | null; serviceSince?: string | null },
+        token?: string,
+      ) =>
+        apiFetch<{ ok: boolean; company: { id: string; servicePlan: Plan | null; serviceSince: string | null } }>(
+          `/admin/ops/clients/${companyId}/service-plan`,
+          { method: 'PATCH', body: JSON.stringify(data), token },
+        ),
+      getHours: (
+        companyId: string,
+        params?: { year?: number; month?: number },
+        token?: string,
+      ) => {
+        const qs = new URLSearchParams();
+        if (params?.year) qs.set('year', String(params.year));
+        if (params?.month) qs.set('month', String(params.month));
+        const q = qs.toString();
+        return apiFetch<{ ok: boolean; hours: OpsHoursView | null }>(
+          `/admin/ops/clients/${companyId}/hours${q ? `?${q}` : ''}`,
+          { token },
+        );
+      },
+      addTimeEntry: (
+        companyId: string,
+        data: { date: string; minutes: number; description: string; billable?: boolean },
+        token?: string,
+      ) =>
+        apiFetch<{ ok: boolean; entry: OpsTimeEntry }>(
+          `/admin/ops/clients/${companyId}/time-entries`,
+          { method: 'POST', body: JSON.stringify(data), token },
+        ),
+      deleteTimeEntry: (id: string, token?: string) =>
+        apiFetch<{ ok: boolean }>(`/admin/ops/time-entries/${id}`, { method: 'DELETE', token }),
+      listPeriods: (companyId: string, token?: string) =>
+        apiFetch<{ ok: boolean; periods: OpsPeriod[] }>(
+          `/admin/ops/clients/${companyId}/periods`,
+          { token },
+        ),
+      settlePeriod: (id: string, token?: string) =>
+        apiFetch<{ ok: boolean; period: OpsPeriod }>(`/admin/ops/periods/${id}/settle`, {
+          method: 'PATCH',
+          token,
+        }),
+      getOnboarding: (companyId: string, token?: string) =>
+        apiFetch<{ ok: boolean; onboarding: OpsOnboarding }>(
+          `/admin/ops/clients/${companyId}/onboarding`,
+          { token },
+        ),
+      updateOnboarding: (
+        companyId: string,
+        data: Partial<{
+          accessCollected: boolean;
+          remoteToolReady: boolean;
+          monitoringSet: boolean;
+          backupSet: boolean;
+          docsCreated: boolean;
+          completed: boolean;
+          notes: string;
+        }>,
+        token?: string,
+      ) =>
+        apiFetch<{ ok: boolean; onboarding: OpsOnboarding }>(
+          `/admin/ops/clients/${companyId}/onboarding`,
+          { method: 'PATCH', body: JSON.stringify(data), token },
         ),
     },
     getStats: (token: string) =>

@@ -1803,6 +1803,7 @@
     "nav": {
       "home": "Dashboard",
       "leads": "Leady",
+      "clients": "Klienci",
       "users": "Użytkownicy",
       "auditLog": "Logi audytu",
       "blog": "Blog",
