@@ -763,6 +763,76 @@ Per D-069 (§4.0 frontend-first gate) execution shifted from week-numbered to FE
 
 ---
 
+## §15. Faza 4.5 — UI completeness sweep (2026-06-16)
+
+> **Trigger:** Audyt UI po BE-1..BE-4 wykrył 5 luk + 2 stuby. Decyzja Wirgiliusza (2026-06-16):
+> zakres **pełny** (łącznie ze stubami admina), faktury jako **placeholder informacyjny**
+> (provider faktur wciąż open — `project_invoicing_deferred`), copy usług **CC pisze z PRD/CLAUDE**.
+>
+> **Tryb pracy:** CC działa autonomicznie do wdrożenia, wraca po każdym ukończonym zadaniu (U-N),
+> nic nie zostaje otwarte. Atomic commits per task (D-048).
+
+### Kontekst — co audyt wykrył
+
+Marketing/panel/admin UI w większości gotowe (36/43 stron). Brakujące/stub:
+
+| # | Obszar | Stan przed | Powód |
+|---|---|---|---|
+| 1 | `/strony-internetowe` | MISSING | Filar 2 usług (PRD §4.2) — brak landingu |
+| 2 | `/aplikacje` | MISSING | Filar 3 usług (PRD §4.3) — brak landingu |
+| 3 | `/automatyzacje` | MISSING | Filar 4 usług (PRD §4.4) — brak landingu |
+| 4 | `/branze` (hub) | MISSING | Są tylko 5 podstron branżowych, brak strony-huba |
+| 5 | `/panel/faktury` | MISSING | Brak UI; provider faktur niewybrany |
+| 6 | `/admin` dashboard | STUB | Placeholder "w przebudowie" |
+| 7 | `/admin/email-kampanie` | STUB | Placeholder; **brak backendu kampanii w ogóle** |
+
+### Zadania (kolejność wykonania = wartość biznesowa + niezależność)
+
+- [ ] **U-1 — Strony usługowe (3 landingi).** Nowy współdzielony template `ServiceLanding`
+  (analogiczny do `IndustryLanding`): PageHeader → "dla kogo/bóle" → zakres dostawy →
+  widełki cenowe (PRD §4.2-4.4) → proces → cross-sell note (15% rabat dla abonamentu) →
+  FinalCTA. 3 strony: `/strony-internetowe`, `/aplikacje`, `/automatyzacje`. Treść w
+  `messages/pl.json` pod `uslugi.{slug}.*`. Per-strona meta + JSON-LD `Service`. **Mobile-first.**
+- [ ] **U-2 — Hub `/branze`.** Strona listująca 5 branż (biura-rachunkowe, kancelarie,
+  gabinety, hotele, produkcja) jako karty → linki do istniejących podstron. Meta + JSON-LD
+  `CollectionPage`. Treść `branze.hub.*`.
+- [ ] **U-3 — Nawigacja + sitemap wiring.** Header: pozycja "Usługi" (link/dropdown do 3 stron
+  usługowych). Footer: kolumna linków (usługi + branże). Sitemap: dorzucić 4 nowe trasy
+  (3 usługi + `/branze`). Homepage `HorizontalServicesSection` — opcjonalnie podlinkować
+  karty do odpowiednich stron usługowych.
+- [ ] **U-4 — `/panel/faktury` (placeholder informacyjny).** Strona w panelu klienta:
+  "Faktury VAT wysyłamy mailem po każdej płatności / dostępne na życzenie", link do kontaktu,
+  pusty stan zamiast listy. Dodać pozycję do nawigacji panelu (jeśli istnieje) + do
+  `/panel/subskrypcja` cross-link. Zero zależności od providera — gdy provider wybrany,
+  zamieniamy placeholder na listę (osobne zadanie post-decyzja).
+- [ ] **U-5 — Admin dashboard `/admin` (KPI).** Realny dashboard z **istniejących** endpointów
+  (zero zmian backendu): `getStats` (users/clients), `getSubscriptionStats` (MRR, aktywne
+  per tier, churn), `leads.getStats` (pipeline NEW/CONTACTED/...), `getActionItems`
+  (pending testimonials, locked accounts). Karty KPI + ostatnie leady + action items.
+- [ ] **U-6 — Admin email-kampanie (moduł).** **DUŻY TASK — wymaga `PLAN_U6_EMAIL_KAMPANIE.md`**
+  (per D-049 + §7: schema change + external API). Brak backendu kampanii → nowy model Prisma
+  (`EmailCampaign` + `EmailCampaignRecipient`/segment), migracja, endpointy CRUD + wyślij,
+  integracja Resend (draft/mock mode dopóki brak `RESEND_API_KEY`, analogicznie do Stripe
+  mock mode), frontend: lista kampanii + kreator + podgląd + status wysyłki. Targety wg
+  placeholdera: newsletter, ankiety satysfakcji, przypomnienia o przedłużeniu, onboarding drip.
+
+### Sanity / definicja "done" per task
+
+Każde U-N: `npm run typecheck -w apps/web` (lub `-w apps/backend`) exit 0 → `npm run build:web`
+(lub `build:backend`) exit 0 → atomic commit Conventional Commits → raport do Wirgiliusza.
+U-6 dodatkowo: migracja = osobny commit `chore(db): ...` (D-D), PLAN file zacommitowany przed kodem.
+
+### Decyzje przyjęte w tej fazie
+
+- **D-071 (2026-06-16)** — Faktury klienta: **placeholder informacyjny** w `/panel/faktury` do
+  czasu wyboru providera faktur (Fakturownia vs wfirma open). Nie budujemy listy faktur teraz.
+- **D-072 (2026-06-16)** — Strony usługowe: jeden współdzielony template `ServiceLanding`
+  (DRY z `IndustryLanding`), treść i18n-driven w `uslugi.*` żeby non-dev mógł edytować copy.
+- **D-073 (2026-06-16)** — Email-kampanie: budujemy pełny moduł z mock/draft mode (bez realnej
+  wysyłki dopóki Resend nieskonfigurowany), zamiast trzymać stub. Cennik/segmentacja minimalna w MVP.
+
+---
+
 ## §14. Final note
 
 Ten dokument to **żywy operating manual.** Nie jest skończony — będziemy go update'ować w trakcie fazy 4 build:
