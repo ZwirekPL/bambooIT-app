@@ -158,8 +158,8 @@ model ServicePeriod {
   month              Int // 1-12
   plan               SubscriptionPlan
   hoursIncluded      Int
-  carryoverInHours   Int                 @default(0)
-  carryoverOutHours  Int                 @default(0)
+  carryoverInMinutes  Int                @default(0) // unused time carried in (minute precision)
+  carryoverOutMinutes Int                @default(0) // unused time carried out (after cap)
   overageRatePerHour Decimal             @db.Decimal(10, 2)
   consumedMinutes    Int                 @default(0)
   overageHours       Decimal             @db.Decimal(10, 2) @default(0)
