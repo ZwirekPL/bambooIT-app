@@ -108,6 +108,12 @@ services:
     # Shared VPS: host reverse proxy (e-dietetyk's) forwards bambooit.pl here.
     ports:
       - "127.0.0.1:3001:3000"
+    # Join both networks: `default` to reach the backend, and e-dietetyk's
+    # `dietetyk_default` so its nginx container can route bambooit.pl →
+    # http://bambooit_web:3000 by container name.
+    networks:
+      - default
+      - dietetyk_default
     depends_on:
       backend:
         condition: service_healthy
@@ -178,3 +184,12 @@ volumes:
   postgres_data:
   redis_data:
   blog_images:
+
+networks:
+  # bambooIT's own internal network (backend/postgres/redis/web talk here).
+  default:
+  # e-dietetyk's existing Docker network — its nginx container lives here and
+  # will reverse-proxy bambooit.pl to bambooit_web. Created by e-dietetyk's
+  # compose, so we reference it as external (we never create/destroy it).
+  dietetyk_default:
+    external: true

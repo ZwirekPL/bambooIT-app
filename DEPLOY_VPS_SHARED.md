@@ -137,53 +137,55 @@ Actions (workflow_dispatch).
 
 ---
 
-## 6. Wpięcie `bambooit.pl` do proxy e-dietetyka
+## 6. Wpięcie `bambooit.pl` do nginx e-dietetyka (kontener `dietetyk_nginx`)
 
-### Wariant A — host ma nginx (najczęstszy)
-`/etc/nginx/sites-available/bambooit.pl`:
-```nginx
-server {
-    listen 80;
-    server_name bambooit.pl www.bambooit.pl;
-    location /.well-known/acme-challenge/ { root /var/www/certbot; }
-    location / { return 301 https://bambooit.pl$request_uri; }
-}
-server {
-    listen 443 ssl http2;
-    server_name bambooit.pl www.bambooit.pl;
-    # certbot dopisze ssl_certificate / ssl_certificate_key
+Ustalone na tym VPS: 80/443 trzyma kontener **`dietetyk_nginx`** (nginx:alpine),
+config = host file **`/opt/dietetyk/nginx/prod.conf`**, sieć **`dietetyk_default`**,
+certy webrootem (`/var/www/certbot` + `/etc/letsencrypt`). `bambooit_web` jest już
+podłączony do `dietetyk_default` (compose), więc nginx widzi go jako
+`http://bambooit_web:3000`.
 
-    client_max_body_size 10M;
+Kanoniczny blok serwera: **`nginx/bambooit-on-dietetyk.conf`** w tym repo.
 
-    location / {
-        proxy_pass http://127.0.0.1:3001;        # kontener web bambooIT
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto https;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_read_timeout 60s;
-    }
-
-    # Stripe webhook (gdy włączymy płatności) — bezpośrednio do backendu:
-    # location /webhooks/ { proxy_pass http://127.0.0.1:4001; ... }
-}
-```
+### 6a. Faza A — HTTP + pobranie certu
 ```bash
-sudo ln -s /etc/nginx/sites-available/bambooit.pl /etc/nginx/sites-enabled/
-sudo nginx -t && sudo systemctl reload nginx
-sudo certbot --nginx -d bambooit.pl -d www.bambooit.pl
+# Dopisz blok HTTP (Faza A) na koniec configu e-dietetyka:
+sudo sh -c 'cat /home/bambooit/bambooIT/nginx/bambooit-on-dietetyk.conf >> /opt/dietetyk/nginx/prod.conf'
+#  ⚠ wklejasz CAŁY plik; sekcja :443 jest zakomentowana — to OK na ten etap.
+
+# Test składni i reload (NIE psuje e-dietetyka — walidacja przed reloadem):
+docker exec dietetyk_nginx nginx -t
+docker exec dietetyk_nginx nginx -s reload
+
+# Sprawdź, że bambooit.pl odpowiada po HTTP (DNS musi już wskazywać na VPS):
+curl -sI http://bambooit.pl | head -1        # → HTTP/1.1 200 (lub 307 z Next.js)
 ```
 
-### Wariant B — e-dietetyk na dockerowym nginx/Traefik/Coolify
-- **Traefik:** dodaj labels na serwisie `web` (Host(`bambooit.pl`)) i podłącz web
-  do sieci Traefika — daj znać, dopiszę labels do compose.
-- **Coolify:** dodaj nowy resource „Docker Compose" wskazujący ten plik, domenę
-  `bambooit.pl`, Coolify ogarnie routing+SSL sam (wtedy pomijamy nginx hosta).
+### 6b. Pobranie certu Let's Encrypt (webroot — tak jak e-dietetyk)
+```bash
+# Jeśli certbot jest na hoście:
+sudo certbot certonly --webroot -w /var/www/certbot -d bambooit.pl -d www.bambooit.pl
+# Jeśli e-dietetyk używa kontenera certbota — daj znać nazwę, podam wariant.
+# Cert ląduje w /etc/letsencrypt (zamontowane do dietetyk_nginx).
+```
 
-> Powiedz mi co pokazał krok 0, a dopiszę dokładny wariant.
+### 6c. Faza B — włącz HTTPS
+W `/opt/dietetyk/nginx/prod.conf` w dopisanym bloku bambooit.pl:
+1. odkomentuj sekcję `server { listen 443 ssl ... }`,
+2. w bloku `:80` zamień `location / { proxy_pass ... }` na
+   `location / { return 301 https://bambooit.pl$request_uri; }`
+   (zostaw `location /.well-known/acme-challenge/` dla odnawiania certu).
+```bash
+docker exec dietetyk_nginx nginx -t
+docker exec dietetyk_nginx nginx -s reload
+curl -sI https://bambooit.pl | head -1        # → HTTP/2 200
+```
+
+> **Uwaga:** `/opt/dietetyk/nginx/prod.conf` należy do e-dietetyka — przy jego
+> ewentualnym redeployu blok bambooit.pl może zostać nadpisany. Kanoniczna kopia
+> jest w `nginx/bambooit-on-dietetyk.conf` (tego repo) — w razie czego dopnij
+> ponownie. (Docelowo można dać `dietetyk_nginx` osobny mount `conf.d/bambooit.conf`
+> — wtedy bez ryzyka nadpisania; wymaga jednorazowego recreate kontenera.)
 
 ---
 
