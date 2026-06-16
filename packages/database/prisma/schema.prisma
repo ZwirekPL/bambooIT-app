@@ -72,6 +72,10 @@ model User {
   deviceFingerprints      DeviceFingerprint[]
   // Ops core — time entries this admin logged (createdBy)
   loggedTimeEntries       TimeEntry[]              @relation("LoggedBy")
+  // Ticketing (TKT-1)
+  ticketsCreated          Ticket[]                 @relation("TicketCreatedBy")
+  ticketsAssigned         Ticket[]                 @relation("TicketAssignee")
+  ticketMessages          TicketMessage[]
 }
 
 model Company {
@@ -105,6 +109,7 @@ model Company {
   servicePeriods   ServicePeriod[]
   onboarding       CompanyOnboarding?
   accessEntries    ClientAccessEntry[]
+  tickets          Ticket[]
 
   @@index([nip])
 }
@@ -139,14 +144,17 @@ model TimeEntry {
   description String   @db.Text
   billable    Boolean  @default(true) // false = goodwill/warranty, not counted vs package
   createdById String
+  ticketId    String?  // optional link to the ticket this work resolved (TKT-1)
   createdAt   DateTime @default(now())
 
   company   Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   period    ServicePeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
   createdBy User          @relation("LoggedBy", fields: [createdById], references: [id])
+  ticket    Ticket?       @relation(fields: [ticketId], references: [id], onDelete: SetNull)
 
   @@index([companyId, date])
   @@index([periodId])
+  @@index([ticketId])
 }
 
 // Monthly hours ledger per company. Snapshots package params so historical
@@ -217,6 +225,79 @@ model ClientAccessEntry {
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([companyId])
+}
+
+// ─── Ticketing (TKT-1) ─────────────────────────────────────────────────────
+
+enum TicketStatus {
+  NEW            // created, no admin reaction yet
+  IN_PROGRESS    // accepted, being worked on
+  WAITING_CLIENT // waiting for the client to reply
+  RESOLVED       // resolved, awaiting confirmation/close
+  CLOSED         // closed
+}
+
+enum TicketPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum TicketChannel {
+  PORTAL // opened by the client in the panel
+  PHONE  // admin logged it from a phone call
+  EMAIL  // phase 2 — inbound email
+  MANUAL // internal
+}
+
+// A support request from a client. The request body lives as the first
+// TicketMessage (whole thread in one place). slaDueAt is the reaction deadline
+// derived from the company's package reactionTimeHours at creation time.
+model Ticket {
+  id              String         @id @default(cuid())
+  number          Int            @unique @default(autoincrement()) // human-facing #1042
+  companyId       String
+  createdById     String
+  assigneeId      String?
+  title           String
+  status          TicketStatus   @default(NEW)
+  priority        TicketPriority @default(NORMAL)
+  channel         TicketChannel  @default(PORTAL)
+  category        String?
+  slaDueAt        DateTime? // reaction deadline (createdAt + package.reactionTimeHours)
+  firstResponseAt DateTime? // first non-internal admin reaction (SLA met if <= slaDueAt)
+  resolvedAt      DateTime?
+  closedAt        DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  company     Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdBy   User            @relation("TicketCreatedBy", fields: [createdById], references: [id])
+  assignee    User?           @relation("TicketAssignee", fields: [assigneeId], references: [id])
+  messages    TicketMessage[]
+  timeEntries TimeEntry[]
+
+  @@index([companyId])
+  @@index([status])
+  @@index([assigneeId])
+  @@index([slaDueAt])
+}
+
+// One message in a ticket thread. internal=true is an admin-only note hidden
+// from the client. The ticket's first message is the original request body.
+model TicketMessage {
+  id        String   @id @default(cuid())
+  ticketId  String
+  authorId  String
+  body      String   @db.Text
+  internal  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  author User   @relation(fields: [authorId], references: [id])
+
+  @@index([ticketId])
 }
 
 model AuditLog {
