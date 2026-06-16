@@ -186,17 +186,32 @@ export function SubscriptionPanel() {
         )}
       </div>
 
-      <div className="rounded-3xl border border-line bg-white p-6">
-        <h2 className="font-display text-lg font-semibold text-navy">Dane firmy</h2>
-        <p className="mt-2 text-sm text-navy-soft">
-          Zmień NIP, adres do faktur, telefon kontaktowy lub branżę.
-        </p>
-        <Link
-          href="/panel/profil"
-          className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-bamboo-deep underline-offset-4 hover:underline"
-        >
-          Edytuj dane firmy →
-        </Link>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="rounded-3xl border border-line bg-white p-6">
+          <h2 className="font-display text-lg font-semibold text-navy">Dane firmy</h2>
+          <p className="mt-2 text-sm text-navy-soft">
+            Zmień NIP, adres do faktur, telefon kontaktowy lub branżę.
+          </p>
+          <Link
+            href="/panel/profil"
+            className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-bamboo-deep underline-offset-4 hover:underline"
+          >
+            Edytuj dane firmy →
+          </Link>
+        </div>
+
+        <div className="rounded-3xl border border-line bg-white p-6">
+          <h2 className="font-display text-lg font-semibold text-navy">Faktury</h2>
+          <p className="mt-2 text-sm text-navy-soft">
+            Fakturę VAT wysyłamy mailem po każdej płatności. Potrzebujesz kopii?
+          </p>
+          <Link
+            href="/panel/faktury"
+            className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-bamboo-deep underline-offset-4 hover:underline"
+          >
+            Zobacz faktury →
+          </Link>
+        </div>
       </div>
     </div>
   );

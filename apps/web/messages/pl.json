@@ -1641,6 +1641,17 @@
     "products": {}
   },
   "clientPanel": {
+    "invoices": {
+      "metaTitle": "Faktury",
+      "eyebrow": "Panel klienta",
+      "title": "Faktury",
+      "cardHeading": "Fakturę VAT wysyłamy mailem po każdej płatności",
+      "body1": "Po każdej opłaconej płatności wystawiamy fakturę VAT i automatycznie wysyłamy ją na adres e-mail przypisany do Twojego konta. Nie musisz o nią prosić.",
+      "body2": "Nie widzisz faktury, zgubiła się w skrzynce albo potrzebujesz duplikatu lub faktury na innych danych? Napisz do nas — wyślemy ją od ręki.",
+      "contactCta": "Napisz do nas",
+      "subscriptionCta": "Subskrypcja i płatności",
+      "note": "Podgląd historii faktur w panelu udostępnimy wkrótce."
+    },
     "subscription": {
       "metaTitle": "Twoja subskrypcja",
       "eyebrow": "Panel klienta",
