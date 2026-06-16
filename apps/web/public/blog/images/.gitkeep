@@ -1,0 +1,3 @@
+# Keeps apps/web/public/blog/images present in fresh clones (git doesn't track
+# empty dirs). The Docker web build COPYs apps/web/public and seeds blog images
+# from here, so this directory must exist on the VPS checkout.
