@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { Menu, LogOut, ChevronDown } from 'lucide-react';
+import { Menu, LogOut, ChevronDown, UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import {
@@ -137,9 +137,13 @@ export function Header() {
               </Button>
             </>
           ) : (
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/zaloguj">{t('login')}</Link>
-            </Button>
+            <Link
+              href="/zaloguj"
+              className="group inline-flex items-center gap-1.5 rounded-full border border-navy-deep/15 px-4 py-2.5 text-sm font-semibold text-navy-deep transition-all hover:-translate-y-0.5 hover:border-bamboo-deep hover:bg-bamboo/10 hover:text-bamboo-deep"
+            >
+              <UserRound className="h-4 w-4 text-navy-soft transition-colors group-hover:text-bamboo-deep" />
+              {t('login')}
+            </Link>
           )}
           <LocaleSwitcher />
           <Link
