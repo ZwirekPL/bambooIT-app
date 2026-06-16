@@ -34,11 +34,6 @@ const REQUIRED_ENV = [
   'DATABASE_URL',
   'ENCRYPTION_KEY',
   'JWT_SECRET',
-  'SMTP_HOST',
-  'SMTP_PORT',
-  'SMTP_USER',
-  'SMTP_PASS',
-  'SMTP_FROM',
   'APP_URL',
   'REDIS_URL',
 ] as const;
@@ -49,7 +44,24 @@ for (const key of REQUIRED_ENV) {
   }
 }
 
-if (isNaN(Number(process.env.SMTP_PORT))) {
+// Email transport: Resend OR full SMTP must be configured (utils/email.ts
+// picks Resend first, falls back to SMTP). At least one is required so
+// transactional mail (lead notifications, password reset) actually sends.
+const hasResend = Boolean(process.env.RESEND_API_KEY);
+const hasSmtp = Boolean(
+  process.env.SMTP_HOST &&
+    process.env.SMTP_PORT &&
+    process.env.SMTP_USER &&
+    process.env.SMTP_PASS,
+);
+if (!hasResend && !hasSmtp) {
+  console.error(
+    '[startup] No email transport configured — set RESEND_API_KEY or SMTP_HOST/PORT/USER/PASS',
+  );
+  process.exit(1);
+}
+
+if (hasSmtp && isNaN(Number(process.env.SMTP_PORT))) {
   console.error('[startup] SMTP_PORT must be a valid number');
   process.exit(1);
 }
