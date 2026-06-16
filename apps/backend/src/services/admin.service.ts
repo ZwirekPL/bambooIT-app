@@ -78,7 +78,6 @@ export async function listUsers({ page, limit, search, role, excludeRole, hideDe
         role: true,
         emailVerified: true,
         lastLoginAt: true,
-        grantedAccessUntil: true,
         createdAt: true,
         deletedAt: true,
         subscription: {
@@ -122,7 +121,6 @@ export async function listUsers({ page, limit, search, role, excludeRole, hideDe
       role: u.role,
       emailVerified: u.emailVerified,
       lastLoginAt: u.lastLoginAt,
-      grantedAccessUntil: u.grantedAccessUntil,
       createdAt: u.createdAt,
       deletedAt: u.deletedAt,
       subscriptionStatus,
@@ -229,7 +227,6 @@ export async function getUserById(id: string) {
       role: true,
       emailVerified: true,
       lastLoginAt: true,
-      grantedAccessUntil: true,
       createdAt: true,
       deletedAt: true,
       company: {

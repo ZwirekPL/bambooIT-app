@@ -212,7 +212,6 @@ export interface AdminUser {
   lastLoginAt: string | null;
   createdAt: string;
   deletedAt: string | null;
-  grantedAccessUntil?: string | null;
   subscriptionStatus?: string;
   subscriptionProductType?: string | null;
   subscriptionExpiresAt?: string | null;

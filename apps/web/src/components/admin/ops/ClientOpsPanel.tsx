@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { api, ApiError } from '@/lib/api';
+import type { AdminUser, UserRole } from '@/types/api';
 import type {
   AccessEntry,
   AccessKind,
@@ -21,13 +22,14 @@ import {
   fmtHoursDecimal,
 } from './opsFormat';
 
-type Tab = 'plan' | 'hours' | 'billing' | 'onboarding';
+type Tab = 'plan' | 'hours' | 'billing' | 'onboarding' | 'account';
 
 const TABS: { key: Tab; label: string }[] = [
   { key: 'plan', label: 'Pakiet' },
   { key: 'hours', label: 'Godziny' },
   { key: 'billing', label: 'Rozliczenia' },
   { key: 'onboarding', label: 'Onboarding' },
+  { key: 'account', label: 'Konto' },
 ];
 
 const ONBOARDING_STEPS: { key: keyof OpsOnboarding; label: string }[] = [
@@ -181,6 +183,9 @@ export function ClientOpsPanel({ companyId }: { companyId: string }) {
             loadSummary();
           }}
         />
+      )}
+      {tab === 'account' && summary && (
+        <AccountTab userId={summary.userId} onChanged={loadSummary} />
       )}
     </div>
   );
@@ -853,6 +858,167 @@ function AccessVault({ companyId }: { companyId: string }) {
         <button type="button" className={btnPrimary} onClick={add} disabled={saving || !label.trim()}>
           {saving ? 'Zapisywanie…' : 'Dodaj dostęp'}
         </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Konto (account management, merged from the old Users tab) ─────────────
+
+const ROLE_LABELS: Record<UserRole, string> = {
+  ADMIN: 'Administrator',
+  CLIENT: 'Klient',
+};
+
+function AccountField({ label, value, danger }: { label: string; value: string; danger?: boolean }) {
+  return (
+    <div>
+      <dt className="text-xs uppercase tracking-wide text-navy-soft">{label}</dt>
+      <dd className={danger ? 'mt-0.5 font-medium text-red-600' : 'mt-0.5 font-medium text-navy-deep'}>
+        {value}
+      </dd>
+    </div>
+  );
+}
+
+function AccountTab({ userId, onChanged }: { userId: string; onChanged: () => void }) {
+  const [user, setUser] = useState<AdminUser | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    const r = await api.admin.getUserById(userId, '');
+    setUser(r.user);
+  }, [userId]);
+
+  useEffect(() => {
+    load().catch(() => setMsg('Nie udało się wczytać konta.'));
+  }, [load]);
+
+  async function run(fn: () => Promise<unknown>, ok: string) {
+    setBusy(true);
+    setMsg(null);
+    try {
+      await fn();
+      setMsg(ok);
+      await load();
+      onChanged();
+    } catch (e) {
+      setMsg(e instanceof ApiError ? e.message : 'Wystąpił błąd.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!user) return <p className="text-sm text-navy-soft">{msg ?? 'Wczytywanie…'}</p>;
+
+  const active = !user.deletedAt;
+  const verified = Boolean(user.emailVerified);
+
+  return (
+    <div className="max-w-2xl space-y-5">
+      <div className="rounded-xl border border-line bg-white p-5">
+        <dl className="grid grid-cols-2 gap-4 text-sm">
+          <AccountField label="E-mail" value={user.email} />
+          <AccountField label="Rola" value={ROLE_LABELS[user.role]} />
+          <AccountField label="Status" value={active ? 'Aktywne' : 'Dezaktywowane'} danger={!active} />
+          <AccountField label="E-mail zweryfikowany" value={verified ? 'Tak' : 'Nie'} danger={!verified} />
+          <AccountField label="Utworzono" value={user.createdAt.slice(0, 10)} />
+          <AccountField
+            label="Ostatnie logowanie"
+            value={user.lastLoginAt ? user.lastLoginAt.slice(0, 10) : '—'}
+          />
+        </dl>
+      </div>
+
+      <div className="space-y-3 rounded-xl border border-line bg-white p-5">
+        <h3 className="text-sm font-semibold text-navy-deep">Akcje konta</h3>
+        <div className="flex flex-wrap gap-2">
+          {!verified && (
+            <button
+              type="button"
+              className={btnGhost}
+              disabled={busy}
+              onClick={() =>
+                run(() => api.admin.verifyUserEmail(user.id, ''), 'E-mail oznaczony jako zweryfikowany.')
+              }
+            >
+              Oznacz e-mail zweryfikowany
+            </button>
+          )}
+          {!verified && (
+            <button
+              type="button"
+              className={btnGhost}
+              disabled={busy}
+              onClick={() =>
+                run(() => api.admin.resendVerification(user.id, ''), 'Wysłano link weryfikacyjny.')
+              }
+            >
+              Wyślij link weryfikacyjny
+            </button>
+          )}
+          <button
+            type="button"
+            className={btnGhost}
+            disabled={busy}
+            onClick={() =>
+              run(() => api.admin.forcePasswordReset(user.id, ''), 'Wysłano link resetu hasła.')
+            }
+          >
+            Wymuś reset hasła
+          </button>
+          <button
+            type="button"
+            className={btnGhost}
+            disabled={busy}
+            onClick={() =>
+              run(() => api.admin.revokeUserSessions(user.id, ''), 'Wylogowano ze wszystkich urządzeń.')
+            }
+          >
+            Wyloguj ze wszystkich urządzeń
+          </button>
+          {active ? (
+            <button
+              type="button"
+              className={`${btnGhost} text-red-600 hover:bg-red-50`}
+              disabled={busy}
+              onClick={() => {
+                if (confirm('Dezaktywować konto? Klient nie będzie mógł się zalogować.')) {
+                  run(() => api.admin.deleteUser(user.id, ''), 'Konto dezaktywowane.');
+                }
+              }}
+            >
+              Dezaktywuj konto
+            </button>
+          ) : (
+            <button
+              type="button"
+              className={btnGhost}
+              disabled={busy}
+              onClick={() => run(() => api.admin.restoreUser(user.id, ''), 'Konto przywrócone.')}
+            >
+              Przywróć konto
+            </button>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 border-t border-line pt-3">
+          <span className="text-sm text-navy-soft">Rola:</span>
+          <select
+            className={`${input} w-48`}
+            value={user.role}
+            disabled={busy}
+            onChange={(e) =>
+              run(() => api.admin.changeRole(user.id, e.target.value as UserRole, ''), 'Rola zmieniona.')
+            }
+          >
+            <option value="CLIENT">Klient</option>
+            <option value="ADMIN">Administrator</option>
+          </select>
+        </div>
+
+        {msg && <p className="text-sm text-navy-soft">{msg}</p>}
       </div>
     </div>
   );

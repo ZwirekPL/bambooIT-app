@@ -15,8 +15,6 @@ const navItems = [
   { href: '/admin',              labelKey: 'nav.home',     icon: LayoutDashboard },
   { href: '/admin/leady',        labelKey: 'nav.leads',    icon: Inbox           },
   { href: '/admin/klienci',      labelKey: 'nav.clients',  icon: Building2       },
-  { href: '/admin/uzytkownicy',  labelKey: 'nav.users',    icon: Users           },
-  // { href: '/admin/tenants',      labelKey: 'nav.tenants',  icon: Building2       },
   { href: '/admin/audit-log',    labelKey: 'nav.auditLog', icon: ScrollText      },
   { href: '/admin/blog',         labelKey: 'nav.blog',     icon: BookOpen        },
   { href: '/admin/opinie',       labelKey: 'nav.testimonials', icon: MessageSquareQuote },

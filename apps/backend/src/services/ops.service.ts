@@ -403,6 +403,7 @@ export async function listClients() {
     const p = byCompany.get(c.id);
     return {
       id: c.id,
+      userId: c.userId,
       companyName: c.companyName,
       contactName: [c.contactFirstName, c.contactLastName].filter(Boolean).join(' '),
       email: c.user.email,

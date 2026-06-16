@@ -405,31 +405,6 @@ export async function resetScoringWeights(_req: Request, res: Response, next: Ne
   }
 }
 
-// ─── Grant Access (29.0.5) ───────────────────────────────────────────────────
-
-const grantAccessSchema = z.object({
-  grantedAccessUntil: z.string().datetime().nullable(),
-});
-
-export async function grantAccess(req: Request, res: Response, next: NextFunction) {
-  try {
-    const idParsed = userIdSchema.safeParse(req.params);
-    if (!idParsed.success) return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid user id'));
-    const bodyParsed = grantAccessSchema.safeParse(req.body);
-    if (!bodyParsed.success) return res.status(400).json(apiError('VALIDATION_ERROR', bodyParsed.error.issues[0]?.message ?? 'Invalid body'));
-
-    const user = await prisma.user.update({
-      where: { id: idParsed.data.id },
-      data: { grantedAccessUntil: bodyParsed.data.grantedAccessUntil },
-      select: { id: true, email: true, grantedAccessUntil: true },
-    });
-
-    return res.json({ ok: true, user });
-  } catch (err) {
-    next(err);
-  }
-}
-
 // ─── 39.6.3: Admin unlock locked account ────────────────────────────────────
 
 export async function unlockAccount(req: Request, res: Response, next: NextFunction) {

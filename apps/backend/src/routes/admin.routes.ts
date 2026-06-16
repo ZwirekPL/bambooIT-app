@@ -24,7 +24,6 @@ adminRouter.get('/dashboard/action-items', adminController.getActionItems);
 adminRouter.patch('/users/:id/role', adminController.changeUserRole);
 adminRouter.post('/users/:id/verify-email', adminController.verifyUserEmail);
 adminRouter.post('/users/:id/resend-verification', adminController.resendVerification);
-adminRouter.patch('/users/:id/grant-access', adminController.grantAccess);
 adminRouter.post('/users/:id/force-password-reset', adminController.forcePasswordReset);
 adminRouter.patch('/users/bulk', adminController.bulkUserAction);
 adminRouter.post('/users/:id/revoke-sessions', adminController.revokeUserSessions);

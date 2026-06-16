@@ -568,12 +568,6 @@ export const api = {
         body: JSON.stringify(data),
         token,
       }),
-    grantAccess: (userId: string, grantedAccessUntil: string | null, token: string) =>
-      apiFetch<{ ok: boolean; user: { id: string; email: string; grantedAccessUntil: string | null } }>(`/admin/users/${userId}/grant-access`, {
-        method: 'PATCH',
-        body: JSON.stringify({ grantedAccessUntil }),
-        token,
-      }),
     forcePasswordReset: (userId: string, token: string) =>
       apiFetch<{ ok: boolean }>(`/admin/users/${userId}/force-password-reset`, {
         method: 'POST',

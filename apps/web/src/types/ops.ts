@@ -15,6 +15,7 @@ export interface ServicePackage {
 
 export interface OpsClientSummary {
   id: string;
+  userId: string;
   companyName: string | null;
   contactName: string;
   email: string;
