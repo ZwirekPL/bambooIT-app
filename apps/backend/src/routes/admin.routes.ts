@@ -7,6 +7,7 @@ import * as stripeAdminController from '../controllers/stripeAdmin.controller';
 import * as accountingController from '../controllers/accounting.controller';
 import * as featureFlagController from '../controllers/featureFlag.controller';
 import * as leadsAdminController from '../controllers/leads-admin.controller';
+import * as emailCampaignController from '../controllers/emailCampaign.controller';
 import { prisma } from '@db';
 import { logAudit } from '../services/audit.service';
 
@@ -102,6 +103,15 @@ adminRouter.get('/leads/:id', leadsAdminController.getById);
 adminRouter.patch('/leads/:id/status', leadsAdminController.updateStatus);
 adminRouter.post('/leads/:id/notes', leadsAdminController.addNote);
 adminRouter.delete('/leads/:id/notes/:noteId', leadsAdminController.deleteNote);
+
+// U-6 — Email campaigns
+adminRouter.get('/email-campaigns', emailCampaignController.list);
+adminRouter.get('/email-campaigns/audience-counts', emailCampaignController.audienceCounts);
+adminRouter.post('/email-campaigns', emailCampaignController.create);
+adminRouter.get('/email-campaigns/:id', emailCampaignController.getById);
+adminRouter.patch('/email-campaigns/:id', emailCampaignController.update);
+adminRouter.delete('/email-campaigns/:id', emailCampaignController.remove);
+adminRouter.post('/email-campaigns/:id/send', emailCampaignController.send);
 
 // 70 — Accounting
 adminRouter.get('/accounting/revenue', accountingController.getRevenue);

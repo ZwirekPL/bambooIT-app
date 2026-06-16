@@ -143,7 +143,10 @@ export type AuditAction =
   | 'PLAN_BLOCKED'
   | 'CLINICAL_SAFETY_WARNING'
   | 'HARD_DELETE_EXPIRED_USER'
-  | 'AUDIT_LOG_PURGED';
+  | 'AUDIT_LOG_PURGED'
+  | 'EMAIL_CAMPAIGN_CREATED'
+  | 'EMAIL_CAMPAIGN_SENT'
+  | 'EMAIL_CAMPAIGN_DELETED';
 
 export type AuditResourceType =
   | 'INTERVIEW'
@@ -173,6 +176,7 @@ export type AuditResourceType =
   | 'DATA_EXPORT'
   | 'LEAD'
   | 'MESSAGE'
+  | 'EMAIL_CAMPAIGN'
   | 'AUDIT_LOG';
 
 interface LogAuditParams {

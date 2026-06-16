@@ -421,3 +421,35 @@ Zespół ${BRAND_NAME}`;
 
   await send(to, subject, text, html);
 }
+
+// ─── U-6: bulk email campaigns ────────────────────────────────────────────────
+
+/**
+ * Whether a real transport is wired (Resend or SMTP). When false, campaign
+ * sends are no-ops that still resolve — the admin UI works end-to-end in dev
+ * without blasting real inboxes. Surfaced to the admin UI as a "mock mode" note.
+ */
+export function isEmailTransportConfigured(): boolean {
+  return resendConfigured() || smtpConfigured();
+}
+
+/**
+ * Send one campaign email. Admin-authored plain-text `body` is wrapped in the
+ * shared emailLayout (subject as heading, blank lines → paragraphs). Throws on
+ * transport failure so the caller can count failures per recipient.
+ */
+export async function sendCampaignEmail(
+  to: string,
+  subject: string,
+  body: string,
+): Promise<void> {
+  const paragraphs = body
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .map((p) => `<p>${p.replace(/\n/g, '<br/>')}</p>`)
+    .join('');
+
+  const html = emailLayout({ heading: subject, bodyHtml: paragraphs });
+  await send(to, subject, body, html);
+}
