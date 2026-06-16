@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { apiError } from '../utils/errors';
 import * as opsService from '../services/ops.service';
+import { sendPeriodReport } from '../services/serviceReport.service';
 import { logAudit } from '../services/audit.service';
 
 const PLAN = z.enum(['START', 'FIRMA', 'FIRMA_PLUS']);
@@ -215,6 +216,26 @@ export async function settlePeriod(req: Request, res: Response, next: NextFuncti
       metadata: { overageAmountNet: String(period.overageAmountNet) },
     });
     return res.json({ ok: true, period });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function sendReport(req: Request, res: Response, next: NextFunction) {
+  const params = idParam.safeParse(req.params);
+  if (!params.success) return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid id'));
+
+  try {
+    const period = await sendPeriodReport(params.data.id);
+    logAudit({
+      userId: req.user!.sub,
+      action: 'SERVICE_PERIOD_REPORT_SENT',
+      resourceType: 'SERVICE_PERIOD',
+      resourceId: period.id,
+      ip: req.ip,
+      metadata: { year: period.year, month: period.month },
+    });
+    return res.json({ ok: true });
   } catch (err) {
     next(err);
   }

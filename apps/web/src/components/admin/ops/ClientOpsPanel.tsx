@@ -478,6 +478,8 @@ function BillingTab({
   onSettled: () => void;
 }) {
   const [busy, setBusy] = useState<string | null>(null);
+  const [reportBusy, setReportBusy] = useState<string | null>(null);
+  const [reportDone, setReportDone] = useState<string | null>(null);
 
   async function settle(id: string) {
     setBusy(id);
@@ -486,6 +488,17 @@ function BillingTab({
       onSettled();
     } finally {
       setBusy(null);
+    }
+  }
+
+  async function sendReport(id: string) {
+    setReportBusy(id);
+    setReportDone(null);
+    try {
+      await api.admin.ops.sendReport(id);
+      setReportDone(id);
+    } finally {
+      setReportBusy(null);
     }
   }
 
@@ -542,17 +555,31 @@ function BillingTab({
                     {PERIOD_STATUS_LABELS[p.status]}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-right">
-                  {p.status !== 'SETTLED' && (
+                <td className="px-4 py-3">
+                  <div className="flex items-center justify-end gap-2">
                     <button
                       type="button"
-                      onClick={() => settle(p.id)}
-                      disabled={busy === p.id}
+                      onClick={() => sendReport(p.id)}
+                      disabled={reportBusy === p.id}
                       className={btnGhost}
                     >
-                      {busy === p.id ? '…' : 'Oznacz rozliczone'}
+                      {reportBusy === p.id
+                        ? '…'
+                        : reportDone === p.id
+                          ? 'Wysłano ✓'
+                          : 'Wyślij raport'}
                     </button>
-                  )}
+                    {p.status !== 'SETTLED' && (
+                      <button
+                        type="button"
+                        onClick={() => settle(p.id)}
+                        disabled={busy === p.id}
+                        className={btnGhost}
+                      >
+                        {busy === p.id ? '…' : 'Oznacz rozliczone'}
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             );

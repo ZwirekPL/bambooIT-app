@@ -422,6 +422,102 @@ Zespół ${BRAND_NAME}`;
   await send(to, subject, text, html);
 }
 
+// ─── OPS-5: monthly hours report ──────────────────────────────────────────
+
+const REPORT_MONTH_NAMES = [
+  'styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec',
+  'lipiec', 'sierpień', 'wrzesień', 'październik', 'listopad', 'grudzień',
+];
+
+function fmtMinutesPl(min: number): string {
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  if (h === 0) return `${m} min`;
+  if (m === 0) return `${h} h`;
+  return `${h} h ${m} min`;
+}
+
+export interface MonthlyReportEntry {
+  date: string; // YYYY-MM-DD
+  minutes: number;
+  description: string;
+  billable: boolean;
+}
+
+export async function sendMonthlyHoursReportEmail(
+  to: string,
+  args: {
+    year: number;
+    month: number; // 1-12
+    consumedMinutes: number;
+    availableMinutes: number;
+    carryoverInMinutes: number;
+    overageHours: string;
+    overageAmountNet: string;
+    entries: MonthlyReportEntry[];
+  },
+): Promise<void> {
+  const { year, month, consumedMinutes, availableMinutes, carryoverInMinutes, overageHours, overageAmountNet, entries } =
+    args;
+  const monthLabel = `${REPORT_MONTH_NAMES[month - 1]} ${year}`;
+  const hasOverage = Number(overageHours) > 0;
+
+  const usageLine = `Wykorzystano ${fmtMinutesPl(consumedMinutes)} z ${fmtMinutesPl(availableMinutes)}${
+    carryoverInMinutes > 0 ? ` (w tym ${fmtMinutesPl(carryoverInMinutes)} przeniesione z poprzedniego miesiąca)` : ''
+  }.`;
+
+  const subject = `Raport obsługi IT — ${monthLabel} — ${BRAND_NAME}`;
+
+  const worklogText = entries.length
+    ? entries
+        .map((e) => `- ${e.date} · ${fmtMinutesPl(e.minutes)} · ${e.description}${e.billable ? '' : ' (nieliczone)'}`)
+        .join('\n')
+    : 'Brak zarejestrowanych prac w tym miesiącu.';
+
+  const text = `Podsumowanie obsługi IT — ${monthLabel}
+
+${usageLine}
+${hasOverage ? `Nadgodziny: ${overageHours} h = ${overageAmountNet} zł netto (do doliczenia osobno).\n` : ''}
+Co zrobiliśmy:
+${worklogText}
+
+Pozdrawiamy,
+Remigiusz + Wirgiliusz
+${BRAND_NAME}`;
+
+  const worklogRows = entries.length
+    ? entries
+        .map(
+          (e) => `<tr style="border-bottom:1px solid ${LINE};">
+            <td style="padding:8px 0;color:${NAVY_SOFT};font-size:13px;white-space:nowrap;">${e.date}</td>
+            <td style="padding:8px 8px;color:${NAVY_DEEP};font-size:14px;">${e.description}${
+              e.billable ? '' : ` <span style="color:${NAVY_SOFT};font-size:11px;">(nieliczone)</span>`
+            }</td>
+            <td style="padding:8px 0;color:${NAVY_DEEP};font-size:14px;text-align:right;white-space:nowrap;">${fmtMinutesPl(e.minutes)}</td>
+          </tr>`,
+        )
+        .join('')
+    : `<tr><td style="padding:8px 0;color:${NAVY_SOFT};font-size:14px;">Brak zarejestrowanych prac w tym miesiącu.</td></tr>`;
+
+  const html = emailLayout({
+    heading: `Podsumowanie — ${monthLabel}`,
+    bodyHtml: `<p>${usageLine}</p>
+      <p style="margin-top:20px;font-weight:600;color:${NAVY_DEEP};">Co zrobiliśmy w tym miesiącu:</p>
+      <table style="width:100%;border-collapse:collapse;margin:8px 0;">
+        ${worklogRows}
+      </table>`,
+    callout: hasOverage
+      ? {
+          variant: 'warning',
+          html: `<strong>Nadgodziny:</strong> ${overageHours} h = ${overageAmountNet} zł netto. Doliczymy je osobno do najbliższego rozliczenia.`,
+        }
+      : undefined,
+    footnoteHtml: `Pozdrawiamy,<br/>Remigiusz + Wirgiliusz`,
+  });
+
+  await send(to, subject, text, html);
+}
+
 // ─── U-6: bulk email campaigns ────────────────────────────────────────────────
 
 /**

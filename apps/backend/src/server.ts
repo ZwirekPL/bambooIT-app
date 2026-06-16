@@ -25,6 +25,7 @@ import { csrfProtection } from './middleware/csrf';
 import {
   scheduleAuditRetention,
   scheduleUserCleanup,
+  scheduleMonthlyReport,
   startMaintenanceWorker,
 } from './jobs/cleanupSoftDeleted.job';
 import { shutdownQueues } from './queues';
@@ -173,6 +174,9 @@ scheduleUserCleanup().catch((err) => {
 });
 scheduleAuditRetention().catch((err) => {
   console.error('[cron] Failed to schedule audit retention:', err);
+});
+scheduleMonthlyReport().catch((err) => {
+  console.error('[cron] Failed to schedule monthly report:', err);
 });
 
 const PORT = Number(process.env.PORT ?? 4000);

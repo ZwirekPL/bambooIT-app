@@ -134,3 +134,4 @@ adminRouter.patch('/ops/time-entries/:id', opsController.updateTimeEntry);
 adminRouter.delete('/ops/time-entries/:id', opsController.deleteTimeEntry);
 adminRouter.get('/ops/clients/:companyId/periods', opsController.listPeriods);
 adminRouter.patch('/ops/periods/:id/settle', opsController.settlePeriod);
+adminRouter.post('/ops/periods/:id/report', opsController.sendReport);

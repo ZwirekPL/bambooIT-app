@@ -438,6 +438,8 @@ export const api = {
           method: 'PATCH',
           token,
         }),
+      sendReport: (id: string, token?: string) =>
+        apiFetch<{ ok: boolean }>(`/admin/ops/periods/${id}/report`, { method: 'POST', token }),
       getOnboarding: (companyId: string, token?: string) =>
         apiFetch<{ ok: boolean; onboarding: OpsOnboarding }>(
           `/admin/ops/clients/${companyId}/onboarding`,

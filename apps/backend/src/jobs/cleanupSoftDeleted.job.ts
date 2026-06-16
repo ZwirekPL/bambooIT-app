@@ -7,16 +7,20 @@ import {
 } from '../queues';
 import { runUserCleanupJob } from '../services/userCleanup.service';
 import { runAuditRetentionJob } from '../services/auditRetention.service';
+import { closeAndReportPreviousMonth } from '../services/serviceReport.service';
 import { captureException } from '../utils/sentry';
 
 export const CLEANUP_USER_JOB_NAME = 'cleanup-soft-deleted-users';
 export const AUDIT_PURGE_JOB_NAME = 'purge-expired-audit-logs';
+export const MONTHLY_REPORT_JOB_NAME = 'monthly-hours-report';
 
 const USER_CLEANUP_SCHEDULER_ID = 'cleanup-soft-deleted-users-daily';
 const AUDIT_PURGE_SCHEDULER_ID = 'purge-expired-audit-logs-weekly';
+const MONTHLY_REPORT_SCHEDULER_ID = 'monthly-hours-report';
 
 const USER_CLEANUP_DEFAULT_CRON = '0 3 * * *';   // daily 03:00
 const AUDIT_PURGE_DEFAULT_CRON  = '0 4 * * 0';   // Sunday 04:00
+const MONTHLY_REPORT_DEFAULT_CRON = '0 9 1 * *'; // 1st of month 09:00
 
 const TIMEZONE = process.env.JOB_SCHEDULER_TZ ?? 'Europe/Warsaw';
 
@@ -50,6 +54,20 @@ export async function scheduleAuditRetention(): Promise<void> {
 }
 
 /**
+ * Monthly 1st 09:00 — close the previous month's hours periods and email each
+ * client their report. Override via env: MONTHLY_REPORT_CRON.
+ */
+export async function scheduleMonthlyReport(): Promise<void> {
+  const pattern = process.env.MONTHLY_REPORT_CRON ?? MONTHLY_REPORT_DEFAULT_CRON;
+  await maintenanceQueue.upsertJobScheduler(
+    MONTHLY_REPORT_SCHEDULER_ID,
+    { pattern, tz: TIMEZONE },
+    { name: MONTHLY_REPORT_JOB_NAME, data: {} },
+  );
+  console.log(`[cron:monthly-report] Scheduled "${pattern}" (${TIMEZONE})`);
+}
+
+/**
  * Starts the maintenance worker. Dispatches by job.name to the correct handler.
  */
 export function startMaintenanceWorker(): Worker {
@@ -75,6 +93,14 @@ export function startMaintenanceWorker(): Worker {
         if (report.hitBatchLimit) {
           console.warn('[cron:audit-purge] batch limit hit — more rows pending, next run will continue');
         }
+        return report;
+      }
+
+      if (job.name === MONTHLY_REPORT_JOB_NAME) {
+        const report = await closeAndReportPreviousMonth();
+        console.log(
+          `[cron:monthly-report] run complete — periods=${report.periods}, closed=${report.closed}, sent=${report.sent}, failed=${report.failed} (${report.month}/${report.year})`,
+        );
         return report;
       }
 
