@@ -39,9 +39,8 @@ RUN addgroup --system --gid 1001 appgroup && \
 # Copy all node_modules (root hoisted + any workspace-local)
 COPY --from=deps /app ./
 
-# Copy built artifacts + static assets (fonts for PDF generation)
+# Copy built artifacts
 COPY --from=backend-builder /app/apps/backend/dist ./apps/backend/dist
-COPY --from=backend-builder /app/apps/backend/src/assets ./apps/backend/dist/assets
 COPY --from=backend-builder /app/apps/backend/tsconfig.json ./apps/backend/
 COPY --from=db-builder /app/packages/database/dist ./packages/database/dist
 
