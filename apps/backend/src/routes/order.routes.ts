@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import { requireAuth } from '../middleware/auth';
 import * as orderController from '../controllers/order.controller';
+import * as opsController from '../controllers/ops.controller';
 
 export const orderRouter = Router();
 
-// PATIENT endpoints
+// CLIENT endpoints
 orderRouter.get('/my', requireAuth('CLIENT'), orderController.listMyOrders);
+orderRouter.get('/my/hours', requireAuth('CLIENT'), opsController.getMyHours);
 orderRouter.get('/my/portal', requireAuth('CLIENT'), orderController.getMyPortal);
 orderRouter.get('/my/invoices', requireAuth('CLIENT'), orderController.listMyInvoices);
 orderRouter.post('/my', requireAuth('CLIENT'), orderController.createMyOrder);

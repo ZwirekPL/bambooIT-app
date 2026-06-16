@@ -8,6 +8,7 @@ import * as accountingController from '../controllers/accounting.controller';
 import * as featureFlagController from '../controllers/featureFlag.controller';
 import * as leadsAdminController from '../controllers/leads-admin.controller';
 import * as emailCampaignController from '../controllers/emailCampaign.controller';
+import * as opsController from '../controllers/ops.controller';
 import { prisma } from '@db';
 import { logAudit } from '../services/audit.service';
 
@@ -119,3 +120,17 @@ adminRouter.get('/accounting/transactions-csv', accountingController.getTransact
 adminRouter.get('/accounting/costs', accountingController.getCosts);
 adminRouter.get('/accounting/churn', accountingController.getChurn);
 adminRouter.get('/accounting/invoices-export', accountingController.getInvoicesExport);
+
+// Ops core — clients / hours / periods / onboarding (PLAN_ops_core.md)
+adminRouter.get('/ops/packages', opsController.listPackages);
+adminRouter.get('/ops/clients', opsController.listClients);
+adminRouter.patch('/ops/clients/:companyId/service-plan', opsController.setServicePlan);
+adminRouter.get('/ops/clients/:companyId/onboarding', opsController.getOnboarding);
+adminRouter.patch('/ops/clients/:companyId/onboarding', opsController.updateOnboarding);
+adminRouter.get('/ops/clients/:companyId/hours', opsController.getClientHours);
+adminRouter.get('/ops/clients/:companyId/time-entries', opsController.listTimeEntries);
+adminRouter.post('/ops/clients/:companyId/time-entries', opsController.addTimeEntry);
+adminRouter.patch('/ops/time-entries/:id', opsController.updateTimeEntry);
+adminRouter.delete('/ops/time-entries/:id', opsController.deleteTimeEntry);
+adminRouter.get('/ops/clients/:companyId/periods', opsController.listPeriods);
+adminRouter.patch('/ops/periods/:id/settle', opsController.settlePeriod);
