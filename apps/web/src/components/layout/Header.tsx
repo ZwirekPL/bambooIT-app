@@ -3,9 +3,15 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { Menu, LogOut } from 'lucide-react';
+import { Menu, LogOut, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { LocaleSwitcher } from './LocaleSwitcher';
 import { BRAND } from '@config/brand';
 import { cn } from '@/lib/utils';
@@ -17,17 +23,31 @@ function getDashboardHref(role?: string): string {
   return '/';
 }
 
-// Anchor-based links scroll to homepage sections; route-based links go to dedicated pages.
-// Routes /pakiety, /o-nas, /audyt land in W2.CC; until then they 404 but Header renders OK.
-const navLinks = [
-  { href: '/#offer',    labelKey: 'whatWeDo'  },
-  { href: '/#services', labelKey: 'services'  },
-  { href: '/pakiety',   labelKey: 'packages'  },
-  { href: '/#process',  labelKey: 'howWeWork' },
-  { href: '/o-nas',     labelKey: 'aboutUs'   },
-  { href: '/audyt',     labelKey: 'audit'     },
-  { href: '/#faq',      labelKey: 'faq'       },
-] as const;
+// Anchor-based links scroll to homepage sections; route-based links go to
+// dedicated pages. The "Usługi" entry is a dropdown grouping the four service
+// pillars (PRD §4): Obsługa IT abonament + the three cross-sell offers.
+type NavItem =
+  | { type: 'link'; href: string; labelKey: string }
+  | { type: 'menu'; labelKey: string; items: { href: string; labelKey: string }[] };
+
+const navItems: NavItem[] = [
+  { type: 'link', href: '/#offer', labelKey: 'whatWeDo' },
+  {
+    type: 'menu',
+    labelKey: 'servicesMenu',
+    items: [
+      { href: '/#services',          labelKey: 'serviceItManaged' },
+      { href: '/strony-internetowe', labelKey: 'serviceWeb' },
+      { href: '/aplikacje',          labelKey: 'serviceApps' },
+      { href: '/automatyzacje',      labelKey: 'serviceAutomation' },
+    ],
+  },
+  { type: 'link', href: '/pakiety',  labelKey: 'packages' },
+  { type: 'link', href: '/#process', labelKey: 'howWeWork' },
+  { type: 'link', href: '/o-nas',    labelKey: 'aboutUs' },
+  { type: 'link', href: '/audyt',    labelKey: 'audit' },
+  { type: 'link', href: '/#faq',     labelKey: 'faq' },
+];
 
 function BrandMark({ className }: { className?: string }) {
   // bambooIT wordmark with bamboo-green accents on `m` and `it`.
@@ -70,15 +90,33 @@ export function Header() {
 
         {/* Desktop nav links */}
         <nav className="hidden lg:flex items-center gap-7" aria-label="Main navigation">
-          {navLinks.map(({ href, labelKey }) => (
-            <Link
-              key={href}
-              href={href}
-              className="text-sm font-medium py-1.5 transition-colors hover:text-bamboo-deep"
-            >
-              {t(labelKey)}
-            </Link>
-          ))}
+          {navItems.map((item) =>
+            item.type === 'menu' ? (
+              <DropdownMenu key={item.labelKey}>
+                <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium py-1.5 outline-none transition-colors hover:text-bamboo-deep data-[state=open]:text-bamboo-deep">
+                  {t(item.labelKey)}
+                  <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="min-w-56">
+                  {item.items.map((sub) => (
+                    <DropdownMenuItem key={sub.href} asChild>
+                      <Link href={sub.href} className="cursor-pointer">
+                        {t(sub.labelKey)}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="text-sm font-medium py-1.5 transition-colors hover:text-bamboo-deep"
+              >
+                {t(item.labelKey)}
+              </Link>
+            ),
+          )}
         </nav>
 
         {/* Desktop right cluster — auth + locale + CTA */}
@@ -131,16 +169,34 @@ export function Header() {
                 </SheetTitle>
               </SheetHeader>
               <nav className="flex flex-col gap-1 pt-8" aria-label="Mobile navigation">
-                {navLinks.map(({ href, labelKey }) => (
-                  <Link
-                    key={href}
-                    href={href}
-                    onClick={() => setOpen(false)}
-                    className="rounded-lg px-3 py-3 font-display text-lg font-normal transition-colors hover:text-bamboo"
-                  >
-                    {t(labelKey)}
-                  </Link>
-                ))}
+                {navItems.map((item) =>
+                  item.type === 'menu' ? (
+                    <div key={item.labelKey} className="py-1">
+                      <span className="block px-3 pb-1 font-mono text-[11px] uppercase tracking-[0.18em] text-bamboo">
+                        {t(item.labelKey)}
+                      </span>
+                      {item.items.map((sub) => (
+                        <Link
+                          key={sub.href}
+                          href={sub.href}
+                          onClick={() => setOpen(false)}
+                          className="rounded-lg px-3 py-2.5 block font-display text-base font-normal transition-colors hover:text-bamboo"
+                        >
+                          {t(sub.labelKey)}
+                        </Link>
+                      ))}
+                    </div>
+                  ) : (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setOpen(false)}
+                      className="rounded-lg px-3 py-3 font-display text-lg font-normal transition-colors hover:text-bamboo"
+                    >
+                      {t(item.labelKey)}
+                    </Link>
+                  ),
+                )}
                 <div className="mt-6 flex flex-col gap-3 pt-6 border-t border-navy-soft">
                   {isLoggedIn ? (
                     <>
