@@ -16,6 +16,11 @@
     "logout": "Wyloguj",
     "openMenu": "Otwórz menu",
     "closeMenu": "Zamknij menu",
+    "servicesMenu": "Usługi",
+    "serviceItManaged": "Obsługa IT",
+    "serviceWeb": "Strony internetowe",
+    "serviceApps": "Aplikacje na zamówienie",
+    "serviceAutomation": "Automatyzacje",
     "ctaAudit": "Bezpłatny audyt →"
   },
   "home": {
@@ -1046,6 +1051,45 @@
     }
   },
   "branze": {
+    "hub": {
+      "meta": {
+        "title": "IT dla Twojej branży — bambooIT",
+        "description": "Wyspecjalizowana obsługa IT dla biur rachunkowych, kancelarii prawnych, gabinetów lekarskich, hoteli i małych produkcji. Wybierz swoją branżę."
+      },
+      "header": {
+        "eyebrow": "Branże, które obsługujemy",
+        "heading": "IT, które rozumie <em>Twoją branżę</em>",
+        "lede": "Inne problemy ma biuro rachunkowe w lutym, inne kancelaria z tajemnicą zawodową, a inne hotel w środku sezonu. Wybierz swoją branżę — pokażemy konkretnie, co potrafimy dla Ciebie zrobić."
+      },
+      "cardCta": "Zobacz szczegóły",
+      "items": {
+        "biura-rachunkowe": {
+          "tag": "Księgowość",
+          "title": "Biura rachunkowe",
+          "desc": "Bezpieczeństwo danych klientów, Comarch/Wapro/Insert, backup baz SQL, RODO i pełna gotowość w szczycie sezonu."
+        },
+        "kancelarie": {
+          "tag": "Prawo",
+          "title": "Kancelarie prawne",
+          "desc": "Szyfrowanie akt, bezpieczne archiwum, dostęp mobilny z sądu i tajemnica zawodowa bez kompromisów."
+        },
+        "gabinety": {
+          "tag": "Medycyna",
+          "title": "Gabinety lekarskie",
+          "desc": "Dane medyczne pod ochroną, systemy gabinetowe, e-recepta i RODO dla danych szczególnie wrażliwych."
+        },
+        "hotele": {
+          "tag": "Hotelarstwo",
+          "title": "Hotele i pensjonaty",
+          "desc": "Wi-Fi dla gości, systemy rezerwacji, terminale płatnicze i ciągłość działania przez cały sezon."
+        },
+        "produkcja": {
+          "tag": "Produkcja",
+          "title": "Małe produkcje",
+          "desc": "Stabilna sieć na hali, systemy ERP i magazynowe, monitoring oraz wsparcie sprzętu produkcyjnego."
+        }
+      }
+    },
     "biura-rachunkowe": {
       "meta": {
         "title": "Obsługa IT dla biur rachunkowych — bambooIT",
@@ -1652,7 +1696,21 @@
     "terms": "Regulamin",
     "cookies": "Polityka cookies",
     "rodo": "RODO",
-    "manageCookies": "Zarządzaj cookies"
+    "manageCookies": "Zarządzaj cookies",
+    "colServices": "Usługi",
+    "colCompany": "Firma",
+    "colContact": "Kontakt",
+    "linkItManaged": "Obsługa IT",
+    "linkWeb": "Strony internetowe",
+    "linkApps": "Aplikacje na zamówienie",
+    "linkAutomation": "Automatyzacje",
+    "linkPackages": "Pakiety i cennik",
+    "linkBranze": "Branże",
+    "linkRemoteSupport": "Pomoc zdalna",
+    "linkBlog": "Blog",
+    "linkAudit": "Bezpłatny audyt",
+    "linkContact": "Napisz do nas",
+    "linkLogin": "Logowanie"
   },
   "admin": {
     "title": "Panel administratora",
