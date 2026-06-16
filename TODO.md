@@ -709,6 +709,27 @@ Po pierwszym płacącym kliencie, faza 5 dodaje:
 
 ---
 
+## §12a. Faza PSA / operacje (post-OPS — micro-MSP toolset)
+
+Aplikacja stała się lekkim **PSA** dla 2-osobowego MSP. Te pozycje napędzają realną obsługę
+firmy. Każda to DUŻY task wymagający PLAN_*.md (per D-049) — zmiany schematu.
+
+- [ ] **TKT — System zgłoszeń (ticketing)** → `PLAN_ticketing.md`. Nadpisuje ADR-005 (ADR-011).
+  Klient+admin tworzą zgłoszenia, wątek wiadomości, SLA z pakietu (24/8/4h) z alertami,
+  godziny powiązane z ticketem (zgłoszenie→godziny→raport→faktura). Email-to-ticket = faza 2.
+  Sub-fazy TKT-1..5 (~28h). **Zastępuje #5 „mini-ticket".**
+- [ ] **#3 Rentowność per klient** — zestawienie przychód (pakiet) vs przepracowane godziny (ledger)
+  = marża per firma. Sygnał które konta są nierentowne. Rozbudowa zakładki Księgowość. Mały-średni.
+- [ ] **#4 Inwentarz sprzętu + licencji/gwarancji** — per `Company`: urządzenia, systemy, licencje,
+  daty wygaśnięcia + przypomnienia (antywirus, M365, domena, gwarancja). Paruje z access vaultem.
+  Napędza proaktywne odnowienia + cross-sell. Wymaga schema (`ClientAsset`).
+- [ ] **#6 Lead → klient + follow-up** — konwersja lead→Company+konto jednym klikiem; pole „następny
+  kontakt" + dashboard zaległych follow-upów. Silnik outreachu Remigiusza.
+- [ ] **2FA admina** (P0 security) — MFA na logowaniu admina; krytyczne odkąd vault trzyma dostępy
+  klientów. (Sugerowane — do osobnej decyzji/PLAN.)
+
+---
+
 ## §13. Status tracking (live)
 
 Ta sekcja **żyje** — Ty + CC updateujemy w trakcie.
