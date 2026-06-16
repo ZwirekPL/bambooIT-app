@@ -700,6 +700,351 @@
       }
     }
   },
+  "uslugi": {
+    "strony-internetowe": {
+      "meta": {
+        "title": "Strony internetowe dla firm — bambooIT",
+        "description": "Projektujemy i budujemy strony firmowe, landingi i sklepy. Next.js lub WordPress, mobile-first, SEO-ready. Wycena po bezpłatnej rozmowie. Wrocław + cała Polska."
+      },
+      "header": {
+        "eyebrow": "Usługa: strony internetowe",
+        "heading": "Strona, która <em>pracuje na Ciebie</em> — nie wisi w internecie jak wizytówka z 2010 roku.",
+        "lede": "Twoja strona to często pierwszy kontakt klienta z firmą. Jeśli wygląda na zaniedbaną albo ładuje się pięć sekund — klient klika „wstecz” i idzie do konkurencji. Robimy strony, które ładnie wyglądają, szybko działają i realnie przyprowadzają klientów."
+      },
+      "why": {
+        "heading": "Po co <em>dobra</em> strona małej firmie",
+        "items": {
+          "1": {
+            "tag": "Pierwsze wrażenie",
+            "title": "Klient ocenia w 3 sekundy",
+            "desc": "Zanim przeczyta choć zdanie, klient już zdecydował, czy wyglądacie poważnie. Stara strona kosztuje Cię klientów, których nigdy nie poznasz."
+          },
+          "2": {
+            "tag": "Mobile",
+            "title": "Połowa ruchu to telefon",
+            "desc": "Jeśli na komórce trzeba przybliżać palcami i scrollować w bok — tracisz. Robimy mobile-first, bo tak ludzie naprawdę przeglądają."
+          },
+          "3": {
+            "tag": "Szybkość i SEO",
+            "title": "Wolna strona = niżej w Google",
+            "desc": "Google karze wolne strony niższą pozycją, a klienci nie czekają. Optymalizujemy szybkość i podstawy SEO od pierwszego dnia."
+          },
+          "4": {
+            "tag": "Własność",
+            "title": "Strona jest Twoja",
+            "desc": "Kod, hasła, domena, hosting — wszystko należy do Ciebie. Żadnego uzależnienia od „informatyka”, który zniknął z dostępami."
+          }
+        }
+      },
+      "deliver": {
+        "label": "Co dostajesz",
+        "heading": "Strona zrobiona <em>pod Twój biznes</em>",
+        "items": {
+          "1": {
+            "title": "Projekt pod Twoją branżę",
+            "desc": "Nie szablon z marketu. Układ, treści i przyciski dobrane pod to, co Twój klient ma kliknąć — umówić wizytę, wysłać zapytanie, zadzwonić."
+          },
+          "2": {
+            "title": "Next.js albo WordPress",
+            "desc": "Prostą wizytówkę, którą sam edytujesz — w WordPress. Coś bardziej zaawansowanego (integracje, szybkość, custom) — w Next.js. Dobieramy do potrzeby, nie do mody."
+          },
+          "3": {
+            "title": "Mobile-first i SEO-ready",
+            "desc": "Responsywność 320–1920px, meta tagi, Open Graph, sitemap, dane strukturalne. Strona gotowa, żeby Google ją lubił."
+          },
+          "4": {
+            "title": "Wsparcie po wdrożeniu",
+            "desc": "Opcjonalny abonament utrzymaniowy (od 200 zł/mies): aktualizacje, kopie, drobne zmiany, monitoring. Strona nie zostaje sama."
+          }
+        }
+      },
+      "pricing": {
+        "label": "Widełki cenowe",
+        "heading": "Ile to <em>kosztuje</em>",
+        "items": {
+          "1": {
+            "name": "Wizytówka / landing",
+            "price": "4–8 tys. zł netto",
+            "desc": "Jedna–kilka sekcji, formularz kontaktowy, mobile + SEO. Dla firmy, która chce po prostu być widoczna i wiarygodna."
+          },
+          "2": {
+            "name": "Strona firmowa",
+            "price": "10–18 tys. zł netto",
+            "desc": "8–12 podstron, blog, formularze, integracje. Dla firmy budującej obecność i pozyskującej klientów z internetu."
+          },
+          "3": {
+            "name": "Sklep / aplikacja webowa",
+            "price": "20–40 tys. zł netto",
+            "desc": "WooCommerce albo custom aplikacja webowa. Płatności, panele, integracje z magazynem czy księgowością."
+          },
+          "4": {
+            "name": "Powyżej",
+            "price": "Indywidualnie",
+            "desc": "Większy zakres, niestandardowe integracje, własny system. Wyceniamy po warsztacie — płacisz za to, co realnie budujemy."
+          }
+        },
+        "note": "Widełki orientacyjne — konkretną wycenę dostajesz po bezpłatnej 30-minutowej rozmowie i krótkim briefie (1–3 dni robocze). Bez zaskoczeń w trakcie: ustalamy zakres i cenę, zanim zaczniemy."
+      },
+      "process": {
+        "label": "Jak pracujemy",
+        "heading": "Od pomysłu do <em>działającej strony</em>",
+        "steps": {
+          "1": {
+            "title": "Bezpłatna rozmowa",
+            "desc": "30 minut online. Słuchamy, co i dla kogo budujesz. Czasem podpowiemy, że wystarczy mniej, niż myślisz."
+          },
+          "2": {
+            "title": "Brief i wycena",
+            "desc": "W 1–3 dni dostajesz konkretny zakres i cenę. Wiesz dokładnie, co dostaniesz i za ile."
+          },
+          "3": {
+            "title": "Realizacja",
+            "desc": "2–8 tygodni zależnie od zakresu. Pokazujemy postępy na bieżąco, nie znikamy na miesiąc."
+          },
+          "4": {
+            "title": "Wdrożenie i opieka",
+            "desc": "Publikujemy, przekazujemy dostępy, szkolimy z edycji. Dalej — opcjonalny abonament utrzymaniowy."
+          }
+        }
+      },
+      "crossSell": {
+        "tag": "Masz już abonament IT?",
+        "heading": "Klienci abonamentu mają <em>15% rabatu</em> i priorytet",
+        "body": "Jeśli korzystasz z naszej obsługi IT, nową stronę robimy z 15% rabatem i z pierwszeństwem w kolejce. Znamy już Twoją firmę — nie musimy zaczynać od zera.",
+        "cta": "Umów bezpłatną rozmowę"
+      }
+    },
+    "aplikacje": {
+      "meta": {
+        "title": "Aplikacje na zamówienie — bambooIT",
+        "description": "Budujemy aplikacje webowe i SaaS na zamówienie: CRM, panele klienta, narzędzia wewnętrzne. Next.js + PostgreSQL + AI. Wycena po warsztacie. Twórca e-dietetyk.com."
+      },
+      "header": {
+        "eyebrow": "Usługa: aplikacje na zamówienie",
+        "heading": "Aplikacja skrojona <em>pod Twój proces</em> — nie kolejny abonament, który nie pasuje.",
+        "lede": "Excel puchnie, kupione narzędzie robi 60% tego, co trzeba, a reszta to ręczna robota i copy-paste. Budujemy aplikacje, które robią dokładnie to, czego potrzebuje Twoja firma — i są Twoją własnością, nie cudzą subskrypcją."
+      },
+      "why": {
+        "heading": "Kiedy <em>warto</em> zbudować własną aplikację",
+        "items": {
+          "1": {
+            "tag": "Gotowce nie pasują",
+            "title": "Kupione narzędzie robi 60%",
+            "desc": "Płacisz za funkcje, których nie używasz, a tych potrzebnych brakuje. Resztę dorabiasz ręcznie. Własna aplikacja robi 100% Twojego procesu."
+          },
+          "2": {
+            "tag": "Ręczna robota",
+            "title": "Ludzie robią pracę komputera",
+            "desc": "Przepisywanie danych, łączenie arkuszy, kopiowanie między systemami. To godziny tygodniowo, które aplikacja załatwia w tle."
+          },
+          "3": {
+            "tag": "Skala",
+            "title": "Excel przestał wystarczać",
+            "desc": "Jeden plik, w którym pracuje pół firmy, to bomba zegarowa. Aplikacja daje role, dostęp, historię zmian i porządek."
+          },
+          "4": {
+            "tag": "Własność",
+            "title": "Twój kod, Twoje dane",
+            "desc": "Dostajesz kod źródłowy, bazę i dokumentację. Żadnego lock-inu — możesz rozwijać dalej z nami albo z kimkolwiek."
+          }
+        }
+      },
+      "deliver": {
+        "label": "Co dostajesz",
+        "heading": "Software house'owa jakość <em>bez software house'owych cen</em>",
+        "items": {
+          "1": {
+            "title": "Warsztat, zanim cokolwiek zbudujemy",
+            "desc": "Wychodzimy z dokumentem: co budujemy, dla kogo, w jakiej kolejności. Płacisz za właściwą rzecz, nie za zgadywanie."
+          },
+          "2": {
+            "title": "Nowoczesny, sprawdzony stack",
+            "desc": "Next.js, TypeScript, PostgreSQL, Stripe, Anthropic API dla funkcji AI. Ten sam stack, na którym działa nasz własny SaaS w produkcji."
+          },
+          "3": {
+            "title": "Demo co dwa tygodnie",
+            "desc": "Pracujemy w sprintach. Regularnie widzisz działający kawałek i korygujemy kurs, zanim zrobi się drogo."
+          },
+          "4": {
+            "title": "Utrzymanie po wdrożeniu",
+            "desc": "Hosting, monitoring, rozwój kolejnych funkcji — osobna, jasna umowa. Aplikacja żyje i rozwija się razem z firmą."
+          }
+        }
+      },
+      "pricing": {
+        "label": "Widełki cenowe",
+        "heading": "Ile to <em>kosztuje</em>",
+        "items": {
+          "1": {
+            "name": "Małe aplikacje",
+            "price": "25–50 tys. zł netto",
+            "desc": "Wewnętrzne narzędzie, prosty panel, kalkulator, formularz z logiką. Jeden konkretny proces zamknięty w aplikacji."
+          },
+          "2": {
+            "name": "Średnie projekty",
+            "price": "50–150 tys. zł netto",
+            "desc": "CRM custom, panel klienta, SaaS B2B. Wiele ról, płatności, integracje, dłuższy rozwój w sprintach."
+          },
+          "3": {
+            "name": "Duże projekty",
+            "price": "od 150 tys. zł netto",
+            "desc": "Rozbudowane systemy, wiele integracji, własna platforma. Zakres i harmonogram ustalamy indywidualnie."
+          }
+        },
+        "note": "Wycena po płatnym warsztacie scopingowym (2–4 tys. zł netto, zaliczanym do projektu) — wychodzimy z konkretnym dokumentem i ceną. Fixed price albo time & materials, do wyboru. Referencja: e-dietetyk.com — nasz własny SaaS w produkcji, z prawdziwymi użytkownikami."
+      },
+      "process": {
+        "label": "Jak pracujemy",
+        "heading": "Od pomysłu do <em>wdrożonej aplikacji</em>",
+        "steps": {
+          "1": {
+            "title": "Rozmowa discovery",
+            "desc": "30 minut, bezpłatnie. Sprawdzamy, czy w ogóle pasujemy do projektu. Jeśli nie — powiemy wprost."
+          },
+          "2": {
+            "title": "Warsztat scopingowy",
+            "desc": "Płatny (zaliczany do projektu). Rozkładamy proces na części i wychodzimy z dokumentem: co, dla kogo, w jakiej kolejności."
+          },
+          "3": {
+            "title": "Wycena",
+            "desc": "Fixed price albo time & materials. Wiesz, na co się piszesz, zanim ruszymy."
+          },
+          "4": {
+            "title": "Realizacja w sprintach",
+            "desc": "Budujemy iteracyjnie, demo co dwa tygodnie. Korygujemy kurs na bieżąco, bez niespodzianek na końcu."
+          },
+          "5": {
+            "title": "Wdrożenie i utrzymanie",
+            "desc": "Przekazujemy kod, bazę i dokumentację. Dalej — osobna umowa na hosting, monitoring i rozwój."
+          }
+        }
+      },
+      "crossSell": {
+        "tag": "Masz już abonament IT?",
+        "heading": "Znamy Twoją firmę — <em>projekt rusza szybciej</em>",
+        "body": "Klientom naszej obsługi IT projekty realizujemy z priorytetem. Znamy już Wasz sprzęt, procesy i ludzi, więc warsztat scopingowy idzie sprawniej, a wdrożenie wpina się w to, co już macie.",
+        "cta": "Umów rozmowę discovery"
+      }
+    },
+    "automatyzacje": {
+      "meta": {
+        "title": "Automatyzacje procesów — bambooIT",
+        "description": "Automatyzujemy powtarzalne procesy w firmie: faktury, leady, raporty, synchronizacje. n8n, Make, custom + AI. Audyt procesów od 1500 zł netto."
+      },
+      "header": {
+        "eyebrow": "Usługa: automatyzacje procesów",
+        "heading": "Niech komputer robi <em>nudną robotę</em> — Ty zajmij się firmą.",
+        "lede": "Każda firma ma procesy, które ktoś klika ręcznie co tydzień: przepisywanie faktur, kopiowanie leadów, sklejanie raportów. To godziny, które można odzyskać. Znajdujemy te procesy, liczymy, ile kosztują, i automatyzujemy te, które naprawdę się opłacają."
+      },
+      "why": {
+        "heading": "Co <em>warto</em> zautomatyzować",
+        "items": {
+          "1": {
+            "tag": "Czas",
+            "title": "Ręczna robota zjada tygodnie",
+            "desc": "Przepisywanie danych ze sklepu do księgowości potrafi być 5 godzin tygodniowo. Rocznie — kilka tygodni pracy oddanych za darmo."
+          },
+          "2": {
+            "tag": "Błędy",
+            "title": "Człowiek się myli, skrypt nie",
+            "desc": "Ręczne przepisywanie to literówki w kwotach, pomylone pozycje, zgubione zamówienia. Automatyzacja robi to samo bez pomyłek."
+          },
+          "3": {
+            "tag": "Skala",
+            "title": "Więcej zamówień, ten sam zespół",
+            "desc": "Gdy wolumen rośnie, ręczne procesy się sypią. Automatyzacja obsługuje 10 i 1000 zdarzeń tak samo, bez dokładania etatów."
+          },
+          "4": {
+            "tag": "Spójność",
+            "title": "Nic nie wypada z procesu",
+            "desc": "Lead z formularza zawsze trafi do CRM, faktura zawsze do księgowości, raport zawsze przyjdzie rano. Bez „zapomniałem”."
+          }
+        }
+      },
+      "deliver": {
+        "label": "Co dostajesz",
+        "heading": "Automatyzacje, które <em>realnie odciążają</em>",
+        "items": {
+          "1": {
+            "title": "Audyt procesów z liczbami",
+            "desc": "Najpierw mierzymy: które procesy, ile godzin, ile to kosztuje. Dostajesz listę 5–10 kandydatów do automatyzacji z policzonym ROI."
+          },
+          "2": {
+            "title": "Właściwe narzędzie do zadania",
+            "desc": "n8n, Make albo custom kod — dobieramy do procesu, nie odwrotnie. Proste scenariusze tanio, złożone solidnie."
+          },
+          "3": {
+            "title": "AI tam, gdzie ma sens",
+            "desc": "Czytanie faktur, klasyfikacja maili, generowanie ofert z szablonu — z Anthropic API. AI jako narzędzie, nie jako hasło na slajdzie."
+          },
+          "4": {
+            "title": "Monitoring i opieka",
+            "desc": "Automatyzacja, która cicho padła, jest gorsza niż żadna. Monitorujemy, alarmujemy przy awarii i poprawiamy — od 200 zł/mies."
+          }
+        }
+      },
+      "pricing": {
+        "label": "Cennik",
+        "heading": "Pakiety i <em>wycena indywidualna</em>",
+        "items": {
+          "1": {
+            "name": "Audyt procesów",
+            "price": "1 500 zł netto",
+            "desc": "Identyfikujemy 5–10 procesów do automatyzacji + policzony ROI. Kwota zaliczana do dalszego projektu."
+          },
+          "2": {
+            "name": "Mała automatyzacja",
+            "price": "od 2 500 zł netto",
+            "desc": "Jeden proces, prosta integracja — np. formularz → CRM → autoresponder."
+          },
+          "3": {
+            "name": "Pakiet automatyzacji",
+            "price": "od 8 000 zł netto",
+            "desc": "3–5 procesów, średnia złożoność. Spięcie kilku narzędzi w jeden działający przepływ."
+          },
+          "4": {
+            "name": "Duże automatyzacje",
+            "price": "Indywidualnie",
+            "desc": "6+ procesów albo custom development. Zakres ustalamy po audycie."
+          },
+          "5": {
+            "name": "Utrzymanie",
+            "price": "od 200 zł/mies",
+            "desc": "Monitoring, alerty, drobne poprawki. Żeby automatyzacje działały też za rok."
+          }
+        },
+        "note": "Najlepiej zacząć od audytu procesów — to 1500 zł netto, które zwykle zwraca się po pierwszej zautomatyzowanej rzeczy, a kwotę zaliczamy do dalszego projektu. Bez audytu łatwo zautomatyzować coś, co wcale nie boli."
+      },
+      "process": {
+        "label": "Jak pracujemy",
+        "heading": "Od chaosu do <em>procesu, który działa sam</em>",
+        "steps": {
+          "1": {
+            "title": "Audyt procesów",
+            "desc": "Mapujemy, co dzieje się ręcznie i ile to kosztuje. Wychodzimy z listą kandydatów i policzonym ROI."
+          },
+          "2": {
+            "title": "Priorytety i wycena",
+            "desc": "Wybieramy procesy o najlepszym zwrocie. Automatyzujemy najpierw to, co najbardziej boli."
+          },
+          "3": {
+            "title": "Wdrożenie",
+            "desc": "Budujemy i testujemy na Twoich realnych danych. Uruchamiamy dopiero, gdy działa pewnie."
+          },
+          "4": {
+            "title": "Monitoring",
+            "desc": "Pilnujemy, że przepływy działają. Alert przy awarii, drobne poprawki, rozwój kolejnych procesów."
+          }
+        }
+      },
+      "crossSell": {
+        "tag": "Masz pakiet Firma Plus?",
+        "heading": "Audyt procesów <em>w cenie pakietu</em>",
+        "body": "Klienci pakietu Firma Plus dostają audyt procesów w ramach abonamentu — pokazujemy, co w Twojej firmie da się zautomatyzować i ile na tym zaoszczędzisz, zanim wydasz złotówkę na wdrożenie.",
+        "cta": "Umów bezpłatny audyt"
+      }
+    }
+  },
   "branze": {
     "biura-rachunkowe": {
       "meta": {
