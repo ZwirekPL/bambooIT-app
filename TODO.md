@@ -771,6 +771,11 @@ Per D-069 (§4.0 frontend-first gate) execution shifted from week-numbered to FE
 >
 > **Tryb pracy:** CC działa autonomicznie do wdrożenia, wraca po każdym ukończonym zadaniu (U-N),
 > nic nie zostaje otwarte. Atomic commits per task (D-048).
+>
+> **STATUS 2026-06-16:** ✅ **U-1..U-6 ukończone i zmergowane na `main`.** Pełny build monorepo
+> (database → backend → web) exit 0. Migracja `add_email_campaign` zaaplikowana na dev DB.
+> Pozostaje (poza zakresem tej fazy): realne sekrety (Resend/SMTP) + `migrate deploy` na prod
+> przy BE-5, oraz zamiana placeholdera `/panel/faktury` na listę po wyborze providera faktur.
 
 ### Kontekst — co audyt wykrył
 
@@ -788,28 +793,28 @@ Marketing/panel/admin UI w większości gotowe (36/43 stron). Brakujące/stub:
 
 ### Zadania (kolejność wykonania = wartość biznesowa + niezależność)
 
-- [ ] **U-1 — Strony usługowe (3 landingi).** Nowy współdzielony template `ServiceLanding`
+- [x] **U-1 — Strony usługowe (3 landingi).** Nowy współdzielony template `ServiceLanding`
   (analogiczny do `IndustryLanding`): PageHeader → "dla kogo/bóle" → zakres dostawy →
   widełki cenowe (PRD §4.2-4.4) → proces → cross-sell note (15% rabat dla abonamentu) →
   FinalCTA. 3 strony: `/strony-internetowe`, `/aplikacje`, `/automatyzacje`. Treść w
   `messages/pl.json` pod `uslugi.{slug}.*`. Per-strona meta + JSON-LD `Service`. **Mobile-first.**
-- [ ] **U-2 — Hub `/branze`.** Strona listująca 5 branż (biura-rachunkowe, kancelarie,
+- [x] **U-2 — Hub `/branze`.** Strona listująca 5 branż (biura-rachunkowe, kancelarie,
   gabinety, hotele, produkcja) jako karty → linki do istniejących podstron. Meta + JSON-LD
   `CollectionPage`. Treść `branze.hub.*`.
-- [ ] **U-3 — Nawigacja + sitemap wiring.** Header: pozycja "Usługi" (link/dropdown do 3 stron
+- [x] **U-3 — Nawigacja + sitemap wiring.** Header: pozycja "Usługi" (link/dropdown do 3 stron
   usługowych). Footer: kolumna linków (usługi + branże). Sitemap: dorzucić 4 nowe trasy
   (3 usługi + `/branze`). Homepage `HorizontalServicesSection` — opcjonalnie podlinkować
   karty do odpowiednich stron usługowych.
-- [ ] **U-4 — `/panel/faktury` (placeholder informacyjny).** Strona w panelu klienta:
+- [x] **U-4 — `/panel/faktury` (placeholder informacyjny).** Strona w panelu klienta:
   "Faktury VAT wysyłamy mailem po każdej płatności / dostępne na życzenie", link do kontaktu,
   pusty stan zamiast listy. Dodać pozycję do nawigacji panelu (jeśli istnieje) + do
   `/panel/subskrypcja` cross-link. Zero zależności od providera — gdy provider wybrany,
   zamieniamy placeholder na listę (osobne zadanie post-decyzja).
-- [ ] **U-5 — Admin dashboard `/admin` (KPI).** Realny dashboard z **istniejących** endpointów
+- [x] **U-5 — Admin dashboard `/admin` (KPI).** Realny dashboard z **istniejących** endpointów
   (zero zmian backendu): `getStats` (users/clients), `getSubscriptionStats` (MRR, aktywne
   per tier, churn), `leads.getStats` (pipeline NEW/CONTACTED/...), `getActionItems`
   (pending testimonials, locked accounts). Karty KPI + ostatnie leady + action items.
-- [ ] **U-6 — Admin email-kampanie (moduł).** **DUŻY TASK — wymaga `PLAN_U6_EMAIL_KAMPANIE.md`**
+- [x] **U-6 — Admin email-kampanie (moduł).** **DUŻY TASK — wymaga `PLAN_U6_EMAIL_KAMPANIE.md`**
   (per D-049 + §7: schema change + external API). Brak backendu kampanii → nowy model Prisma
   (`EmailCampaign` + `EmailCampaignRecipient`/segment), migracja, endpointy CRUD + wyślij,
   integracja Resend (draft/mock mode dopóki brak `RESEND_API_KEY`, analogicznie do Stripe
