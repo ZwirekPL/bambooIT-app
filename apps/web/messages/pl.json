@@ -2148,9 +2148,9 @@
       "deleteDescription": "Czy na pewno chcesz dezaktywować konto {email}? Użytkownik nie będzie mógł się zalogować.",
       "restoreTitle": "Przywróć użytkownika",
       "restoreDescription": "Czy na pewno chcesz przywrócić dostęp dla {email}?",
-      "createButton": "Dodaj pacjenta",
-      "createTitle": "Dodaj nowego pacjenta",
-      "createDescription": "Utwórz konto pacjenta z automatyczną weryfikacją emaila.",
+      "createButton": "Dodaj klienta",
+      "createTitle": "Dodaj nowego klienta",
+      "createDescription": "Utwórz konto klienta z automatyczną weryfikacją emaila.",
       "createFirstName": "Imię",
       "createLastName": "Nazwisko",
       "createPassword": "Hasło",
@@ -2163,8 +2163,17 @@
       "validationPasswordMismatch": "Hasła nie są identyczne",
       "validationFieldRequired": "Pole {field} jest wymagane",
       "validationGeneric": "Sprawdź poprawność danych",
-      "filterClient": "Pacjent",
-      "roleClient": "Pacjent"
+      "filterClient": "Klient",
+      "roleClient": "Klient"
+    },
+    "grantAccess": {
+      "title": "Nadaj dostęp",
+      "indefinite": "Bezterminowo",
+      "until": "Do daty",
+      "granted": "Dostęp do {date}",
+      "grantedIndefinite": "Dostęp bezterminowy",
+      "revoke": "Cofnij dostęp",
+      "error": "Nie udało się zapisać zmian"
     },
     "auditLog": {
       "title": "Logi audytu",
