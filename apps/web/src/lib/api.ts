@@ -3,7 +3,7 @@
  * Uses NEXT_PUBLIC_API_URL (client + server) for all requests.
  * Server-only auth requests use API_URL env variable.
  */
-import type { Company, Order, ProductType, CheckoutProductType, Subscription, AdminStats, UserRole, User, AdminUser, AuditLog, BlogPost, BlogListItem, BlogCategoryConfig, AccessStatus, Testimonial, TestimonialWithUser, PublicTestimonial, NotificationPreferences, SubscriptionStats, SubscriptionItem, CompanyInvoice, Lead, LeadStatus, LeadType, LeadsStats, LeadsListResponse } from '@/types/api';
+import type { Company, Order, ProductType, CheckoutProductType, Subscription, AdminStats, UserRole, User, AdminUser, AuditLog, BlogPost, BlogListItem, BlogCategoryConfig, AccessStatus, Testimonial, TestimonialWithUser, PublicTestimonial, NotificationPreferences, SubscriptionStats, SubscriptionItem, CompanyInvoice, Lead, LeadStatus, LeadType, LeadsStats, LeadsListResponse, EmailCampaign, EmailCampaignAudience, AudienceCounts } from '@/types/api';
 import { getApiBaseUrl } from './api-url';
 
 /** Tracks whether a 401 auto-logout is already in progress to prevent multiple redirects */
@@ -335,6 +335,48 @@ export const api = {
         const qs = query.toString();
         return `/api/proxy/admin/leads/export.csv${qs ? `?${qs}` : ''}`;
       },
+    },
+    emailCampaigns: {
+      list: (token?: string) =>
+        apiFetch<{ ok: boolean; campaigns: EmailCampaign[]; audienceCounts: AudienceCounts }>(
+          '/admin/email-campaigns',
+          { token },
+        ),
+      audienceCounts: (token?: string) =>
+        apiFetch<{ ok: boolean; audienceCounts: AudienceCounts }>(
+          '/admin/email-campaigns/audience-counts',
+          { token },
+        ),
+      get: (id: string, token?: string) =>
+        apiFetch<{ ok: boolean; campaign: EmailCampaign }>(`/admin/email-campaigns/${id}`, {
+          token,
+        }),
+      create: (
+        input: { subject: string; body: string; audience: EmailCampaignAudience },
+        token?: string,
+      ) =>
+        apiFetch<{ ok: boolean; campaign: EmailCampaign }>('/admin/email-campaigns', {
+          method: 'POST',
+          body: JSON.stringify(input),
+          token,
+        }),
+      update: (
+        id: string,
+        input: { subject?: string; body?: string; audience?: EmailCampaignAudience },
+        token?: string,
+      ) =>
+        apiFetch<{ ok: boolean; campaign: EmailCampaign }>(`/admin/email-campaigns/${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify(input),
+          token,
+        }),
+      remove: (id: string, token?: string) =>
+        apiFetch<{ ok: boolean }>(`/admin/email-campaigns/${id}`, { method: 'DELETE', token }),
+      send: (id: string, token?: string) =>
+        apiFetch<{ ok: boolean; campaign: EmailCampaign; transportConfigured: boolean }>(
+          `/admin/email-campaigns/${id}/send`,
+          { method: 'POST', token },
+        ),
     },
     getStats: (token: string) =>
       apiFetch<{ ok: boolean; stats: AdminStats }>('/admin/stats', { token }),

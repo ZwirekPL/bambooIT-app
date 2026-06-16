@@ -96,6 +96,29 @@ export interface LeadsListResponse {
   pageSize: number;
 }
 
+export type EmailCampaignStatus = 'DRAFT' | 'SENDING' | 'SENT' | 'FAILED';
+export type EmailCampaignAudience = 'ALL_CLIENTS' | 'LEADS' | 'TEST';
+
+export interface EmailCampaign {
+  id: string;
+  subject: string;
+  body: string;
+  audience: EmailCampaignAudience;
+  status: EmailCampaignStatus;
+  recipientCount: number;
+  sentCount: number;
+  failedCount: number;
+  createdById: string | null;
+  sentAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AudienceCounts {
+  ALL_CLIENTS: number;
+  LEADS: number;
+}
+
 export type OrderStatus = 'PENDING_PAYMENT' | 'PAID' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
 
 export interface Order {

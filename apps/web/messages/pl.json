@@ -1751,6 +1751,55 @@
       "anonLead": "Lead",
       "loadError": "Nie udało się pobrać części danych — pokazujemy, co mamy."
     },
+    "emailCampaigns": {
+      "title": "Kampanie email",
+      "subtitle": "Newsletter, ankiety, przypomnienia i onboarding — jedna wiadomość do wybranej grupy.",
+      "newCampaign": "Nowa kampania",
+      "empty": "Brak kampanii. Utwórz pierwszą, żeby wysłać wiadomość do klientów lub leadów.",
+      "mockNote": "Tryb testowy: brak skonfigurowanego dostawcy email (RESEND/SMTP). Kampanie zapiszą się i policzą odbiorców, ale wiadomości nie zostaną realnie wysłane do czasu konfiguracji.",
+      "composer": {
+        "heading": "Nowa kampania",
+        "editHeading": "Edytuj szkic",
+        "subjectLabel": "Temat",
+        "subjectPlaceholder": "np. Nowości w bambooIT — styczeń",
+        "bodyLabel": "Treść",
+        "bodyPlaceholder": "Napisz wiadomość. Pusta linia rozdziela akapity.",
+        "audienceLabel": "Odbiorcy",
+        "save": "Zapisz szkic",
+        "saving": "Zapisuję…",
+        "cancel": "Anuluj"
+      },
+      "audiences": {
+        "ALL_CLIENTS": "Wszyscy klienci",
+        "ALL_CLIENTS_hint": "Klienci z aktywną zgodą na powiadomienia email",
+        "LEADS": "Leady",
+        "LEADS_hint": "Leady ze zgodą RODO (poza odrzuconymi)",
+        "TEST": "Tylko do mnie (test)",
+        "TEST_hint": "Wyślij próbnie na własny adres"
+      },
+      "recipients": "Odbiorcy: {count}",
+      "statuses": {
+        "DRAFT": "Szkic",
+        "SENDING": "Wysyłka…",
+        "SENT": "Wysłana",
+        "FAILED": "Błąd"
+      },
+      "table": {
+        "subject": "Temat",
+        "audience": "Odbiorcy",
+        "status": "Status",
+        "stats": "Wysłano",
+        "created": "Utworzono"
+      },
+      "sendCta": "Wyślij",
+      "sendConfirm": "Wysłać kampanię „{subject}” do {count} odbiorców? Tej operacji nie można cofnąć.",
+      "sending": "Wysyłam…",
+      "deleteCta": "Usuń",
+      "deleteConfirm": "Usunąć kampanię „{subject}”?",
+      "sentSummary": "{sent} / {total} wysłanych{failed, plural, =0 {} other { · # błędów}}",
+      "sentMockResult": "Kampania oznaczona jako wysłana, ale dostawca email nie jest skonfigurowany — realnie nic nie wyszło.",
+      "error": "Coś poszło nie tak. Spróbuj ponownie."
+    },
     "nav": {
       "home": "Dashboard",
       "leads": "Leady",
