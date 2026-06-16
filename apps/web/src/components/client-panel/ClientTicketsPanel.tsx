@@ -100,7 +100,7 @@ export function ClientTicketsPanel() {
         </ul>
       )}
 
-      <Link href="/panel/subskrypcja" className="inline-block text-sm text-navy-soft hover:text-bamboo-deep">
+      <Link href="/panel" className="inline-block text-sm text-navy-soft hover:text-bamboo-deep">
         ← Wróć do panelu
       </Link>
     </div>

@@ -21,7 +21,7 @@ import { performFullLogout } from '@/lib/logout';
 
 function getDashboardHref(role?: string): string {
   if (role === 'ADMIN') return '/admin';
-  return '/';
+  return '/panel';
 }
 
 // Build 1-2 letter initials for the account avatar. Prefers the two words of a
