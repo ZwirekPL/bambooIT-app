@@ -156,7 +156,7 @@ app.use('/profile', requireAuth(), userLimiter, profileRouter);
 app.use('/admin', requireAuth('ADMIN'), userLimiter, adminRouter);
 app.use('/checkout', requireAuth(), userLimiter, checkoutRouter);
 app.use('/orders', requireAuth('ADMIN', 'CLIENT'), userLimiter, orderRouter);
-app.use('/subscriptions', requireAuth('ADMIN'), userLimiter, subscriptionRouter);
+app.use('/subscriptions', requireAuth('ADMIN', 'CLIENT'), userLimiter, subscriptionRouter);
 app.use('/posts', globalLimiter, blogRouter);
 app.use('/testimonials', globalLimiter, testimonialRouter);
 app.use('/referrals', requireAuth(), userLimiter, referralRouter);
