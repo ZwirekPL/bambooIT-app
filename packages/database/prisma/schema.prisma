@@ -71,8 +71,8 @@ model User {
   // Protocol relations (28.1)
   trialFingerprints       TrialFingerprint[]
   deviceFingerprints      DeviceFingerprint[]
-  // Chat (79.1)
-  // Supplements (79.6)
+  // Ops core — time entries this admin logged (createdBy)
+  loggedTimeEntries       TimeEntry[]              @relation("LoggedBy")
 }
 
 model Company {
@@ -95,10 +95,102 @@ model Company {
   phone           String?
   website         String?
 
-  user             User              @relation("CompanyUser", fields: [userId], references: [id], onDelete: Cascade)
+  // Ops core — interim source of "which package" until Subscription rework (S1).
+  // Admin sets this when activating a client; later the active Subscription drives it.
+  servicePlan     SubscriptionPlan?
+  serviceSince    DateTime?
+
+  user             User               @relation("CompanyUser", fields: [userId], references: [id], onDelete: Cascade)
   orders           Order[]
+  timeEntries      TimeEntry[]
+  servicePeriods   ServicePeriod[]
+  onboarding       CompanyOnboarding?
 
   @@index([nip])
+}
+
+// ─── Ops core (operational subscription delivery) ──────────────────────────
+
+enum ServicePeriodStatus {
+  OPEN        // current month, hours still accruing
+  TO_SETTLE   // closed month with overage > 0, awaiting invoice
+  SETTLED     // settled (invoice issued/paid — manual until Stripe/Fakturownia)
+}
+
+// Source of truth for each tier's hours / overage rate / SLA. Replaces the
+// hardcoded "2h/5h/10h" marketing copy. Seeded for the 3 plans.
+model ServicePackage {
+  plan               SubscriptionPlan @id
+  monthlyPriceNet    Decimal          @db.Decimal(10, 2)
+  hoursIncluded      Int
+  overageRatePerHour Decimal          @db.Decimal(10, 2)
+  reactionTimeHours  Int              // SLA reaction time (business hours)
+  carryoverCapHours  Int              // max unused hours carried to next month
+  updatedAt          DateTime         @updatedAt
+}
+
+// One unit of work an admin logged for a client. Minutes for precision.
+model TimeEntry {
+  id          String   @id @default(cuid())
+  companyId   String
+  periodId    String
+  date        DateTime // day the work was performed
+  minutes     Int
+  description String   @db.Text
+  billable    Boolean  @default(true) // false = goodwill/warranty, not counted vs package
+  createdById String
+  createdAt   DateTime @default(now())
+
+  company   Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  period    ServicePeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
+  createdBy User          @relation("LoggedBy", fields: [createdById], references: [id])
+
+  @@index([companyId, date])
+  @@index([periodId])
+}
+
+// Monthly hours ledger per company. Snapshots package params so historical
+// periods stay correct if the plan/rate changes. Carries unused hours forward.
+model ServicePeriod {
+  id                 String              @id @default(cuid())
+  companyId          String
+  year               Int
+  month              Int // 1-12
+  plan               SubscriptionPlan
+  hoursIncluded      Int
+  carryoverInHours   Int                 @default(0)
+  carryoverOutHours  Int                 @default(0)
+  overageRatePerHour Decimal             @db.Decimal(10, 2)
+  consumedMinutes    Int                 @default(0)
+  overageHours       Decimal             @db.Decimal(10, 2) @default(0)
+  overageAmountNet   Decimal             @db.Decimal(10, 2) @default(0)
+  status             ServicePeriodStatus @default(OPEN)
+  settledAt          DateTime?
+  reportSentAt       DateTime?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  company     Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  timeEntries TimeEntry[]
+
+  @@unique([companyId, year, month])
+  @@index([companyId])
+  @@index([status])
+}
+
+// Onboarding checklist (1:1 with company). Discrete steps → reportable.
+model CompanyOnboarding {
+  companyId       String    @id
+  accessCollected DateTime?
+  remoteToolReady DateTime?
+  monitoringSet   DateTime?
+  backupSet       DateTime?
+  docsCreated     DateTime?
+  completedAt     DateTime?
+  notes           String?   @db.Text
+  updatedAt       DateTime  @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 model AuditLog {
