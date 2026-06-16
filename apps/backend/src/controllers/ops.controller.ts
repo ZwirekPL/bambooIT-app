@@ -21,6 +21,7 @@ const timeEntryBody = z.object({
   minutes: z.number().int().min(1).max(1440),
   description: z.string().min(1).max(2000),
   billable: z.boolean().optional().default(true),
+  ticketId: z.string().cuid().nullable().optional(), // optional link to a ticket (TKT-2)
 });
 
 const timeEntryPatchBody = z.object({
@@ -28,6 +29,7 @@ const timeEntryPatchBody = z.object({
   minutes: z.number().int().min(1).max(1440).optional(),
   description: z.string().min(1).max(2000).optional(),
   billable: z.boolean().optional(),
+  ticketId: z.string().cuid().nullable().optional(),
 });
 
 const servicePlanBody = z.object({

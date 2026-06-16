@@ -180,6 +180,19 @@ interface TimeEntryInput {
   minutes: number;
   description: string;
   billable: boolean;
+  ticketId?: string | null;
+}
+
+/** Ensure a ticket exists and belongs to the company we're logging time for. */
+async function assertTicketBelongsToCompany(ticketId: string, companyId: string) {
+  const ticket = await prisma.ticket.findUnique({
+    where: { id: ticketId },
+    select: { companyId: true },
+  });
+  if (!ticket) throw new AppError(404, 'NOT_FOUND', 'Ticket not found');
+  if (ticket.companyId !== companyId) {
+    throw new AppError(400, 'TICKET_COMPANY_MISMATCH', 'Ticket belongs to a different company');
+  }
 }
 
 export async function addTimeEntry(
@@ -187,6 +200,7 @@ export async function addTimeEntry(
   input: TimeEntryInput,
   createdById: string,
 ) {
+  if (input.ticketId) await assertTicketBelongsToCompany(input.ticketId, companyId);
   const period = await getOrCreatePeriod(companyId, input.date);
   const entry = await prisma.timeEntry.create({
     data: {
@@ -196,6 +210,7 @@ export async function addTimeEntry(
       minutes: input.minutes,
       description: input.description,
       billable: input.billable,
+      ticketId: input.ticketId ?? null,
       createdById,
     },
   });
@@ -221,6 +236,7 @@ export async function updateTimeEntry(
     periodId = newPeriod.id;
   }
 
+  if (patch.ticketId) await assertTicketBelongsToCompany(patch.ticketId, existing.companyId);
   const entry = await prisma.timeEntry.update({
     where: { id },
     data: {
@@ -228,6 +244,8 @@ export async function updateTimeEntry(
       minutes: patch.minutes ?? undefined,
       description: patch.description ?? undefined,
       billable: patch.billable ?? undefined,
+      // ticketId: undefined = leave as-is; null = unlink; string = relink
+      ticketId: patch.ticketId === undefined ? undefined : patch.ticketId,
       periodId,
     },
   });

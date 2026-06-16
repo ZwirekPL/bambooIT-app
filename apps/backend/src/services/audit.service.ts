@@ -55,6 +55,11 @@ export type AuditAction =
   | 'ACCESS_ENTRY_ADDED'
   | 'ACCESS_ENTRY_UPDATED'
   | 'ACCESS_ENTRY_DELETED'
+  | 'TICKET_CREATED'
+  | 'TICKET_UPDATED'
+  | 'TICKET_MESSAGE_ADDED'
+  | 'TICKET_STATUS_CHANGED'
+  | 'TICKET_ASSIGNED'
   | 'CREATE_POST'
   | 'EDIT_POST'
   | 'DELETE_POST'
@@ -191,6 +196,7 @@ export type AuditResourceType =
   | 'TIME_ENTRY'
   | 'SERVICE_PERIOD'
   | 'ACCESS_ENTRY'
+  | 'TICKET'
   | 'AUDIT_LOG';
 
 interface LogAuditParams {

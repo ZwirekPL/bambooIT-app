@@ -9,6 +9,7 @@ import * as featureFlagController from '../controllers/featureFlag.controller';
 import * as leadsAdminController from '../controllers/leads-admin.controller';
 import * as emailCampaignController from '../controllers/emailCampaign.controller';
 import * as opsController from '../controllers/ops.controller';
+import * as ticketController from '../controllers/ticket.controller';
 import { prisma } from '@db';
 import { logAudit } from '../services/audit.service';
 
@@ -138,3 +139,11 @@ adminRouter.get('/ops/clients/:companyId/access', opsController.listAccessEntrie
 adminRouter.post('/ops/clients/:companyId/access', opsController.addAccessEntry);
 adminRouter.patch('/ops/access/:id', opsController.updateAccessEntry);
 adminRouter.delete('/ops/access/:id', opsController.deleteAccessEntry);
+
+// Ticketing (TKT-2) — /tickets/stats must precede /tickets/:id
+adminRouter.get('/tickets', ticketController.listTickets);
+adminRouter.get('/tickets/stats', ticketController.getTicketStats);
+adminRouter.post('/tickets', ticketController.createTicket);
+adminRouter.get('/tickets/:id', ticketController.getTicket);
+adminRouter.patch('/tickets/:id', ticketController.updateTicket);
+adminRouter.post('/tickets/:id/messages', ticketController.addAdminMessage);
