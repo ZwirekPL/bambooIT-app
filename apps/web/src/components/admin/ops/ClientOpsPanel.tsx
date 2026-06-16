@@ -562,6 +562,7 @@ function BillingTab({
                       onClick={() => sendReport(p.id)}
                       disabled={reportBusy === p.id}
                       className={btnGhost}
+                      title="Wysyła klientowi e-mail z podsumowaniem miesiąca: wykorzystane godziny, lista wykonanych prac i ewentualne nadgodziny."
                     >
                       {reportBusy === p.id
                         ? '…'
@@ -575,6 +576,7 @@ function BillingTab({
                         onClick={() => settle(p.id)}
                         disabled={busy === p.id}
                         className={btnGhost}
+                        title="Oznacz okres jako rozliczony — po wystawieniu klientowi faktury za nadgodziny. To tylko status wewnętrzny, nie wysyła nic do klienta."
                       >
                         {busy === p.id ? '…' : 'Oznacz rozliczone'}
                       </button>
