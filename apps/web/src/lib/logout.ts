@@ -32,6 +32,13 @@ export async function performFullLogout(callbackUrl = '/') {
     document.cookie = 'idle_last_activity=; Path=/; SameSite=Lax; Max-Age=0';
   }
 
-  await signOut({ redirect: false });
+  // signOut() hits /api/auth/* — never let its failure (e.g. no origin in the
+  // test env, or a network blip) reject performFullLogout. We always proceed to
+  // the hard redirect, which clears the session regardless.
+  try {
+    await signOut({ redirect: false });
+  } catch {
+    /* ignore — fall through to hard redirect */
+  }
   window.location.href = callbackUrl;
 }

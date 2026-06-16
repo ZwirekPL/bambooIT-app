@@ -86,9 +86,9 @@ export async function apiFetch<T>(
       // e.g. "you were logged out because someone signed in elsewhere".
       const reason = errorCode === 'SESSION_SUPERSEDED' ? '?reason=superseded' : '';
       const loginPath = `/${locale}/zaloguj${reason}`;
-      import('./logout').then(({ performFullLogout }) => {
-        performFullLogout(loginPath);
-      }).catch(() => {
+      // Return the logout promise so any rejection chains into .catch() below
+      // instead of floating as an unhandled rejection (which fails CI test runs).
+      import('./logout').then(({ performFullLogout }) => performFullLogout(loginPath)).catch(() => {
         // Fallback: hard redirect
         window.location.href = loginPath;
       });
