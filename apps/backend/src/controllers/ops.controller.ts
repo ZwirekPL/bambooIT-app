@@ -276,6 +276,87 @@ export async function updateOnboarding(req: Request, res: Response, next: NextFu
   }
 }
 
+// ─── Access vault (admin) ─────────────────────────────────────────────────
+
+const accessEntryBody = z.object({
+  kind: z.enum(['REMOTE', 'SYSTEM', 'NETWORK', 'OTHER']),
+  label: z.string().min(1).max(120),
+  identifier: z.string().max(500).nullable().optional(),
+  secret: z.string().max(2000).nullable().optional(),
+  notes: z.string().max(5000).nullable().optional(),
+});
+const accessEntryPatch = accessEntryBody.partial();
+
+export async function listAccessEntries(req: Request, res: Response, next: NextFunction) {
+  const params = companyIdParam.safeParse(req.params);
+  if (!params.success) return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid company id'));
+  try {
+    const entries = await opsService.listAccessEntries(params.data.companyId);
+    return res.json({ ok: true, entries });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function addAccessEntry(req: Request, res: Response, next: NextFunction) {
+  const params = companyIdParam.safeParse(req.params);
+  const body = accessEntryBody.safeParse(req.body);
+  if (!params.success) return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid company id'));
+  if (!body.success) return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid access entry'));
+  try {
+    const entry = await opsService.createAccessEntry(params.data.companyId, body.data);
+    logAudit({
+      userId: req.user!.sub,
+      action: 'ACCESS_ENTRY_ADDED',
+      resourceType: 'ACCESS_ENTRY',
+      resourceId: entry.id,
+      ip: req.ip,
+      metadata: { companyId: params.data.companyId, label: entry.label },
+    });
+    return res.status(201).json({ ok: true, entry });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function updateAccessEntry(req: Request, res: Response, next: NextFunction) {
+  const params = idParam.safeParse(req.params);
+  const body = accessEntryPatch.safeParse(req.body);
+  if (!params.success) return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid id'));
+  if (!body.success) return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid patch'));
+  try {
+    const entry = await opsService.updateAccessEntry(params.data.id, body.data);
+    logAudit({
+      userId: req.user!.sub,
+      action: 'ACCESS_ENTRY_UPDATED',
+      resourceType: 'ACCESS_ENTRY',
+      resourceId: entry.id,
+      ip: req.ip,
+    });
+    return res.json({ ok: true, entry });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function deleteAccessEntry(req: Request, res: Response, next: NextFunction) {
+  const params = idParam.safeParse(req.params);
+  if (!params.success) return res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid id'));
+  try {
+    const entry = await opsService.deleteAccessEntry(params.data.id);
+    logAudit({
+      userId: req.user!.sub,
+      action: 'ACCESS_ENTRY_DELETED',
+      resourceType: 'ACCESS_ENTRY',
+      resourceId: entry.id,
+      ip: req.ip,
+    });
+    return res.json({ ok: true });
+  } catch (err) {
+    next(err);
+  }
+}
+
 // ─── Per-client hours (admin) ─────────────────────────────────────────────
 
 export async function getClientHours(req: Request, res: Response, next: NextFunction) {

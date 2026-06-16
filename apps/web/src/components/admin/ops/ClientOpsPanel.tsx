@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { api, ApiError } from '@/lib/api';
 import type {
+  AccessEntry,
+  AccessKind,
   OpsClientSummary,
   OpsHoursView,
   OpsOnboarding,
@@ -634,6 +636,7 @@ function OnboardingTab({
   }
 
   return (
+    <div className="space-y-6">
     <div className="max-w-xl space-y-4 rounded-xl border border-line bg-white p-5">
       <ul className="space-y-2">
         {ONBOARDING_STEPS.map((s) => {
@@ -670,6 +673,186 @@ function OnboardingTab({
             Ukończony {onboarding.completedAt.slice(0, 10)}
           </p>
         )}
+      </div>
+    </div>
+
+    <AccessVault companyId={companyId} />
+    </div>
+  );
+}
+
+// ─── Access vault (inside Onboarding) ─────────────────────────────────────
+
+const ACCESS_KIND_LABELS: Record<AccessKind, string> = {
+  REMOTE: 'Pomoc zdalna',
+  SYSTEM: 'System / aplikacja',
+  NETWORK: 'Sieć / sprzęt',
+  OTHER: 'Inne',
+};
+
+function AccessVault({ companyId }: { companyId: string }) {
+  const [entries, setEntries] = useState<AccessEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [revealed, setRevealed] = useState<Set<string>>(new Set());
+
+  const [kind, setKind] = useState<AccessKind>('REMOTE');
+  const [label, setLabel] = useState('');
+  const [identifier, setIdentifier] = useState('');
+  const [secret, setSecret] = useState('');
+  const [notes, setNotes] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const load = useCallback(async () => {
+    const r = await api.admin.ops.listAccess(companyId);
+    setEntries(r.entries);
+    setLoading(false);
+  }, [companyId]);
+
+  useEffect(() => {
+    load().catch(() => setLoading(false));
+  }, [load]);
+
+  async function add() {
+    if (!label.trim()) return;
+    setSaving(true);
+    try {
+      await api.admin.ops.addAccess(companyId, {
+        kind,
+        label: label.trim(),
+        identifier: identifier.trim() || null,
+        secret: secret || null,
+        notes: notes.trim() || null,
+      });
+      setLabel('');
+      setIdentifier('');
+      setSecret('');
+      setNotes('');
+      setKind('REMOTE');
+      await load();
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function remove(id: string) {
+    await api.admin.ops.deleteAccess(id);
+    await load();
+  }
+
+  function toggleReveal(id: string) {
+    setRevealed((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  return (
+    <div className="max-w-3xl space-y-4 rounded-xl border border-line bg-white p-5">
+      <div>
+        <h3 className="text-sm font-semibold text-navy-deep">Dostępy i połączenia</h3>
+        <p className="mt-1 text-xs text-navy-soft">
+          Wewnętrzny notatnik — dane do połączenia (AnyDesk / TeamViewer / RustDesk) i loginy do
+          systemów klienta. Hasła są szyfrowane w bazie. Widoczne tylko dla administratorów.
+        </p>
+      </div>
+
+      {loading ? (
+        <p className="text-sm text-navy-soft">Wczytywanie…</p>
+      ) : entries.length === 0 ? (
+        <p className="text-sm text-navy-soft">Brak zapisanych dostępów.</p>
+      ) : (
+        <ul className="divide-y divide-line rounded-lg border border-line">
+          {entries.map((e) => (
+            <li key={e.id} className="space-y-1 p-3">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="rounded bg-bamboo-deep/10 px-1.5 py-0.5 text-[10px] font-medium text-navy-deep">
+                    {ACCESS_KIND_LABELS[e.kind]}
+                  </span>
+                  <span className="text-sm font-medium text-navy-deep">{e.label}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => remove(e.id)}
+                  className="text-xs text-navy-soft hover:text-red-600"
+                >
+                  Usuń
+                </button>
+              </div>
+              {e.identifier && (
+                <p className="text-xs text-navy-soft">
+                  ID / login: <span className="font-mono text-navy-deep">{e.identifier}</span>
+                </p>
+              )}
+              {e.secret && (
+                <p className="flex items-center gap-2 text-xs text-navy-soft">
+                  Hasło:{' '}
+                  <span className="font-mono text-navy-deep">
+                    {revealed.has(e.id) ? e.secret : '••••••••'}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => toggleReveal(e.id)}
+                    className="text-bamboo-deep hover:underline"
+                  >
+                    {revealed.has(e.id) ? 'Ukryj' : 'Pokaż'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => navigator.clipboard?.writeText(e.secret ?? '')}
+                    className="text-bamboo-deep hover:underline"
+                  >
+                    Kopiuj
+                  </button>
+                </p>
+              )}
+              {e.notes && <p className="whitespace-pre-wrap text-xs text-navy-soft">{e.notes}</p>}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <div className="space-y-2 border-t border-line pt-4">
+        <div className="grid gap-2 sm:grid-cols-[160px_1fr]">
+          <select className={input} value={kind} onChange={(e) => setKind(e.target.value as AccessKind)}>
+            {(Object.keys(ACCESS_KIND_LABELS) as AccessKind[]).map((k) => (
+              <option key={k} value={k}>
+                {ACCESS_KIND_LABELS[k]}
+              </option>
+            ))}
+          </select>
+          <input
+            className={input}
+            placeholder="Nazwa (np. TeamViewer, Serwer NAS, Poczta admin)"
+            value={label}
+            onChange={(e) => setLabel(e.target.value)}
+          />
+        </div>
+        <div className="grid gap-2 sm:grid-cols-2">
+          <input
+            className={input}
+            placeholder="ID / login / adres"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+          />
+          <input
+            className={input}
+            placeholder="Hasło / kod sesji (szyfrowane)"
+            value={secret}
+            onChange={(e) => setSecret(e.target.value)}
+          />
+        </div>
+        <textarea
+          className={`${input} min-h-[60px]`}
+          placeholder="Notatki (opcjonalne)"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+        />
+        <button type="button" className={btnPrimary} onClick={add} disabled={saving || !label.trim()}>
+          {saving ? 'Zapisywanie…' : 'Dodaj dostęp'}
+        </button>
       </div>
     </div>
   );

@@ -52,6 +52,9 @@ export type AuditAction =
   | 'SERVICE_PERIOD_REPORT_SENT'
   | 'SERVICE_PLAN_SET'
   | 'ONBOARDING_UPDATED'
+  | 'ACCESS_ENTRY_ADDED'
+  | 'ACCESS_ENTRY_UPDATED'
+  | 'ACCESS_ENTRY_DELETED'
   | 'CREATE_POST'
   | 'EDIT_POST'
   | 'DELETE_POST'
@@ -187,6 +190,7 @@ export type AuditResourceType =
   | 'COMPANY'
   | 'TIME_ENTRY'
   | 'SERVICE_PERIOD'
+  | 'ACCESS_ENTRY'
   | 'AUDIT_LOG';
 
 interface LogAuditParams {

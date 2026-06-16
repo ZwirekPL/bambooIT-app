@@ -85,3 +85,17 @@ export interface OpsOnboarding {
   completedAt: string | null;
   notes: string | null;
 }
+
+export type AccessKind = 'REMOTE' | 'SYSTEM' | 'NETWORK' | 'OTHER';
+
+export interface AccessEntry {
+  id: string;
+  companyId: string;
+  kind: AccessKind;
+  label: string;
+  identifier: string | null;
+  secret: string | null;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}

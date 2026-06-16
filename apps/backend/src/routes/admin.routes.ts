@@ -135,3 +135,7 @@ adminRouter.delete('/ops/time-entries/:id', opsController.deleteTimeEntry);
 adminRouter.get('/ops/clients/:companyId/periods', opsController.listPeriods);
 adminRouter.patch('/ops/periods/:id/settle', opsController.settlePeriod);
 adminRouter.post('/ops/periods/:id/report', opsController.sendReport);
+adminRouter.get('/ops/clients/:companyId/access', opsController.listAccessEntries);
+adminRouter.post('/ops/clients/:companyId/access', opsController.addAccessEntry);
+adminRouter.patch('/ops/access/:id', opsController.updateAccessEntry);
+adminRouter.delete('/ops/access/:id', opsController.deleteAccessEntry);

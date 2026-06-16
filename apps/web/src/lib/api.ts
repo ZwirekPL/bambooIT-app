@@ -4,7 +4,7 @@
  * Server-only auth requests use API_URL env variable.
  */
 import type { Company, Order, ProductType, CheckoutProductType, Subscription, AdminStats, UserRole, User, AdminUser, AuditLog, BlogPost, BlogListItem, BlogCategoryConfig, AccessStatus, Testimonial, TestimonialWithUser, PublicTestimonial, NotificationPreferences, SubscriptionStats, SubscriptionItem, CompanyInvoice, Lead, LeadStatus, LeadType, LeadsStats, LeadsListResponse, EmailCampaign, EmailCampaignAudience, AudienceCounts } from '@/types/api';
-import type { Plan, ServicePackage, OpsClientSummary, OpsHoursView, OpsPeriod, OpsOnboarding, OpsTimeEntry } from '@/types/ops';
+import type { Plan, ServicePackage, OpsClientSummary, OpsHoursView, OpsPeriod, OpsOnboarding, OpsTimeEntry, AccessEntry, AccessKind } from '@/types/ops';
 import { getApiBaseUrl } from './api-url';
 
 /** Tracks whether a 401 auto-logout is already in progress to prevent multiple redirects */
@@ -462,6 +462,32 @@ export const api = {
           `/admin/ops/clients/${companyId}/onboarding`,
           { method: 'PATCH', body: JSON.stringify(data), token },
         ),
+      listAccess: (companyId: string, token?: string) =>
+        apiFetch<{ ok: boolean; entries: AccessEntry[] }>(
+          `/admin/ops/clients/${companyId}/access`,
+          { token },
+        ),
+      addAccess: (
+        companyId: string,
+        data: { kind: AccessKind; label: string; identifier?: string | null; secret?: string | null; notes?: string | null },
+        token?: string,
+      ) =>
+        apiFetch<{ ok: boolean; entry: AccessEntry }>(
+          `/admin/ops/clients/${companyId}/access`,
+          { method: 'POST', body: JSON.stringify(data), token },
+        ),
+      updateAccess: (
+        id: string,
+        data: Partial<{ kind: AccessKind; label: string; identifier: string | null; secret: string | null; notes: string | null }>,
+        token?: string,
+      ) =>
+        apiFetch<{ ok: boolean; entry: AccessEntry }>(`/admin/ops/access/${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify(data),
+          token,
+        }),
+      deleteAccess: (id: string, token?: string) =>
+        apiFetch<{ ok: boolean }>(`/admin/ops/access/${id}`, { method: 'DELETE', token }),
     },
     getStats: (token: string) =>
       apiFetch<{ ok: boolean; stats: AdminStats }>('/admin/stats', { token }),

@@ -1,5 +1,6 @@
 import { prisma, Prisma } from '@db';
 import { AppError } from '../utils/errors';
+import { encryptString, decryptString } from '../utils/encryption';
 
 /**
  * Operational core — hours ledger for the IT-support subscription.
@@ -429,4 +430,88 @@ export async function getCompanyIdForUser(userId: string) {
   });
   if (!company) throw new AppError(404, 'NO_COMPANY', 'No company linked to this account');
   return company.id;
+}
+
+// ─── Access vault (ADMIN-only; secret encrypted at rest) ──────────────────
+
+type AccessKind = 'REMOTE' | 'SYSTEM' | 'NETWORK' | 'OTHER';
+
+interface AccessEntryInput {
+  kind: AccessKind;
+  label: string;
+  identifier?: string | null;
+  secret?: string | null;
+  notes?: string | null;
+}
+
+type RawAccessEntry = {
+  id: string;
+  companyId: string;
+  kind: AccessKind;
+  label: string;
+  identifier: string | null;
+  secret: string | null;
+  notes: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+/** Decrypt the secret for presentation. Decrypt failures degrade to null. */
+function presentAccessEntry(e: RawAccessEntry) {
+  let secret: string | null = null;
+  if (e.secret) {
+    try {
+      secret = decryptString(e.secret);
+    } catch {
+      secret = null;
+    }
+  }
+  return { ...e, secret };
+}
+
+export async function listAccessEntries(companyId: string) {
+  const entries = await prisma.clientAccessEntry.findMany({
+    where: { companyId },
+    orderBy: { createdAt: 'asc' },
+  });
+  return entries.map(presentAccessEntry);
+}
+
+export async function createAccessEntry(companyId: string, input: AccessEntryInput) {
+  const entry = await prisma.clientAccessEntry.create({
+    data: {
+      companyId,
+      kind: input.kind,
+      label: input.label,
+      identifier: input.identifier ?? null,
+      secret: input.secret ? encryptString(input.secret) : null,
+      notes: input.notes ?? null,
+    },
+  });
+  return presentAccessEntry(entry);
+}
+
+export async function updateAccessEntry(id: string, patch: Partial<AccessEntryInput>) {
+  const existing = await prisma.clientAccessEntry.findUnique({ where: { id } });
+  if (!existing) throw new AppError(404, 'NOT_FOUND', 'Access entry not found');
+
+  const data: Prisma.ClientAccessEntryUpdateInput = {};
+  if (patch.kind !== undefined) data.kind = patch.kind;
+  if (patch.label !== undefined) data.label = patch.label;
+  if (patch.identifier !== undefined) data.identifier = patch.identifier;
+  if (patch.notes !== undefined) data.notes = patch.notes;
+  // secret: undefined = leave as-is; '' or null = clear; string = re-encrypt
+  if (patch.secret !== undefined) {
+    data.secret = patch.secret ? encryptString(patch.secret) : null;
+  }
+
+  const entry = await prisma.clientAccessEntry.update({ where: { id }, data });
+  return presentAccessEntry(entry);
+}
+
+export async function deleteAccessEntry(id: string) {
+  const existing = await prisma.clientAccessEntry.findUnique({ where: { id } });
+  if (!existing) throw new AppError(404, 'NOT_FOUND', 'Access entry not found');
+  await prisma.clientAccessEntry.delete({ where: { id } });
+  return existing;
 }
