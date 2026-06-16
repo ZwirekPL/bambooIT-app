@@ -1670,6 +1670,7 @@
         "INCOMPLETE": "Niedokończona"
       },
       "managePortalCta": "Zarządzaj w Stripe",
+      "hoursCta": "Twoje godziny wsparcia",
       "changePlanCta": "Zmień pakiet",
       "cancelNotice": "Subskrypcja zostanie anulowana {date}. Do tego dnia masz pełny dostęp do usługi.",
       "emptyTitle": "Nie masz aktywnej subskrypcji",
@@ -1679,6 +1680,29 @@
       "errorLoad": "Spróbuj odświeżyć stronę za chwilę.",
       "errorPortal": "Nie udało się otworzyć portalu Stripe. Spróbuj ponownie.",
       "mockModeNote": "Stripe nie jest skonfigurowany w tym środowisku — funkcja Zarządzaj w Stripe jest wyłączona."
+    },
+    "hours": {
+      "metaTitle": "Twoje godziny",
+      "eyebrow": "Panel klienta",
+      "title": "Twoje godziny wsparcia",
+      "subtitle": "Wykorzystanie godzin obsługi IT w wybranym miesiącu.",
+      "used": "Wykorzystano",
+      "available": "dostępne",
+      "included": "W pakiecie",
+      "carryover": "Przeniesione",
+      "overageHours": "Nadgodziny",
+      "overageAmount": "Do doliczenia",
+      "worklog": "Wykonane prace",
+      "noEntries": "Brak wpisów w tym miesiącu.",
+      "notBillable": "nieliczone",
+      "prev": "← poprzedni",
+      "next": "następny →",
+      "emptyTitle": "Brak aktywnego pakietu obsługi",
+      "emptyMessage": "Nie masz jeszcze uruchomionej obsługi IT. Skontaktuj się z nami albo wybierz pakiet, żeby zacząć.",
+      "emptyCta": "Zobacz pakiety",
+      "backToSubscription": "Subskrypcja i płatności",
+      "errorTitle": "Nie udało się wczytać danych",
+      "errorLoad": "Spróbuj odświeżyć stronę za chwilę."
     }
   },
   "checkout": {

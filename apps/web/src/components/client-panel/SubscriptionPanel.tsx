@@ -106,6 +106,11 @@ export function SubscriptionPanel() {
         >
           {t('emptyCta')}
         </Link>
+        <div className="mt-6">
+          <Link href="/panel/godziny" className="text-sm text-navy-soft hover:text-bamboo-deep">
+            {t('hoursCta')} →
+          </Link>
+        </div>
       </div>
     );
   }
@@ -129,6 +134,12 @@ export function SubscriptionPanel() {
         <h1 className="mt-2 font-display text-3xl font-light leading-tight tracking-[-0.02em] text-navy md:text-4xl">
           {t('title')}
         </h1>
+        <Link
+          href="/panel/godziny"
+          className="mt-3 inline-block text-sm text-navy-soft hover:text-bamboo-deep"
+        >
+          {t('hoursCta')} →
+        </Link>
       </header>
 
       <div className="rounded-3xl border border-line bg-white p-8 md:p-10">
