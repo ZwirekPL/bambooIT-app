@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
+import { api } from '@/lib/api';
 import { performFullLogout } from '@/lib/logout';
 import { LayoutDashboard, Users, Building2, ScrollText, LogOut, PanelLeft, BookOpen, MessageSquareQuote, Apple, ChefHat, ShieldCheck, ClipboardList, Settings, Link2, Unlink, Cpu, Shield, Phone, CreditCard, Calculator, Repeat, Mail, Activity, Inbox, Ticket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -46,11 +47,13 @@ function NavLink({
   labelKey,
   icon: Icon,
   onClick,
+  badge,
 }: {
   href: string;
   labelKey: string;
   icon: React.ElementType;
   onClick?: () => void;
+  badge?: number;
 }) {
   const t = useTranslations('admin');
   const pathname = usePathname();
@@ -71,12 +74,25 @@ function NavLink({
       )}
     >
       <Icon className="h-4 w-4 shrink-0" />
-      {t(labelKey)}
+      <span className="flex-1">{t(labelKey)}</span>
+      {badge !== undefined && badge > 0 && (
+        <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-bamboo-deep px-1.5 text-xs font-semibold text-navy-deep">
+          {badge}
+        </span>
+      )}
     </Link>
   );
 }
 
-function SidebarContent({ email, onLinkClick }: { email: string; onLinkClick?: () => void }) {
+function SidebarContent({
+  email,
+  onLinkClick,
+  ticketCount,
+}: {
+  email: string;
+  onLinkClick?: () => void;
+  ticketCount: number;
+}) {
   const t = useTranslations('admin');
 
   return (
@@ -101,6 +117,7 @@ function SidebarContent({ email, onLinkClick }: { email: string; onLinkClick?: (
             labelKey={labelKey}
             icon={icon}
             onClick={onLinkClick}
+            badge={href === '/admin/zgloszenia' ? ticketCount : undefined}
           />
         ))}
       </nav>
@@ -122,13 +139,33 @@ function SidebarContent({ email, onLinkClick }: { email: string; onLinkClick?: (
 
 export function AdminSidebar({ email }: AdminSidebarProps) {
   const [open, setOpen] = useState(false);
+  const [ticketCount, setTicketCount] = useState(0);
   const t = useTranslations('admin');
+
+  // Open-ticket badge. Refreshed on mount and on a light interval so a ticket
+  // that lands while the admin sits on another page still bumps the count.
+  useEffect(() => {
+    let cancelled = false;
+    const fetchCount = () =>
+      api.admin.tickets
+        .stats('')
+        .then((r) => {
+          if (!cancelled) setTicketCount(r.stats.open);
+        })
+        .catch(() => {});
+    fetchCount();
+    const id = setInterval(fetchCount, 60_000);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, []);
 
   return (
     <>
       {/* Desktop sidebar */}
       <aside className="hidden md:flex w-60 shrink-0 flex-col border-r border-line bg-white">
-        <SidebarContent email={email} />
+        <SidebarContent email={email} ticketCount={ticketCount} />
       </aside>
 
       {/* Mobile top bar */}
@@ -143,7 +180,11 @@ export function AdminSidebar({ email }: AdminSidebarProps) {
             <SheetHeader className="sr-only">
               <SheetTitle>{BRAND.shortName}</SheetTitle>
             </SheetHeader>
-            <SidebarContent email={email} onLinkClick={() => setOpen(false)} />
+            <SidebarContent
+              email={email}
+              ticketCount={ticketCount}
+              onLinkClick={() => setOpen(false)}
+            />
           </SheetContent>
         </Sheet>
       </div>
