@@ -3,13 +3,14 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { Menu, LogOut, ChevronDown, UserRound } from 'lucide-react';
+import { Menu, LogOut, ChevronDown, UserRound, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { LocaleSwitcher } from './LocaleSwitcher';
@@ -21,6 +22,19 @@ import { performFullLogout } from '@/lib/logout';
 function getDashboardHref(role?: string): string {
   if (role === 'ADMIN') return '/admin';
   return '/';
+}
+
+// Build 1-2 letter initials for the account avatar. Prefers the two words of a
+// display name ("Jan Kowalski" → "JK"); falls back to the first two characters
+// of a single token / email local-part.
+function getInitials(name?: string | null, email?: string | null): string {
+  const source = (name || email || '').trim();
+  if (!source) return '?';
+  const words = source.split(/\s+/).filter(Boolean);
+  if (words.length >= 2) {
+    return (words[0][0] + words[1][0]).toUpperCase();
+  }
+  return source.slice(0, 2).toUpperCase();
 }
 
 // Anchor-based links scroll to homepage sections; route-based links go to
@@ -67,7 +81,13 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const { data: session, status } = useSession();
   const isLoggedIn = status === 'authenticated';
-  const panelHref = getDashboardHref(session?.user?.role);
+  const role = session?.user?.role;
+  const panelHref = getDashboardHref(role);
+  const isClient = role === 'CLIENT';
+  const displayName = session?.user?.name || session?.user?.email || '';
+  const email = session?.user?.email ?? '';
+  const initials = getInitials(session?.user?.name, email);
+  const roleLabel = role === 'ADMIN' ? t('roleAdmin') : t('roleClient');
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -122,20 +142,52 @@ export function Header() {
         {/* Desktop right cluster — auth + locale + CTA */}
         <div className="hidden lg:flex items-center gap-3">
           {isLoggedIn ? (
-            <>
-              <Button asChild variant="ghost" size="sm">
-                <Link href={panelHref}>{t('dashboard')}</Link>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => performFullLogout('/')}
-                className="gap-1.5"
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger
+                className="group inline-flex items-center gap-2 rounded-full border border-navy-deep/15 py-1.5 pl-1.5 pr-3 text-sm font-semibold text-navy-deep outline-none transition-all hover:border-bamboo-deep hover:bg-bamboo/10 data-[state=open]:border-bamboo-deep data-[state=open]:bg-bamboo/10"
+                aria-label={t('account')}
               >
-                <LogOut className="h-4 w-4" />
-                {t('logout')}
-              </Button>
-            </>
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-bamboo text-xs font-bold text-navy-deep">
+                  {initials}
+                </span>
+                <span className="max-w-[10rem] truncate">{displayName}</span>
+                <ChevronDown
+                  className="h-3.5 w-3.5 text-navy-soft transition-transform group-data-[state=open]:rotate-180"
+                  aria-hidden="true"
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-60">
+                <div className="px-2 py-1.5">
+                  <p className="truncate text-sm font-semibold text-navy-deep">{displayName}</p>
+                  <p className="truncate text-xs text-navy-soft">
+                    {email} · {roleLabel}
+                  </p>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href={panelHref} className="cursor-pointer gap-2">
+                    <LayoutDashboard className="h-4 w-4" />
+                    {t('dashboard')}
+                  </Link>
+                </DropdownMenuItem>
+                {isClient && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/panel/profil" className="cursor-pointer gap-2">
+                      <UserRound className="h-4 w-4" />
+                      {t('profile')}
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => performFullLogout('/')}
+                  className="cursor-pointer gap-2 text-red-600 focus:bg-red-50 focus:text-red-700"
+                >
+                  <LogOut className="h-4 w-4" />
+                  {t('logout')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <Link
               href="/zaloguj"
@@ -146,12 +198,14 @@ export function Header() {
             </Link>
           )}
           <LocaleSwitcher />
-          <Link
-            href="/audyt"
-            className="inline-flex items-center gap-2 rounded-full bg-bamboo px-5 py-2.5 text-sm font-semibold text-navy-deep transition-all hover:bg-white hover:-translate-y-0.5"
-          >
-            {t('ctaAudit')}
-          </Link>
+          {!isLoggedIn && (
+            <Link
+              href="/audyt"
+              className="inline-flex items-center gap-2 rounded-full bg-bamboo px-5 py-2.5 text-sm font-semibold text-navy-deep transition-all hover:bg-white hover:-translate-y-0.5"
+            >
+              {t('ctaAudit')}
+            </Link>
+          )}
         </div>
 
         {/* Mobile menu */}
@@ -204,6 +258,17 @@ export function Header() {
                 <div className="mt-6 flex flex-col gap-3 pt-6 border-t border-navy-soft">
                   {isLoggedIn ? (
                     <>
+                      <div className="flex items-center gap-3 px-1 pb-1">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-bamboo text-sm font-bold text-navy-deep">
+                          {initials}
+                        </span>
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold text-white">{displayName}</p>
+                          <p className="truncate text-xs text-white/60">
+                            {email} · {roleLabel}
+                          </p>
+                        </div>
+                      </div>
                       <Button
                         asChild
                         size="default"
@@ -213,10 +278,23 @@ export function Header() {
                           {t('dashboard')}
                         </Link>
                       </Button>
+                      {isClient && (
+                        <Button
+                          asChild
+                          variant="ghost"
+                          size="default"
+                          className="w-full justify-start gap-1.5 text-white hover:bg-transparent hover:text-bamboo"
+                        >
+                          <Link href="/panel/profil" onClick={() => setOpen(false)}>
+                            <UserRound className="h-4 w-4" />
+                            {t('profile')}
+                          </Link>
+                        </Button>
+                      )}
                       <Button
                         variant="ghost"
                         size="default"
-                        className="w-full gap-1.5 justify-start text-white hover:text-bamboo hover:bg-transparent"
+                        className="w-full justify-start gap-1.5 text-red-300 hover:bg-transparent hover:text-red-200"
                         onClick={() => {
                           setOpen(false);
                           performFullLogout('/');
