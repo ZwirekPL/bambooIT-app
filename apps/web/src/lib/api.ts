@@ -5,6 +5,17 @@
  */
 import type { Company, Order, ProductType, CheckoutProductType, Subscription, AdminStats, UserRole, User, AdminUser, AuditLog, BlogPost, BlogListItem, BlogCategoryConfig, AccessStatus, Testimonial, TestimonialWithUser, PublicTestimonial, NotificationPreferences, SubscriptionStats, SubscriptionItem, CompanyInvoice, Lead, LeadStatus, LeadType, LeadsStats, LeadsListResponse, EmailCampaign, EmailCampaignAudience, AudienceCounts } from '@/types/api';
 import type { Plan, ServicePackage, OpsClientSummary, OpsHoursView, OpsPeriod, OpsOnboarding, OpsTimeEntry, AccessEntry, AccessKind } from '@/types/ops';
+import type {
+  MyTicketSummary,
+  MyTicketDetail,
+  AdminTicketRow,
+  AdminTicketDetail,
+  TicketMessage,
+  TicketStats,
+  TicketStatus,
+  TicketPriority,
+  TicketChannel,
+} from '@/types/tickets';
 import { getApiBaseUrl } from './api-url';
 
 /** Tracks whether a 401 auto-logout is already in progress to prevent multiple redirects */
@@ -189,6 +200,29 @@ export const api = {
         { token },
       );
     },
+  },
+  tickets: {
+    listMy: (status?: TicketStatus, token?: string) => {
+      const q = status ? `?status=${status}` : '';
+      return apiFetch<{ ok: boolean; tickets: MyTicketSummary[] }>(`/tickets/my${q}`, { token });
+    },
+    create: (
+      data: { title: string; body: string; priority?: TicketPriority; category?: string | null },
+      token?: string,
+    ) =>
+      apiFetch<{ ok: boolean; ticket: MyTicketDetail }>('/tickets/my', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        token,
+      }),
+    getMy: (id: string, token?: string) =>
+      apiFetch<{ ok: boolean; ticket: MyTicketDetail }>(`/tickets/my/${id}`, { token }),
+    addMessage: (id: string, body: string, token?: string) =>
+      apiFetch<{ ok: boolean; message: TicketMessage }>(`/tickets/my/${id}/messages`, {
+        method: 'POST',
+        body: JSON.stringify({ body }),
+        token,
+      }),
   },
   profile: {
     getCompany: (token?: string) =>
@@ -419,7 +453,7 @@ export const api = {
       },
       addTimeEntry: (
         companyId: string,
-        data: { date: string; minutes: number; description: string; billable?: boolean },
+        data: { date: string; minutes: number; description: string; billable?: boolean; ticketId?: string | null },
         token?: string,
       ) =>
         apiFetch<{ ok: boolean; entry: OpsTimeEntry }>(
@@ -488,6 +522,82 @@ export const api = {
         }),
       deleteAccess: (id: string, token?: string) =>
         apiFetch<{ ok: boolean }>(`/admin/ops/access/${id}`, { method: 'DELETE', token }),
+    },
+    tickets: {
+      list: (
+        params?: {
+          status?: TicketStatus;
+          priority?: TicketPriority;
+          companyId?: string;
+          assigneeId?: string;
+          slaBreached?: boolean;
+          page?: number;
+          pageSize?: number;
+        },
+        token?: string,
+      ) => {
+        const qs = new URLSearchParams();
+        if (params?.status) qs.set('status', params.status);
+        if (params?.priority) qs.set('priority', params.priority);
+        if (params?.companyId) qs.set('companyId', params.companyId);
+        if (params?.assigneeId) qs.set('assigneeId', params.assigneeId);
+        if (params?.slaBreached) qs.set('slaBreached', 'true');
+        if (params?.page) qs.set('page', String(params.page));
+        if (params?.pageSize) qs.set('pageSize', String(params.pageSize));
+        const q = qs.toString();
+        return apiFetch<{
+          ok: boolean;
+          tickets: AdminTicketRow[];
+          total: number;
+          page: number;
+          pageSize: number;
+        }>(`/admin/tickets${q ? `?${q}` : ''}`, { token });
+      },
+      stats: (token?: string) =>
+        apiFetch<{ ok: boolean; stats: TicketStats }>('/admin/tickets/stats', { token }),
+      get: (id: string, token?: string) =>
+        apiFetch<{ ok: boolean; ticket: AdminTicketDetail }>(`/admin/tickets/${id}`, { token }),
+      create: (
+        data: {
+          companyId: string;
+          title: string;
+          body: string;
+          priority?: TicketPriority;
+          category?: string | null;
+          channel?: Extract<TicketChannel, 'PHONE' | 'MANUAL'>;
+        },
+        token?: string,
+      ) =>
+        apiFetch<{ ok: boolean; ticket: AdminTicketDetail }>('/admin/tickets', {
+          method: 'POST',
+          body: JSON.stringify(data),
+          token,
+        }),
+      patch: (
+        id: string,
+        data: Partial<{
+          status: TicketStatus;
+          priority: TicketPriority;
+          category: string | null;
+          assigneeId: string | null;
+        }>,
+        token?: string,
+      ) =>
+        apiFetch<{ ok: boolean; ticket: AdminTicketDetail }>(`/admin/tickets/${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify(data),
+          token,
+        }),
+      addMessage: (
+        id: string,
+        data: { body: string; internal?: boolean },
+        token?: string,
+      ) =>
+        apiFetch<{ ok: boolean; message: TicketMessage }>(`/admin/tickets/${id}/messages`, {
+          method: 'POST',
+          body: JSON.stringify(data),
+          token,
+        }),
     },
     getStats: (token: string) =>
       apiFetch<{ ok: boolean; stats: AdminStats }>('/admin/stats', { token }),
