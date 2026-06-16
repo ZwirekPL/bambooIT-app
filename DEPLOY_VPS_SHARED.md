@@ -42,6 +42,54 @@ sudo ss -ltnp '( sport = :3001 or sport = :4001 )'   # powinno nic nie zwrócić
 
 ---
 
+## 0.5 ⚠️ Bezpieczeństwo e-dietetyka — przeczytaj przed `up`
+
+bambooIT współdzieli host z **produkcyjnym** e-dietetykiem. Te zasady trzymają go
+nietkniętym. Każdy krok niżej jest **addytywny** — nic nie modyfikuje kontenerów,
+sieci, wolumenów ani bazy e-dietetyka.
+
+**A) RAM — największe ryzyko (OOM-killer).** bambooIT to ~2,2 GB limitów
+(postgres 512M + backend 1G + web 512M + redis 192M). Jeśli na hoście braknie
+RAM, kernel może ubić **dowolny** kontener — w tym e-dietetyka. **Sprawdź zapas
+PRZED `up`:**
+```bash
+free -h            # ile wolnego RAM + czy jest swap
+docker stats --no-stream   # ile zżera e-dietetyk teraz
+```
+Jeśli wolnego < ~2,5 GB i brak swapu → **NIE odpalaj `up`**, najpierw dodaj swap:
+```bash
+sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+```
+
+**B) Porty.** bambooIT publikuje tylko `127.0.0.1:3001/4001` (loopback) — potwierdź,
+że są wolne (krok 0). Postgres/Redis bambooIT **nie publikują** portów hosta → zero
+kolizji.
+
+**C) Edycja `/opt/dietetyk/nginx/prod.conf` (jedyny dotyk pliku e-dietetyka).**
+ZAWSZE:
+```bash
+sudo cp /opt/dietetyk/nginx/prod.conf /opt/dietetyk/nginx/prod.conf.bak   # backup PRZED edycją
+# ...dopisz blok bambooit...
+docker exec dietetyk_nginx nginx -t        # JEŚLI BŁĄD → NIE reloaduj, przywróć .bak:
+#   sudo cp /opt/dietetyk/nginx/prod.conf.bak /opt/dietetyk/nginx/prod.conf
+docker exec dietetyk_nginx nginx -s reload # graceful — e-dietetyk bez przerwy
+```
+Reload bez `nginx -t` = ZAKAZANE. Błędny config z reloadem ubiłby też e-dietetyka.
+
+**D) Sieć `dietetyk_default`** jest w naszym compose jako `external: true` — compose
+**nigdy jej nie tworzy ani nie kasuje**, tylko dopina do niej `bambooit_web`
+(addytywnie). `docker compose down` jej nie ruszy.
+
+**E) Nigdy `docker compose down -v`** (skasowałoby wolumeny). Nigdy
+`docker system prune -a` (zdjęłoby obrazy e-dietetyka). deploy.yml używa tylko
+`docker image prune -f` = wyłącznie obrazy-sieroty (nieużywane), bezpieczne.
+
+**F) Migracje** dotyczą wyłącznie `bambooit_postgres` (osobny kontener/baza) —
+nie ma fizycznej drogi do bazy e-dietetyka.
+
+---
+
 ## 1. DNS (panel aftermarket.hosting — tam są nameservery bambooit.pl)
 
 Dodaj rekordy A na IP VPS:
