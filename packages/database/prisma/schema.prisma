@@ -535,4 +535,39 @@ model Lead {
   @@index([email])
   @@index([type, status])
 }
+
+enum EmailCampaignStatus {
+  DRAFT
+  SENDING
+  SENT
+  FAILED
+}
+
+enum EmailCampaignAudience {
+  ALL_CLIENTS
+  LEADS
+  TEST
+}
+
+/// Admin-composed bulk emails (newsletter, satysfakcja, renewal reminders,
+/// onboarding). Fanned out via the shared email transport (mock-safe in dev).
+/// MVP: compose + audience segment + send. No scheduling/tracking — see
+/// PLAN_U6_EMAIL_KAMPANIE.md.
+model EmailCampaign {
+  id             String                @id @default(cuid())
+  subject        String
+  body           String                @db.Text
+  audience       EmailCampaignAudience
+  status         EmailCampaignStatus   @default(DRAFT)
+  recipientCount Int                   @default(0)
+  sentCount      Int                   @default(0)
+  failedCount    Int                   @default(0)
+  createdById    String?
+  sentAt         DateTime?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
 
