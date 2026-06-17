@@ -67,12 +67,12 @@ export function CookieBanner() {
   return (
     <>
       {visible && (
-        <div className="fixed inset-x-0 bottom-0 z-50 p-4 sm:p-6">
-          <div className="mx-auto max-w-2xl rounded-2xl border border-line-strong bg-white/95 p-5 shadow-2xl backdrop-blur-md sm:p-6">
-            <div className="flex items-start gap-3">
-              <Cookie className="mt-0.5 h-5 w-5 shrink-0 text-bamboo-deep" aria-hidden="true" />
-              <div className="flex-1 space-y-3">
-                <p className="text-sm leading-relaxed text-navy-soft">
+        <div className="fixed inset-x-0 bottom-0 z-50 p-2 sm:p-6">
+          <div className="mx-auto max-w-2xl rounded-xl border border-line-strong bg-white/95 p-3.5 shadow-2xl backdrop-blur-md sm:rounded-2xl sm:p-6">
+            <div className="flex items-start gap-2.5 sm:gap-3">
+              <Cookie className="mt-0.5 h-4 w-4 shrink-0 text-bamboo-deep sm:h-5 sm:w-5" aria-hidden="true" />
+              <div className="flex-1 space-y-2.5 sm:space-y-3">
+                <p className="text-xs leading-relaxed text-navy-soft sm:text-sm">
                   {t('message')}{' '}
                   <Link
                     href="/dokumenty-prawne?tab=cookies"
@@ -81,25 +81,25 @@ export function CookieBanner() {
                     {t('learnMore')}
                   </Link>
                 </p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5 sm:gap-2">
                   <button
                     type="button"
                     onClick={handleAcceptAll}
-                    className="inline-flex items-center rounded-full bg-bamboo px-5 py-2 text-sm font-semibold text-navy-deep transition-all hover:-translate-y-0.5 hover:bg-bamboo-deep"
+                    className="inline-flex items-center rounded-full bg-bamboo px-4 py-1.5 text-xs font-semibold text-navy-deep transition-all hover:-translate-y-0.5 hover:bg-bamboo-deep sm:px-5 sm:py-2 sm:text-sm"
                   >
                     {t('acceptAll')}
                   </button>
                   <button
                     type="button"
                     onClick={handleEssentialOnly}
-                    className="inline-flex items-center rounded-full border border-line-strong bg-white px-5 py-2 text-sm font-medium text-navy transition-colors hover:border-navy-soft"
+                    className="inline-flex items-center rounded-full border border-line-strong bg-white px-4 py-1.5 text-xs font-medium text-navy transition-colors hover:border-navy-soft sm:px-5 sm:py-2 sm:text-sm"
                   >
                     {t('essentialOnly')}
                   </button>
                   <button
                     type="button"
                     onClick={() => setSettingsOpen(true)}
-                    className="inline-flex items-center rounded-full px-4 py-2 text-sm font-medium text-navy-soft transition-colors hover:text-navy"
+                    className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium text-navy-soft transition-colors hover:text-navy sm:px-4 sm:py-2 sm:text-sm"
                   >
                     {t('customize')}
                   </button>
