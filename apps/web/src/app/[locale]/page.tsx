@@ -1,8 +1,7 @@
-import { setRequestLocale, getTranslations } from 'next-intl/server';
+import { setRequestLocale } from 'next-intl/server';
 import { HeroSection } from '@/components/marketing/HeroSection';
 import { MarqueeBar } from '@/components/marketing/MarqueeBar';
 import { OfferSection } from '@/components/marketing/OfferSection';
-import { NarrativeSection } from '@/components/marketing/NarrativeSection';
 import { ManifestoSection } from '@/components/marketing/ManifestoSection';
 import { HorizontalServicesSection } from '@/components/marketing/HorizontalServicesSection';
 import { PricingTiersSection } from '@/components/marketing/PricingTiersSection';
@@ -47,7 +46,6 @@ function organizationLd() {
 export default async function HomePage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const tn = await getTranslations('home.narratives');
 
   return (
     <>
@@ -59,15 +57,11 @@ export default async function HomePage({ params }: Props) {
       <HeroSection />
       <MarqueeBar />
       <OfferSection />
-      <NarrativeSection variant="navy">{tn('beforeNumbers')}</NarrativeSection>
       <ManifestoSection />
-      <NarrativeSection variant="bamboo">{tn('andNowWhat')}</NarrativeSection>
       <HorizontalServicesSection />
-      <NarrativeSection variant="paper">{tn('choosePackage')}</NarrativeSection>
       <PricingTiersSection />
       <ProcessSection />
       <IndustriesSection />
-      <NarrativeSection variant="navy">{tn('oneStepAway')}</NarrativeSection>
       <AuditFormSection />
       <FAQSection />
       <FinalCTASection />
