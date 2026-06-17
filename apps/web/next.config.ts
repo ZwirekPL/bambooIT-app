@@ -36,6 +36,10 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ['192.168.*.*', '172.*.*.*', '10.*.*.*'],
   async headers() {
     const isProd = process.env.NODE_ENV === 'production';
+    // Pre-launch guard: emit a hard noindex on every response until
+    // SITE_INDEXABLE=true. Strongest of the three layers (robots.ts +
+    // root-layout metadata are the others) — applies to non-HTML too.
+    const indexable = process.env.SITE_INDEXABLE === 'true';
 
     // Content Security Policy — covers Stripe, Sentry, NextAuth, Next.js dev tools.
     // Starts in REPORT-ONLY mode in production: violations are logged but not
@@ -64,6 +68,7 @@ const nextConfig: NextConfig = {
       {
         source: '/(.*)',
         headers: [
+          ...(indexable ? [] : [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }]),
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'X-Frame-Options', value: 'DENY' },

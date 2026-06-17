@@ -20,6 +20,13 @@ const PROTECTED_PATHS = [
 export default function robots(): MetadataRoute.Robots {
   const baseUrl = `https://${BRAND.domain}`;
 
+  // Pre-launch: block all crawling until SITE_INDEXABLE=true is set.
+  if (process.env.SITE_INDEXABLE !== 'true') {
+    return {
+      rules: { userAgent: '*', disallow: '/' },
+    };
+  }
+
   return {
     rules: [
       // Default rule for all crawlers
