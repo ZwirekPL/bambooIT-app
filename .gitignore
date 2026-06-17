@@ -43,3 +43,6 @@ backups/
 
 # Solver baseline perf results (machine-specific timings, regenerable)
 apps/solver/tests/baseline_perf_results.json
+
+# Local dev credentials (never commit)
+DEV_CREDENTIALS.md

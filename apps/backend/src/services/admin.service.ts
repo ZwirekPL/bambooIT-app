@@ -2,11 +2,15 @@ import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { prisma, Prisma } from '@db';
 import { AppError } from '../utils/errors';
-import { sendEmailVerificationEmail } from '../utils/email';
+import { sendEmailVerificationEmail, sendClientInviteEmail } from '../utils/email';
 
 function sha256(value: string): string {
   return crypto.createHash('sha256').update(value).digest('hex');
 }
+
+// Admin-created clients get a longer window than a normal 1h password reset —
+// they may open the invite days after the account is set up.
+const INVITE_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 export type UserRole = 'ADMIN' | 'CLIENT';
 
@@ -194,12 +198,36 @@ export async function createUser({ email, password, firstName, lastName }: Creat
     data: { userId: user.id, contactFirstName: firstName, contactLastName: lastName },
   });
 
+  // When the admin doesn't set a password, the client can't log in yet. Send an
+  // invite to set their own password (reuses the reset-password token + page).
+  let invited = false;
+  if (!password) {
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = sha256(rawToken);
+    const expiresAt = new Date(Date.now() + INVITE_TOKEN_TTL_MS);
+
+    await prisma.passwordResetToken.create({
+      data: { userId: user.id, tokenHash, expiresAt },
+    });
+
+    const inviteUrl = `${process.env.APP_URL}/pl/resetuj-haslo?token=${rawToken}`;
+    try {
+      await sendClientInviteEmail(user.email, inviteUrl);
+      invited = true;
+    } catch (err) {
+      // Don't fail account creation if email transport hiccups — the token is
+      // already stored; the admin can re-trigger via force-password-reset.
+      console.error('[admin] Failed to send client invite email:', err);
+    }
+  }
+
   return {
     userId: user.id,
     email: user.email,
     role: user.role,
     firstName: firstName ?? null,
     lastName: lastName ?? null,
+    invited,
   };
 }
 

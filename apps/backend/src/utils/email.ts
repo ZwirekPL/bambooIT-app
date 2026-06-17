@@ -278,6 +278,41 @@ Zespół ${BRAND_NAME}`;
   await send(to, subject, text, html);
 }
 
+// ─── Client invite (admin-created account) ────────────────────────────────────
+
+/**
+ * Sent when an admin creates a client account without a password. The link
+ * points to the set-password page (reuses the reset-password flow). Longer
+ * expiry than a normal reset because the client may open it days later.
+ */
+export async function sendClientInviteEmail(to: string, inviteUrl: string): Promise<void> {
+  const subject = `Twój dostęp do panelu ${BRAND_NAME}`;
+  const text = `Witaj!
+
+Zespół ${BRAND_NAME} założył dla Ciebie konto w panelu klienta.
+
+Aby dokończyć aktywację, ustaw swoje hasło, klikając poniższy link (link wygasa po 7 dniach):
+${inviteUrl}
+
+Po ustawieniu hasła zalogujesz się tym adresem email.
+
+Pozdrawiamy,
+Remigiusz + Wirgiliusz
+${BRAND_NAME}`;
+
+  const html = emailLayout({
+    heading: `Witaj w ${BRAND_NAME}!`,
+    bodyHtml: `<p>Zespół ${BRAND_NAME} założył dla Ciebie konto w panelu klienta.</p>
+      <p>Aby dokończyć aktywację, ustaw swoje hasło — kliknij przycisk poniżej. Link wygasa po <strong>7 dniach</strong>. Po ustawieniu hasła zalogujesz się tym adresem email.</p>`,
+    cta: { label: 'Ustaw hasło', url: inviteUrl },
+    footnoteHtml: `Jeśli przycisk nie działa, skopiuj ten link do przeglądarki:<br/>
+      <span style="color:${NAVY_DEEP};word-break:break-all;">${inviteUrl}</span><br/><br/>
+      Jeśli nie spodziewałeś się tej wiadomości, zignoruj ją lub napisz na <a href="mailto:${SUPPORT_EMAIL}" style="color:${NAVY_DEEP};">${SUPPORT_EMAIL}</a>.`,
+  });
+
+  await send(to, subject, text, html);
+}
+
 // ─── Subscription cancellation confirmation ───────────────────────────────────
 
 export async function sendSubscriptionCancelEmail(

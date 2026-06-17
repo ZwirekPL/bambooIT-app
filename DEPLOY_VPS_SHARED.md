@@ -77,6 +77,26 @@ docker exec dietetyk_nginx nginx -s reload # graceful — e-dietetyk bez przerwy
 ```
 Reload bez `nginx -t` = ZAKAZANE. Błędny config z reloadem ubiłby też e-dietetyka.
 
+> ⚠️ **PUŁAPKA INODE (kosztowała nas awarię stylów na pierwszym deployu).**
+> `prod.conf` jest montowany do kontenera jako **POJEDYNCZY PLIK**
+> (`/opt/dietetyk/nginx/prod.conf → /etc/nginx/conf.d/default.conf`). `sed -i`
+> i `cp` **podmieniają inode** (zapis temp + rename) → kontener po cichu odpina
+> się od pliku: `nginx -s reload` czyta stary, osierocony inode, a `tail prod.conf`
+> pokazuje już nową treść. Objaw: „zmiany nie wchodzą", reload nic nie daje.
+> Bezpiecznie:
+> - dopisywanie tylko przez `>>` (zachowuje inode), albo
+> - po każdym `sed -i`/`cp`: `docker restart dietetyk_nginx` (Docker przepina mount
+>   na aktualny inode; e-dietetyk wraca w ~2 s — **waliduj config PRZED restartem**,
+>   bo zły config zatrzyma też e-dietetyka).
+> Walidacja bez dotykania żywego kontenera (na sieci, żeby nazwy upstreamów się
+> rozwiązały):
+> ```bash
+> docker run --rm --network dietetyk_default \
+>   -v /opt/dietetyk/nginx/prod.conf:/etc/nginx/conf.d/default.conf:ro \
+>   -v /etc/letsencrypt:/etc/letsencrypt:ro \
+>   nginx:alpine nginx -t
+> ```
+
 **D) Sieć `dietetyk_default`** jest w naszym compose jako `external: true` — compose
 **nigdy jej nie tworzy ani nie kasuje**, tylko dopina do niej `bambooit_web`
 (addytywnie). `docker compose down` jej nie ruszy.
@@ -211,10 +231,11 @@ curl -sI http://bambooit.pl | head -1        # → HTTP/1.1 200 (lub 307 z Next.
 
 ### 6b. Pobranie certu Let's Encrypt (webroot — tak jak e-dietetyk)
 ```bash
-# Jeśli certbot jest na hoście:
-sudo certbot certonly --webroot -w /var/www/certbot -d bambooit.pl -d www.bambooit.pl
-# Jeśli e-dietetyk używa kontenera certbota — daj znać nazwę, podam wariant.
-# Cert ląduje w /etc/letsencrypt (zamontowane do dietetyk_nginx).
+# certbot jest na hoście (2.9.0). Tylko apex — `www` dodaj DOPIERO gdy ma rekord A
+# wskazujący na VPS (inaczej cały cert padnie). Tak zrobione na prod 2026-06-17:
+sudo certbot certonly --webroot -w /var/www/certbot -d bambooit.pl \
+  --non-interactive --agree-tos -m <email> --no-eff-email
+# Cert ląduje w /etc/letsencrypt (zamontowane do dietetyk_nginx), auto-renew gotowe.
 ```
 
 ### 6c. Faza B — włącz HTTPS
@@ -224,9 +245,15 @@ W `/opt/dietetyk/nginx/prod.conf` w dopisanym bloku bambooit.pl:
    `location / { return 301 https://bambooit.pl$request_uri; }`
    (zostaw `location /.well-known/acme-challenge/` dla odnawiania certu).
 ```bash
-docker exec dietetyk_nginx nginx -t
-docker exec dietetyk_nginx nginx -s reload
-curl -sI https://bambooit.pl | head -1        # → HTTP/2 200
+# Jeśli edytowałeś przez sed -i / cp → reload NIE wystarczy (inode!, patrz pkt C).
+# Waliduj na sieci, potem RESTART (nie reload):
+docker run --rm --network dietetyk_default \
+  -v /opt/dietetyk/nginx/prod.conf:/etc/nginx/conf.d/default.conf:ro \
+  -v /etc/letsencrypt:/etc/letsencrypt:ro \
+  nginx:alpine nginx -t                      # syntax ok → bezpieczny restart
+docker restart dietetyk_nginx
+curl -skI --resolve bambooit.pl:443:127.0.0.1 https://bambooit.pl/ | head -1  # → HTTP/2 307
+curl -skI --resolve e-dietetyk.com:443:127.0.0.1 https://e-dietetyk.com/ | head -1  # e-dietetyk żyje
 ```
 
 > **Uwaga:** `/opt/dietetyk/nginx/prod.conf` należy do e-dietetyka — przy jego

@@ -239,16 +239,10 @@ export interface AuditLog {
 
 // ─── Plan Quality & Soft Validations (Faza 74) ─────────────────────────────
 
-// ─── Notification Preferences (19.2) ────────────────────────────────────────
+// ─── Notification Preferences ───────────────────────────────────────────────
 
 export interface NotificationPreferences {
   emailReminders: boolean;
-  breakfastTime: string | null;
-  lunchTime: string | null;
-  dinnerTime: string | null;
-  snackTime: string | null;
-  reminderLeadMinutes: number;
-  weeklySummary: boolean;
   timezone: string;
 }
 
