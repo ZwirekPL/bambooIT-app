@@ -67,9 +67,6 @@ adminRouter.delete('/feature-flags/:id', featureFlagController.remove);
 // App Settings (29.0)
 adminRouter.get('/settings', adminController.getSettings);
 adminRouter.patch('/settings', adminController.patchSettings);
-adminRouter.get('/settings/scoring-weights', adminController.getScoringWeights);
-adminRouter.patch('/settings/scoring-weights', adminController.patchScoringWeights);
-adminRouter.delete('/settings/scoring-weights', adminController.resetScoringWeights);
 
 // 39.7: Security Monitoring — ADMIN only
 adminRouter.get('/security/stats', adminController.getSecurityStats);

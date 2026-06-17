@@ -31,11 +31,7 @@ const INDUSTRY_OPTIONS = [
 ] as const;
 type IndustryValue = (typeof INDUSTRY_OPTIONS)[number];
 
-interface RegisterFormProps {
-  initialReferralCode?: string;
-}
-
-export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
+export function RegisterForm() {
   const t = useTranslations('auth');
   const deviceFingerprint = useDeviceFingerprint();
   const searchParams = useSearchParams();
@@ -46,8 +42,8 @@ export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successEmail, setSuccessEmail] = useState<string | null>(null);
-  const [consentHealth, setConsentHealth] = useState(false);
-  const [consentAi, setConsentAi] = useState(false);
+  const [consentTerms, setConsentTerms] = useState(false);
+  const [consentPrivacy, setConsentPrivacy] = useState(false);
   const [consentEmail, setConsentEmail] = useState(false);
   const [showConsentErrors, setShowConsentErrors] = useState(false);
 
@@ -67,7 +63,6 @@ export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
     const phone = (form.elements.namedItem('phone') as HTMLInputElement).value.trim();
     const employeesCountRaw = (form.elements.namedItem('employeesCount') as HTMLInputElement).value.trim();
     const website = (form.elements.namedItem('website') as HTMLInputElement).value.trim() || undefined;
-    const referralCode = (form.elements.namedItem('referralCode') as HTMLInputElement).value.trim() || undefined;
 
     const hasLetter = /[a-zA-Z]/.test(password);
     const hasDigit = /[0-9]/.test(password);
@@ -98,7 +93,7 @@ export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
       return;
     }
 
-    if (!consentHealth || !consentAi) {
+    if (!consentTerms || !consentPrivacy) {
       setShowConsentErrors(true);
       setError(t('errorConsentsRequired'));
       return;
@@ -120,10 +115,9 @@ export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
         phone,
         employeesCount,
         website,
-        referralCode,
         consents: {
-          healthDataProcessing: consentHealth,
-          aiDisclaimer: consentAi,
+          termsAccepted: consentTerms,
+          privacyPolicy: consentPrivacy,
           emailNotifications: consentEmail,
         },
         deviceFingerprint: deviceFingerprint ?? undefined,
@@ -380,47 +374,31 @@ export function RegisterForm({ initialReferralCode }: RegisterFormProps) {
         </div>
       </div>
 
-      {/* Referral code */}
-      <div className="space-y-2">
-        <Label htmlFor="referralCode">{t('referralCodeLabel')}</Label>
-        <Input
-          id="referralCode"
-          name="referralCode"
-          type="text"
-          placeholder={t('referralCodePlaceholder')}
-          autoComplete="off"
-          className="h-11 uppercase"
-          maxLength={20}
-          defaultValue={initialReferralCode}
-        />
-        <p className="text-xs text-navy-soft">{t('referralCodeHint')}</p>
-      </div>
-
       {/* Consents */}
       <div className="space-y-3 rounded-2xl border border-line bg-paper p-4">
         <p className="text-xs font-medium text-navy-soft uppercase tracking-wide">{t('consentsTitle')}</p>
 
-        <label className={`flex items-start gap-3 cursor-pointer rounded-md p-2 -m-2 transition-colors ${showConsentErrors && !consentHealth ? 'bg-red-50 ring-1 ring-red-300' : ''}`}>
+        <label className={`flex items-start gap-3 cursor-pointer rounded-md p-2 -m-2 transition-colors ${showConsentErrors && !consentTerms ? 'bg-red-50 ring-1 ring-red-300' : ''}`}>
           <input
             type="checkbox"
-            checked={consentHealth}
-            onChange={(e) => setConsentHealth(e.target.checked)}
-            className={`mt-0.5 h-4 w-4 rounded shrink-0 ${showConsentErrors && !consentHealth ? 'border-red-400 accent-red-500' : 'border-input accent-bamboo-deep'}`}
+            checked={consentTerms}
+            onChange={(e) => setConsentTerms(e.target.checked)}
+            className={`mt-0.5 h-4 w-4 rounded shrink-0 ${showConsentErrors && !consentTerms ? 'border-red-400 accent-red-500' : 'border-input accent-bamboo-deep'}`}
           />
-          <span className={`text-sm leading-snug ${showConsentErrors && !consentHealth ? 'text-red-700' : 'text-navy-deep'}`}>
-            {t('consentHealthData')} <span className="text-red-600">*</span>
+          <span className={`text-sm leading-snug ${showConsentErrors && !consentTerms ? 'text-red-700' : 'text-navy-deep'}`}>
+            {t('consentTerms')} <span className="text-red-600">*</span>
           </span>
         </label>
 
-        <label className={`flex items-start gap-3 cursor-pointer rounded-md p-2 -m-2 transition-colors ${showConsentErrors && !consentAi ? 'bg-red-50 ring-1 ring-red-300' : ''}`}>
+        <label className={`flex items-start gap-3 cursor-pointer rounded-md p-2 -m-2 transition-colors ${showConsentErrors && !consentPrivacy ? 'bg-red-50 ring-1 ring-red-300' : ''}`}>
           <input
             type="checkbox"
-            checked={consentAi}
-            onChange={(e) => setConsentAi(e.target.checked)}
-            className={`mt-0.5 h-4 w-4 rounded shrink-0 ${showConsentErrors && !consentAi ? 'border-red-400 accent-red-500' : 'border-input accent-bamboo-deep'}`}
+            checked={consentPrivacy}
+            onChange={(e) => setConsentPrivacy(e.target.checked)}
+            className={`mt-0.5 h-4 w-4 rounded shrink-0 ${showConsentErrors && !consentPrivacy ? 'border-red-400 accent-red-500' : 'border-input accent-bamboo-deep'}`}
           />
-          <span className={`text-sm leading-snug ${showConsentErrors && !consentAi ? 'text-red-700' : 'text-navy-deep'}`}>
-            {t('consentAiDisclaimer')} <span className="text-red-600">*</span>
+          <span className={`text-sm leading-snug ${showConsentErrors && !consentPrivacy ? 'text-red-700' : 'text-navy-deep'}`}>
+            {t('consentPrivacyPolicy')} <span className="text-red-600">*</span>
           </span>
         </label>
 

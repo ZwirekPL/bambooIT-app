@@ -2,7 +2,6 @@ import { prisma } from '@db';
 import { AppError } from '../utils/errors';
 import { isStripeConfigured, createCheckoutSession as stripeCheckout } from './stripe.service';
 import type { ProductType, CheckoutProductType } from './order.service';
-import { getReferralDiscount, markReferralRedeemed, applyReferralOnRegistration } from './referral.service';
 import { hasUserUsedTrial } from './trialFingerprint.service';
 
 const APP_URL = process.env.APP_URL ?? 'http://localhost:3000';
@@ -26,7 +25,6 @@ export async function createSession(
   userId: string,
   email: string,
   productType: CheckoutProductType,
-  referralCode?: string,
 ) {
   // Resolve Stripe price ID
   const envKey = PRICE_ENV_MAP[productType];
@@ -66,18 +64,6 @@ export async function createSession(
 
   const mode = 'subscription';
 
-  // Apply referral code if provided at checkout (and not already applied at registration)
-  if (referralCode) {
-    try {
-      await applyReferralOnRegistration(referralCode, userId);
-    } catch {
-      // Silently ignore — invalid code or already applied
-    }
-  }
-
-  // Check for referral discount
-  const discountPercent = await getReferralDiscount(userId);
-
   const url = await stripeCheckout({
     priceId: priceId ?? 'price_mock',
     successUrl: `${BASE_URL}/zamowienie/sukces?product=${productType}&order=${order.id}`,
@@ -85,14 +71,8 @@ export async function createSession(
     customerEmail: email,
     metadata: { productType, userId, orderId: order.id },
     mode,
-    discountPercent: discountPercent > 0 ? discountPercent : undefined,
     trialPeriodDays: productType === 'TRIAL' ? TRIAL_PERIOD_DAYS : undefined,
   });
-
-  // Mark referral as redeemed if discount was applied
-  if (discountPercent > 0) {
-    await markReferralRedeemed(userId, order.id);
-  }
 
   return { url, orderId: order.id };
 }

@@ -50,60 +50,6 @@ export const SETTING_STRIPE_FEE_PERCENT = 'stripe_fee_percent';
 export const SETTING_STRIPE_FEE_FIXED_PLN = 'stripe_fee_fixed_pln';
 export const SETTING_USD_TO_PLN_RATE = 'usd_to_pln_rate';
 
-/** Scoring weights (76a) */
-export const SETTING_SCORING_WEIGHTS = 'scoring_weights';
-
-export interface ScoringWeights {
-  nutritionFit: number;
-  quality: number;
-  cuisine: number;
-  season: number;
-  diversity: number;
-  cost: number; // kept for backwards compat (ignored in scoring)
-  microFit: number;
-  practicalFit: number;
-  satietyProxy: number;
-  interaction: number;
-  compliance: number;
-}
-
-export const DEFAULT_SCORING_WEIGHTS: ScoringWeights = {
-  nutritionFit: 0.32,
-  quality: 0.08,
-  cuisine: 0.07,
-  season: 0.05,
-  diversity: 0.07,
-  cost: 0,
-  microFit: 0.11,
-  practicalFit: 0.07,
-  satietyProxy: 0.05,
-  interaction: 0.05,
-  compliance: 0.05,
-};
-
-/** All weight keys in order. */
-export const SCORING_WEIGHT_KEYS = Object.keys(DEFAULT_SCORING_WEIGHTS) as (keyof ScoringWeights)[];
-
-/**
- * Get scoring weights from AppSettings, merged with defaults.
- * Optionally applies a per-call override (kept generic for bambooIT;
- * was named `dietitianOverride` in the e-dietetyk era).
- */
-export async function getScoringWeights(
-  override?: Partial<ScoringWeights> | null,
-): Promise<ScoringWeights> {
-  const stored = await getSetting<Partial<ScoringWeights>>(SETTING_SCORING_WEIGHTS, {});
-  const merged = { ...DEFAULT_SCORING_WEIGHTS, ...stored };
-  if (override) {
-    for (const key of SCORING_WEIGHT_KEYS) {
-      if (override[key] !== undefined) {
-        merged[key] = override[key]!;
-      }
-    }
-  }
-  return merged;
-}
-
 export interface VatConfig {
   vatEnabled: boolean;
   vatRate: number;

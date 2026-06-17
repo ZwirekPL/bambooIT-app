@@ -64,8 +64,6 @@ model User {
   emailVerificationTokens EmailVerificationToken[]
   testimonial             Testimonial?
   notificationPreferences NotificationPreferences?
-  referralCode            ReferralCode?
-  referralUsagesAsReferred ReferralUsage[]         @relation("ReferredUser")
   consents                UserConsent[]
   // Protocol relations (28.1)
   trialFingerprints       TrialFingerprint[]
@@ -522,26 +520,16 @@ model Testimonial {
   @@index([isPinned])
 }
 
-// ─── Notification Preferences (19.2) ──────────────────────────────────────────
+// ─── Notification Preferences ─────────────────────────────────────────────────
+// Generic per-user email notification settings. Legacy meal-reminder fields
+// were dropped — bambooIT only needs a global opt-in + timezone.
 
 model NotificationPreferences {
   id     String @id @default(cuid())
   userId String @unique
 
-  // Email reminders toggle
+  // Global email notifications opt-in (service updates, reports)
   emailReminders Boolean @default(false)
-
-  // Meal times (HH:MM format, e.g. "08:00")
-  breakfastTime String? // default null = no reminder
-  lunchTime     String? // default null = no reminder
-  dinnerTime    String? // default null = no reminder
-  snackTime     String? // default null = no reminder
-
-  // Reminder lead time in minutes (how long before meal to send reminder)
-  reminderLeadMinutes Int @default(30)
-
-  // Weekly summary email
-  weeklySummary Boolean @default(true)
 
   // Timezone (IANA, e.g. "Europe/Warsaw")
   timezone String @default("Europe/Warsaw")
@@ -552,36 +540,7 @@ model NotificationPreferences {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model ReferralCode {
-  id              String   @id @default(cuid())
-  userId          String   @unique
-  code            String   @unique @db.VarChar(20)
-  discountPercent Int      @default(20)
-  createdAt       DateTime @default(now())
-
-  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  usages ReferralUsage[]
-}
-
-model ReferralUsage {
-  id             String   @id @default(cuid())
-  referralCodeId String
-  referredUserId String
-  orderId        String?
-  createdAt      DateTime @default(now())
-
-  referralCode ReferralCode @relation(fields: [referralCodeId], references: [id], onDelete: Cascade)
-  referredUser User         @relation("ReferredUser", fields: [referredUserId], references: [id], onDelete: Cascade)
-
-  @@unique([referralCodeId, referredUserId])
-  @@index([referralCodeId])
-  @@index([referredUserId])
-}
-
-
 enum ConsentType {
-  HEALTH_DATA_PROCESSING
-  AI_DISCLAIMER
   EMAIL_NOTIFICATIONS
   TERMS_ACCEPTANCE
   PRIVACY_POLICY

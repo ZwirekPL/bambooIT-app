@@ -1,5 +1,5 @@
 /**
- * Typed API client for the e-dietetyk.com backend (port 4000).
+ * Typed API client for the bambooIT backend.
  * Uses NEXT_PUBLIC_API_URL (client + server) for all requests.
  * Server-only auth requests use API_URL env variable.
  */
@@ -117,10 +117,9 @@ export const api = {
       phone: string;
       employeesCount?: number;
       website?: string;
-      referralCode?: string;
       consents: {
-        healthDataProcessing: boolean;
-        aiDisclaimer: boolean;
+        termsAccepted: boolean;
+        privacyPolicy: boolean;
         emailNotifications: boolean;
       };
       deviceFingerprint?: string;
@@ -300,7 +299,7 @@ export const api = {
   },
   checkout: {
     createSession: (
-      data: { productType: CheckoutProductType; referralCode?: string },
+      data: { productType: CheckoutProductType },
       token?: string
     ) =>
       apiFetch<{ ok: boolean; url: string }>('/checkout/create-session', {
@@ -926,36 +925,6 @@ export const api = {
         token,
       }),
   },
-  referrals: {
-    getMy: (token: string) =>
-      apiFetch<{
-        ok: boolean;
-        referral: {
-          id: string;
-          code: string;
-          discountPercent: number;
-          usageCount: number;
-          createdAt: string;
-        };
-      }>('/referrals/my', { token }),
-    getAdminStats: (token: string) =>
-      apiFetch<{
-        ok: boolean;
-        stats: {
-          totalCodes: number;
-          totalUsages: number;
-          totalRedeemed: number;
-          conversionRate: number;
-          topReferrers: Array<{
-            userId: string;
-            email: string;
-            code: string;
-            usageCount: number;
-          }>;
-        };
-      }>('/referrals/admin/stats', { token }),
-  },
-
   // ── Measurements (79.3) ──────────────────────────────────────────────────
 
   // ── Supplements (79.6) ──────────────────────────────────────────────────

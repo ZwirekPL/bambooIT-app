@@ -6,8 +6,6 @@ import * as consentService from '../services/consent.service';
 import { logAudit } from '../services/audit.service';
 
 const consentTypeSchema = z.enum([
-  'HEALTH_DATA_PROCESSING',
-  'AI_DISCLAIMER',
   'EMAIL_NOTIFICATIONS',
   'TERMS_ACCEPTANCE',
   'PRIVACY_POLICY',

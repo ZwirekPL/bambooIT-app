@@ -25,16 +25,6 @@ import type { AuditLog } from '@/types/api';
 const ACTION_LABELS: Record<string, string> = {
   LOGIN: 'Logowanie',
   LOGOUT: 'Wylogowanie',
-  VIEW_INTERVIEW: 'Podgląd wywiadu',
-  CREATE_INTERVIEW: 'Utworzenie wywiadu',
-  GENERATE_PLAN: 'Generowanie planu',
-  VIEW_PLAN: 'Podgląd planu',
-  APPROVE_PLAN: 'Zatwierdzenie planu',
-  SEND_PLAN: 'Wysłanie planu',
-  PUBLISH_PLAN: 'Publikacja planu',
-  EDIT_PLAN: 'Edycja planu',
-  EXPORT_PLAN: 'Eksport planu',
-  CREATE_MANUAL_PLAN: 'Ręczne tworzenie planu',
   DELETE_USER: 'Usunięcie użytkownika',
   RESTORE_USER: 'Przywrócenie użytkownika',
   CHANGE_USER_ROLE: 'Zmiana roli',
@@ -43,11 +33,14 @@ const ACTION_LABELS: Record<string, string> = {
   PASSWORD_CHANGE: 'Zmiana hasła',
   EMAIL_VERIFIED: 'Weryfikacja email',
   EMAIL_CHANGE: 'Zmiana email',
+  RESEND_VERIFICATION: 'Ponowna weryfikacja',
   ADMIN_VERIFY_EMAIL: 'Admin: weryfikacja email',
   ADMIN_RESEND_VERIFICATION: 'Admin: ponowna weryfikacja',
   ADMIN_FORCE_PASSWORD_RESET: 'Admin: reset hasła',
   BULK_USER_ACTION: 'Operacja masowa',
   REVOKE_USER_SESSIONS: 'Unieważnienie sesji',
+  CONSENT_GRANTED: 'Udzielenie zgody',
+  CONSENT_REVOKED: 'Cofnięcie zgody',
   SUBSCRIPTION_CHECKOUT_STARTED: 'Rozpoczęcie płatności',
   SUBSCRIPTION_PORTAL_ACCESSED: 'Dostęp do portalu',
   STRIPE_CHECKOUT_COMPLETED: 'Płatność zakończona',
@@ -61,46 +54,11 @@ const ACTION_LABELS: Record<string, string> = {
   CREATE_POST: 'Utworzenie wpisu',
   EDIT_POST: 'Edycja wpisu',
   DELETE_POST: 'Usunięcie wpisu',
-  CREATE_RECIPE: 'Utworzenie przepisu',
-  UPDATE_RECIPE: 'Aktualizacja przepisu',
-  DELETE_RECIPE: 'Usunięcie przepisu',
-  BULK_UPDATE_RECIPES: 'Masowa edycja przepisów',
-  MERGE_RECIPES: 'Scalanie przepisów',
-  CREATE_CLEAN_PRODUCT: 'Utworzenie produktu',
-  UPDATE_CLEAN_PRODUCT: 'Aktualizacja produktu',
-  DELETE_CLEAN_PRODUCT: 'Usunięcie produktu',
-  BULK_UPDATE_CLEAN_PRODUCTS: 'Masowa edycja produktów',
-  CREATE_PROTOCOL: 'Utworzenie protokołu',
-  UPDATE_PROTOCOL: 'Aktualizacja protokołu',
-  TOGGLE_PROTOCOL: 'Zmiana statusu protokołu',
-  ASSIGN_PROTOCOL: 'Przypisanie protokołu',
-  UNASSIGN_PROTOCOL: 'Odpisanie protokołu',
-  PROTOCOL_AUTO_MATCHED: 'Auto-dopasowanie protokołu',
-  PROTOCOL_CONFLICT_DETECTED: 'Wykryty konflikt protokołów',
-  CREATE_PROTOCOL_TRIGGER: 'Utworzenie mapowania',
-  UPDATE_PROTOCOL_TRIGGER: 'Aktualizacja mapowania',
-  DELETE_PROTOCOL_TRIGGER: 'Usunięcie mapowania',
-  CREATE_PROTOCOL_CONFLICT: 'Utworzenie konfliktu',
-  UPDATE_PROTOCOL_CONFLICT: 'Aktualizacja konfliktu',
-  DELETE_PROTOCOL_CONFLICT: 'Usunięcie konfliktu',
-  AI_GENERATION_ENQUEUED: 'Generowanie AI zlecone',
-  AI_REPAIR_ENQUEUED: 'Naprawa AI zlecona',
-  AI_PARTIAL_REGEN_ENQUEUED: 'Częściowa regeneracja AI',
-  REGENERATE_PARTIAL: 'Regeneracja częściowa',
-  RED_FLAG_TRIGGERED: 'Red flag wyzwolony',
-  GENERATION_BLOCKED: 'Generowanie zablokowane',
-  CREATE_CHECKIN: 'Check-in',
-  CHECKIN_ADAPTATION: 'Adaptacja z check-inu',
   CREATE_TESTIMONIAL: 'Dodanie opinii',
   DELETE_TESTIMONIAL: 'Usunięcie opinii',
   APPROVE_TESTIMONIAL: 'Zatwierdzenie opinii',
   REJECT_TESTIMONIAL: 'Odrzucenie opinii',
-  REQUEST_MEAL_SWAP: 'Żądanie zamiany posiłku',
-  CONFIRM_MEAL_SWAP: 'Potwierdzenie zamiany',
   CREATE_NOTE: 'Utworzenie notatki',
-  REFERRAL_CODE_GENERATED: 'Wygenerowanie kodu polecającego',
-  REFERRAL_USED: 'Użycie kodu polecającego',
-  REFERRAL_DISCOUNT_APPLIED: 'Zastosowanie rabatu',
   UNLOCK_ACCOUNT: 'Odblokowanie konta',
   DELETE_OWN_ACCOUNT: 'Usunięcie własnego konta',
   LOGIN_FAILED: 'Nieudane logowanie',
@@ -110,24 +68,15 @@ const ACTION_LABELS: Record<string, string> = {
 const RESOURCE_LABELS: Record<string, string> = {
   USER: 'Użytkownik',
   CLIENT: 'Klient',
-  INTERVIEW: 'Wywiad',
-  DIET_PLAN: 'Plan diety',
-  TENANT: 'Tenant',
+  COMPANY: 'Firma',
   SUBSCRIPTION: 'Subskrypcja',
   POST: 'Wpis blogowy',
-  FOOD_PRODUCT: 'Produkt spożywczy',
-  RECIPE: 'Przepis',
-  CLEAN_PRODUCT: 'Produkt',
   ORDER: 'Zamówienie',
-  CHECKIN: 'Check-in',
   TESTIMONIAL: 'Opinia',
-  MEAL_SWAP: 'Zamiana posiłku',
-  REFERRAL: 'Polecenie',
-  NUTRITION_PROTOCOL: 'Protokół żywieniowy',
-  PROTOCOL_TRIGGER: 'Mapowanie protokołu',
-  PROTOCOL_CONFLICT: 'Konflikt protokołów',
+  CONSENT: 'Zgoda',
+  LEAD: 'Lead',
+  TICKET: 'Zgłoszenie',
   FEATURE_FLAG: 'Feature flag',
-  DIET_TEMPLATE: 'Szablon diety',
 };
 
 // ── Action severity for coloring ──────────────────────────────────────────
@@ -135,11 +84,12 @@ const RESOURCE_LABELS: Record<string, string> = {
 type Severity = 'critical' | 'warning' | 'normal';
 
 function getActionSeverity(action: string): Severity {
-  if (action.startsWith('DELETE_') || action === 'GENERATION_BLOCKED' || action === 'RED_FLAG_TRIGGERED' ||
+  if (action.startsWith('DELETE_') ||
       action === 'ACCOUNT_LOCKED' || action === 'LOGIN_FAILED') return 'critical';
   if (action.startsWith('EXPORT_') || action.startsWith('BULK_') || action === 'CHANGE_USER_ROLE' ||
       action === 'STRIPE_INVOICE_PAYMENT_FAILED' || action === 'STRIPE_REFUND' ||
-      action === 'REVOKE_USER_SESSIONS' || action === 'ADMIN_FORCE_PASSWORD_RESET') return 'warning';
+      action === 'REVOKE_USER_SESSIONS' || action === 'ADMIN_FORCE_PASSWORD_RESET' ||
+      action === 'CONSENT_REVOKED') return 'warning';
   return 'normal';
 }
 
@@ -152,15 +102,12 @@ const SEVERITY_CLASSES: Record<Severity, string> = {
 // ── Grouped actions for dropdown ──────────────────────────────────────────
 
 const ACTION_GROUPS: Array<{ label: string; actions: string[] }> = [
-  { label: 'Auth', actions: ['LOGIN', 'LOGOUT', 'LOGIN_FAILED', 'ACCOUNT_LOCKED', 'PASSWORD_RESET', 'PASSWORD_CHANGE', 'EMAIL_VERIFIED', 'EMAIL_CHANGE'] },
-  { label: 'Plany diety', actions: ['GENERATE_PLAN', 'VIEW_PLAN', 'APPROVE_PLAN', 'SEND_PLAN', 'PUBLISH_PLAN', 'EDIT_PLAN', 'EXPORT_PLAN', 'CREATE_MANUAL_PLAN', 'AI_GENERATION_ENQUEUED', 'AI_REPAIR_ENQUEUED', 'AI_PARTIAL_REGEN_ENQUEUED', 'REGENERATE_PARTIAL', 'RED_FLAG_TRIGGERED', 'GENERATION_BLOCKED'] },
-  { label: 'Klienci', actions: ['CREATE_INTERVIEW', 'VIEW_INTERVIEW', 'CREATE_CHECKIN', 'CHECKIN_ADAPTATION', 'REQUEST_MEAL_SWAP', 'CONFIRM_MEAL_SWAP'] },
+  { label: 'Auth', actions: ['LOGIN', 'LOGOUT', 'LOGIN_FAILED', 'ACCOUNT_LOCKED', 'PASSWORD_RESET', 'PASSWORD_CHANGE', 'EMAIL_VERIFIED', 'EMAIL_CHANGE', 'RESEND_VERIFICATION'] },
   { label: 'Użytkownicy', actions: ['CREATE_USER', 'DELETE_USER', 'RESTORE_USER', 'CHANGE_USER_ROLE', 'ADMIN_VERIFY_EMAIL', 'ADMIN_RESEND_VERIFICATION', 'ADMIN_FORCE_PASSWORD_RESET', 'BULK_USER_ACTION', 'REVOKE_USER_SESSIONS', 'DELETE_OWN_ACCOUNT', 'UNLOCK_ACCOUNT'] },
+  { label: 'Zgody', actions: ['CONSENT_GRANTED', 'CONSENT_REVOKED'] },
   { label: 'Stripe', actions: ['CHECKOUT_STARTED', 'CHECKOUT_COMPLETED', 'SUBSCRIPTION_CHECKOUT_STARTED', 'SUBSCRIPTION_PORTAL_ACCESSED', 'STRIPE_CHECKOUT_COMPLETED', 'STRIPE_INVOICE_PAID', 'STRIPE_SUBSCRIPTION_DELETED', 'STRIPE_SUBSCRIPTION_UPDATED', 'STRIPE_INVOICE_PAYMENT_FAILED', 'STRIPE_REFUND'] },
-  { label: 'Przepisy & Produkty', actions: ['CREATE_RECIPE', 'UPDATE_RECIPE', 'DELETE_RECIPE', 'BULK_UPDATE_RECIPES', 'MERGE_RECIPES', 'CREATE_CLEAN_PRODUCT', 'UPDATE_CLEAN_PRODUCT', 'DELETE_CLEAN_PRODUCT', 'BULK_UPDATE_CLEAN_PRODUCTS'] },
-  { label: 'Protokoły', actions: ['CREATE_PROTOCOL', 'UPDATE_PROTOCOL', 'TOGGLE_PROTOCOL', 'ASSIGN_PROTOCOL', 'UNASSIGN_PROTOCOL', 'PROTOCOL_AUTO_MATCHED', 'PROTOCOL_CONFLICT_DETECTED', 'CREATE_PROTOCOL_TRIGGER', 'UPDATE_PROTOCOL_TRIGGER', 'DELETE_PROTOCOL_TRIGGER', 'CREATE_PROTOCOL_CONFLICT', 'UPDATE_PROTOCOL_CONFLICT', 'DELETE_PROTOCOL_CONFLICT'] },
   { label: 'Blog & Opinie', actions: ['CREATE_POST', 'EDIT_POST', 'DELETE_POST', 'CREATE_TESTIMONIAL', 'DELETE_TESTIMONIAL', 'APPROVE_TESTIMONIAL', 'REJECT_TESTIMONIAL'] },
-  { label: 'Inne', actions: ['CREATE_NOTE', 'REFERRAL_CODE_GENERATED', 'REFERRAL_USED', 'REFERRAL_DISCOUNT_APPLIED'] },
+  { label: 'Inne', actions: ['CREATE_NOTE'] },
 ];
 
 const ALL_RESOURCE_TYPES = Object.keys(RESOURCE_LABELS);

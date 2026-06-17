@@ -22,18 +22,6 @@ const STYLES: Record<string, CategoryStyle> = {
   'Automatyzacje':       { bg: 'bg-purple-100',  text: 'text-purple-700'  },
   'Strony i aplikacje':  { bg: 'bg-emerald-100', text: 'text-emerald-700' },
   'Branże':              { bg: 'bg-stone-100',   text: 'text-stone-700'   },
-
-  // legacy DietetykDEV aliases — visual fallback for old DB rows before BE-1 migration
-  'Porady dietetyczne':  { bg: 'bg-slate-100',   text: 'text-slate-700'   },
-  'Porady':              { bg: 'bg-slate-100',   text: 'text-slate-700'   },
-  'Odchudzanie':         { bg: 'bg-slate-100',   text: 'text-slate-700'   },
-  'Zdrowie i choroby':   { bg: 'bg-red-100',     text: 'text-red-700'     },
-  'Zdrowie':             { bg: 'bg-red-100',     text: 'text-red-700'     },
-  'Przepisy':            { bg: 'bg-slate-100',   text: 'text-slate-700'   },
-  'AI i dietetyka':      { bg: 'bg-purple-100',  text: 'text-purple-700'  },
-  'Motywacja':           { bg: 'bg-slate-100',   text: 'text-slate-700'   },
-  'Subskrypcja':         { bg: 'bg-slate-100',   text: 'text-slate-700'   },
-  'Thermomix & Airfryer':{ bg: 'bg-amber-100',   text: 'text-amber-700'   },
 };
 
 export function getCategoryStyle(category: string): CategoryStyle {

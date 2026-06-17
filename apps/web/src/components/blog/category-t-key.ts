@@ -11,13 +11,9 @@ export type CategoryTKey =
   | 'catBranze';
 
 /**
- * Maps Polish category values (canonical bambooIT + legacy DietetykDEV)
- * to their blog translation keys. Legacy entries route old DB rows to
- * the closest semantic bambooIT category until BE-1 ships a one-time
- * Post.category migration.
+ * Maps Polish category values to their blog translation keys.
  */
 export const CATEGORY_T_KEY: Record<string, CategoryTKey> = {
-  // canonical bambooIT (matches BLOG_CATEGORY_LIST)
   'Obsługa IT':          'catObslugaIt',
   'Cyberbezpieczeństwo': 'catCyberbezpieczenstwo',
   'Backup':              'catBackup',
@@ -26,15 +22,4 @@ export const CATEGORY_T_KEY: Record<string, CategoryTKey> = {
   'Automatyzacje':       'catAutomatyzacje',
   'Strony i aplikacje':  'catStronyAplikacje',
   'Branże':              'catBranze',
-  // legacy DietetykDEV aliases (route to nearest bambooIT bucket)
-  'Porady dietetyczne':  'catObslugaIt',
-  'Porady':              'catObslugaIt',
-  'Odchudzanie':         'catObslugaIt',
-  'Zdrowie i choroby':   'catCyberbezpieczenstwo',
-  'Zdrowie':             'catCyberbezpieczenstwo',
-  'Przepisy':            'catObslugaIt',
-  'AI i dietetyka':      'catAutomatyzacje',
-  'Motywacja':           'catObslugaIt',
-  'Subskrypcja':         'catObslugaIt',
-  'Thermomix & Airfryer':'catSprzetSieci',
 };

@@ -2,7 +2,7 @@
   "name": "backend",
   "version": "1.0.0",
   "private": true,
-  "description": "DietetykDEV API - Express backend",
+  "description": "bambooIT API - Express backend",
   "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/server.ts",

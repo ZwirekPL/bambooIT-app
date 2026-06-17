@@ -75,7 +75,7 @@
 
     --radius: 1rem;                   /* 16px */
 
-    /* ── Brand Tokens (legacy — DietetykDEV, replaced gradually in W2–W6) ── */
+    /* ── Brand Tokens (legacy green palette, replaced gradually in W2–W6) ── */
     --brand-green:        138 64% 29%;   /* #1B7937 — WCAG AA 4.9:1 */
     --brand-green-hover:  138 58% 39%;   /* #2B9A45 — slightly lighter hover */
     --brand-orange:       30 100% 48%;   /* #F57C00 */

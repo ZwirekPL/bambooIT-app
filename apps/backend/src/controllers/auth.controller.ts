@@ -14,8 +14,8 @@ const loginSchema = z.object({
 });
 
 const consentSchema = z.object({
-  healthDataProcessing: z.literal(true, { errorMap: () => ({ message: 'Health data processing consent is required' }) }),
-  aiDisclaimer: z.literal(true, { errorMap: () => ({ message: 'AI disclaimer consent is required' }) }),
+  termsAccepted: z.literal(true, { errorMap: () => ({ message: 'Terms acceptance is required' }) }),
+  privacyPolicy: z.literal(true, { errorMap: () => ({ message: 'Privacy policy acceptance is required' }) }),
   emailNotifications: z.boolean().default(false),
 });
 
@@ -48,10 +48,6 @@ const registerSchema = z.object({
     .max(200)
     .optional()
     .transform((v) => (v && v.trim().length > 0 ? v.trim() : undefined)),
-  referralCode: z
-    .string()
-    .optional()
-    .transform((v) => v?.trim() || undefined),
   consents: consentSchema,
   deviceFingerprint: z.string().optional(),
 });
@@ -137,7 +133,6 @@ export async function register(req: Request, res: Response, next: NextFunction) 
         employeesCount: parsed.data.employeesCount,
         website: parsed.data.website,
       },
-      parsed.data.referralCode,
       parsed.data.consents,
       req.ip ?? undefined,
     );

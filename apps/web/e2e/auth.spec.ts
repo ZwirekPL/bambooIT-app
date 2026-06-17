@@ -111,37 +111,37 @@ test.describe('Register page', () => {
 // ── Protected routes ──────────────────────────────────────────────────────────
 
 test.describe('Protected routes', () => {
-  test('redirects unauthenticated user from /dashboard to login', async ({ page }) => {
-    await page.goto('/pl/dashboard');
+  test('redirects unauthenticated user from /panel to login', async ({ page }) => {
+    await page.goto('/pl/panel');
     // Should be redirected to login page
     await expect(page).toHaveURL(/zaloguj/, { timeout: 5000 });
   });
 
-  test('redirects unauthenticated user from /dietetyk to login', async ({ page }) => {
-    await page.goto('/pl/dietetyk');
+  test('redirects unauthenticated user from /admin to login', async ({ page }) => {
+    await page.goto('/pl/admin');
     await expect(page).toHaveURL(/zaloguj/, { timeout: 5000 });
   });
 });
 
-// ── 80.4.1 Login → redirect to dashboard ─────────────────────────────────────
+// ── 80.4.1 Login → redirect to client panel ──────────────────────────────────
 
 test.describe('Login flow (80.4.1)', () => {
-  test.skip(!process.env.SMOKE_PATIENT_EMAIL, 'SMOKE_PATIENT_EMAIL not set');
+  test.skip(!process.env.SMOKE_CLIENT_EMAIL, 'SMOKE_CLIENT_EMAIL not set');
 
-  test('successful patient login → redirects to /dashboard', async ({ page }) => {
+  test('successful client login → redirects to /panel', async ({ page }) => {
     await page.goto('/pl/zaloguj');
-    await page.fill('[name="email"]', process.env.SMOKE_PATIENT_EMAIL!);
-    await page.fill('[name="password"]', process.env.SMOKE_PATIENT_PASSWORD!);
+    await page.fill('[name="email"]', process.env.SMOKE_CLIENT_EMAIL!);
+    await page.fill('[name="password"]', process.env.SMOKE_CLIENT_PASSWORD!);
     await page.click('button[type="submit"]');
-    await expect(page).toHaveURL(/dashboard/, { timeout: 10000 });
+    await expect(page).toHaveURL(/panel/, { timeout: 10000 });
   });
 
-  test('successful dietitian login → redirects to /dietetyk', async ({ page }) => {
-    test.skip(!process.env.SMOKE_DIETITIAN_EMAIL, 'SMOKE_DIETITIAN_EMAIL not set');
+  test('successful admin login → redirects to /admin', async ({ page }) => {
+    test.skip(!process.env.SMOKE_ADMIN_EMAIL, 'SMOKE_ADMIN_EMAIL not set');
     await page.goto('/pl/zaloguj');
-    await page.fill('[name="email"]', process.env.SMOKE_DIETITIAN_EMAIL!);
-    await page.fill('[name="password"]', process.env.SMOKE_DIETITIAN_PASSWORD!);
+    await page.fill('[name="email"]', process.env.SMOKE_ADMIN_EMAIL!);
+    await page.fill('[name="password"]', process.env.SMOKE_ADMIN_PASSWORD!);
     await page.click('button[type="submit"]');
-    await expect(page).toHaveURL(/dietetyk/, { timeout: 10000 });
+    await expect(page).toHaveURL(/admin/, { timeout: 10000 });
   });
 });

@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
         hostname: 'bambooit.pl',
         pathname: '/uploads/**',
       },
-      // Local dev backend (e-dietetyk port 4000 + bambooIT port 4001)
+      // Local dev backend (port 4000)
       {
         protocol: 'http',
         hostname: 'localhost',

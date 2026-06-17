@@ -26,23 +26,11 @@ export async function createCheckoutSession(params: {
   customerEmail?: string;
   metadata?: Record<string, string>;
   mode?: 'subscription' | 'payment';
-  discountPercent?: number;
   trialPeriodDays?: number;
 }): Promise<string> {
   if (!stripe) {
     const separator = params.successUrl.includes('?') ? '&' : '?';
     return `${params.successUrl}${separator}mock=checkout`;
-  }
-
-  // Create an inline coupon for referral discount if provided
-  let discounts: { coupon: string }[] | undefined;
-  if (params.discountPercent && params.discountPercent > 0) {
-    const coupon = await stripe.coupons.create({
-      percent_off: params.discountPercent,
-      duration: 'once',
-      name: `Referral ${params.discountPercent}% off`,
-    });
-    discounts = [{ coupon: coupon.id }];
   }
 
   const session = await stripe.checkout.sessions.create({
@@ -51,7 +39,6 @@ export async function createCheckoutSession(params: {
     success_url: params.successUrl,
     cancel_url: params.cancelUrl,
     ...(params.metadata ? { metadata: params.metadata } : {}),
-    ...(discounts ? { discounts } : {}),
     ...(params.trialPeriodDays
       ? {
           subscription_data: {

@@ -9,7 +9,6 @@ import { logAudit } from '../services/audit.service';
 // trial. Re-enable by adding 'TRIAL' back to the enum below + adding a CTA.
 const createSessionSchema = z.object({
   productType: z.enum(['START', 'FIRMA', 'FIRMA_PLUS']),
-  referralCode: z.string().max(20).optional(),
 });
 
 export async function createSession(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -24,7 +23,6 @@ export async function createSession(req: Request, res: Response, next: NextFunct
       req.user!.sub,
       req.user!.email,
       parsed.data.productType,
-      parsed.data.referralCode,
     );
 
     logAudit({

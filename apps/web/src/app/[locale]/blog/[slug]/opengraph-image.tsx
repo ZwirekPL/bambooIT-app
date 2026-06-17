@@ -3,14 +3,14 @@ import { ImageResponse } from 'next/og';
 export const runtime = 'edge';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
-export const alt = 'Blog e-dietetyk.com';
+export const alt = 'Blog bambooIT';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
 
 export default async function OgImage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
-  let title = 'Blog — e-dietetyk.com';
+  let title = 'Blog — bambooIT';
   let category = '';
   try {
     const res = await fetch(`${API_URL}/posts/${slug}`);
@@ -33,7 +33,7 @@ export default async function OgImage({ params }: { params: Promise<{ slug: stri
           flexDirection: 'column',
           justifyContent: 'space-between',
           padding: '60px 64px',
-          background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%)',
+          background: 'linear-gradient(135deg, #f6f4ee 0%, #eef3e3 50%, #dcecc4 100%)',
           fontFamily: 'system-ui, sans-serif',
         }}
       >
@@ -45,7 +45,7 @@ export default async function OgImage({ params }: { params: Promise<{ slug: stri
             left: 0,
             right: 0,
             height: 6,
-            background: 'linear-gradient(90deg, #1F8F3A, #F57C00)',
+            background: 'linear-gradient(90deg, #8BC34A, #1A2735)',
           }}
         />
 
@@ -99,12 +99,12 @@ export default async function OgImage({ params }: { params: Promise<{ slug: stri
                 width: 40,
                 height: 40,
                 borderRadius: 20,
-                backgroundColor: '#1F8F3A',
+                backgroundColor: '#1A2735',
               }}
             >
-              <span style={{ fontSize: 22, color: '#fff', fontWeight: 800 }}>e</span>
+              <span style={{ fontSize: 22, color: '#8BC34A', fontWeight: 800 }}>b</span>
             </div>
-            <span style={{ fontSize: 22, fontWeight: 700, color: '#1F8F3A' }}>e-dietetyk.com</span>
+            <span style={{ fontSize: 22, fontWeight: 700, color: '#1A2735' }}>bambooit.pl</span>
           </div>
           <span style={{ fontSize: 16, color: '#9ca3af' }}>Blog</span>
         </div>

@@ -6,7 +6,6 @@ import { AppError } from '../utils/errors';
 import { sendPasswordResetEmail, sendEmailVerificationEmail } from '../utils/email';
 import { logAudit } from './audit.service';
 import { redis } from '../utils/redis';
-import { getOrCreateCode, applyReferralOnRegistration } from './referral.service';
 import {
   isDisposableEmail,
   checkIpAbuse,
@@ -96,8 +95,8 @@ export async function login(email: string, password: string) {
 }
 
 interface RegisterConsents {
-  healthDataProcessing: boolean;
-  aiDisclaimer: boolean;
+  termsAccepted: boolean;
+  privacyPolicy: boolean;
   emailNotifications: boolean;
 }
 
@@ -116,7 +115,6 @@ export async function register(
   email: string,
   password: string,
   company: RegisterCompanyFields,
-  referralCode?: string,
   consents?: RegisterConsents,
   ipAddress?: string,
 ) {
@@ -164,10 +162,8 @@ export async function register(
   if (consents) {
     const version = '1.0';
     const ip = ipAddress ?? null;
-    type ConsentRecord = { userId: string; consentType: 'HEALTH_DATA_PROCESSING' | 'AI_DISCLAIMER' | 'TERMS_ACCEPTANCE' | 'PRIVACY_POLICY' | 'EMAIL_NOTIFICATIONS' | 'COOKIE_FUNCTIONAL'; documentVersion: string; ipAddress: string | null };
+    type ConsentRecord = { userId: string; consentType: 'TERMS_ACCEPTANCE' | 'PRIVACY_POLICY' | 'EMAIL_NOTIFICATIONS' | 'COOKIE_FUNCTIONAL'; documentVersion: string; ipAddress: string | null };
     const consentRecords: ConsentRecord[] = [
-      { userId: user.id, consentType: 'HEALTH_DATA_PROCESSING', documentVersion: version, ipAddress: ip },
-      { userId: user.id, consentType: 'AI_DISCLAIMER', documentVersion: version, ipAddress: ip },
       { userId: user.id, consentType: 'TERMS_ACCEPTANCE', documentVersion: version, ipAddress: ip },
       { userId: user.id, consentType: 'PRIVACY_POLICY', documentVersion: version, ipAddress: ip },
     ];
@@ -187,18 +183,6 @@ export async function register(
   // 39.4: Record registration IP
   if (ipAddress) {
     recordRegistrationIp(ipAddress).catch(() => {});
-  }
-
-  // Auto-generate a referral code for the new user
-  await getOrCreateCode(user.id);
-
-  // If a referral code was provided, record the referral usage
-  if (referralCode) {
-    try {
-      await applyReferralOnRegistration(referralCode, user.id);
-    } catch {
-      // Non-blocking — invalid referral code should not prevent registration
-    }
   }
 
   // Invalidate any stale verification tokens before creating a new one

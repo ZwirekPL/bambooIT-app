@@ -259,7 +259,7 @@ export async function getInvoice(req: Request, res: Response, next: NextFunction
   try {
     const order = await orderService.getOrder(parsed.data.id);
 
-    // Ownership check: PATIENT can only see own orders
+    // Ownership check: a CLIENT can only see their own company's orders
     if (req.user?.role === 'CLIENT') {
       const company = await prisma.company.findUnique({ where: { userId }, select: { id: true } });
       if (!company || order.companyId !== company.id) {

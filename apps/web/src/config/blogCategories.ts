@@ -26,28 +26,9 @@ export const BLOG_CATEGORY_LIST: BlogCategoryDef[] = [
 ];
 
 /**
- * Legacy DietetykDEV category names → bambooIT mapping.
- * Catches old DB rows seeded before D-070 rename so they still render with
- * a known canonical name. Drop after a one-time DB migration in BE-1.
- */
-const LEGACY_ALIASES: Record<string, string> = {
-  'Porady dietetyczne': 'Obsługa IT',
-  'Porady':             'Obsługa IT',
-  'Odchudzanie':        'Obsługa IT',
-  'Zdrowie i choroby':  'Cyberbezpieczeństwo',
-  'Zdrowie':            'Cyberbezpieczeństwo',
-  'Przepisy':           'Obsługa IT',
-  'AI i dietetyka':     'Automatyzacje',
-  'Motywacja':          'Obsługa IT',
-  'Subskrypcja':        'Obsługa IT',
-  'Thermomix & Airfryer': 'Sprzęt i sieci',
-};
-
-/**
- * Resolves any category string (canonical or legacy) to its definition.
+ * Resolves a category string to its definition.
  * Returns null for truly unknown/custom values — caller should display raw string.
  */
 export function normalizeCategory(input: string): BlogCategoryDef | null {
-  const canonical = LEGACY_ALIASES[input] ?? input;
-  return BLOG_CATEGORY_LIST.find((c) => c.name === canonical) ?? null;
+  return BLOG_CATEGORY_LIST.find((c) => c.name === input) ?? null;
 }

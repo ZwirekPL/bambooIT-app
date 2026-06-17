@@ -17,7 +17,6 @@ import { webhookRouter } from './routes/webhook.routes';
 import { checkoutRouter } from './routes/checkout.routes';
 import { blogRouter } from './routes/blog.routes';
 import { testimonialRouter } from './routes/testimonial.routes';
-import { referralRouter } from './routes/referral.routes';
 import { leadsRouter } from './routes/leads.routes';
 import { errorHandler } from './middleware/errorHandler';
 import { requireAuth } from './middleware/auth';
@@ -161,7 +160,6 @@ app.use('/tickets', requireAuth('CLIENT'), userLimiter, ticketRouter);
 app.use('/subscriptions', requireAuth('ADMIN', 'CLIENT'), userLimiter, subscriptionRouter);
 app.use('/posts', globalLimiter, blogRouter);
 app.use('/testimonials', globalLimiter, testimonialRouter);
-app.use('/referrals', requireAuth(), userLimiter, referralRouter);
 app.use('/leads', leadLimiter, leadsRouter);
 
 // Global error handler — must be last

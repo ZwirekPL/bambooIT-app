@@ -1,4 +1,4 @@
-# Informacja o wykorzystaniu sztucznej inteligencji (AI) — bambooIT
+# Umowa o współpracy B2B — bambooIT
 
 > **PLACEHOLDER / DOKUMENT DO OPRACOWANIA.**
 > Poprzednia treść pochodziła z poprzedniego projektu i została usunięta —

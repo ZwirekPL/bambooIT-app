@@ -9,14 +9,14 @@ export interface BlogCategoryInput {
 
 /** Default slugs — these categories cannot be fully deleted (only deactivated). */
 const DEFAULT_SLUGS = new Set([
-  'porady-dietetyczne',
-  'odchudzanie',
-  'zdrowie-i-choroby',
-  'przepisy',
-  'ai-i-dietetyka',
-  'motywacja',
-  'subskrypcja',
-  'thermomix-airfryer',
+  'obsluga-it',
+  'cyberbezpieczenstwo',
+  'backup',
+  'microsoft-365',
+  'sprzet-i-sieci',
+  'automatyzacje',
+  'strony-i-aplikacje',
+  'branze',
 ]);
 
 export function isDefaultCategory(slug: string): boolean {

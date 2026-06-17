@@ -2,7 +2,7 @@
   "name": "database",
   "private": true,
   "version": "1.0.0",
-  "description": "Prisma database layer for DietetykDEV",
+  "description": "Prisma database layer for bambooIT",
   "scripts": {
     "generate": "prisma generate",
     "migrate:dev": "prisma migrate dev",

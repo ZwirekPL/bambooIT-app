@@ -11,14 +11,14 @@ import { Pencil, Trash2, Plus, Check, X } from 'lucide-react';
 import type { BlogCategoryConfig } from '@/types/api';
 
 const DEFAULT_SLUGS = new Set([
-  'porady-dietetyczne',
-  'odchudzanie',
-  'zdrowie-i-choroby',
-  'przepisy',
-  'ai-i-dietetyka',
-  'motywacja',
-  'subskrypcja',
-  'thermomix-airfryer',
+  'obsluga-it',
+  'cyberbezpieczenstwo',
+  'backup',
+  'microsoft-365',
+  'sprzet-i-sieci',
+  'automatyzacje',
+  'strony-i-aplikacje',
+  'branze',
 ]);
 
 interface AdminBlogCategoriesProps {

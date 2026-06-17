@@ -31,7 +31,7 @@ const config: Config = {
           300: '#ead4a0',
         },
 
-        /* ── Brand tokens (legacy — DietetykDEV, used in 5 files, replaced gradually in W2–W6) ── */
+        /* ── Brand tokens (legacy green palette, used in 5 files, replaced gradually in W2–W6) ── */
         'brand-green': {
           DEFAULT: 'hsl(var(--brand-green))',
           hover:   'hsl(var(--brand-green-hover))',

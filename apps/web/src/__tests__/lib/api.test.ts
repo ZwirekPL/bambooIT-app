@@ -114,7 +114,7 @@ describe('api.auth.register', () => {
       email: 'a@b.com',
       password: 'secret123',
       ...baseCompanyFields,
-      consents: { healthDataProcessing: true, aiDisclaimer: true, emailNotifications: false },
+      consents: { termsAccepted: true, privacyPolicy: true, emailNotifications: false },
     });
 
     const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit];
@@ -136,8 +136,7 @@ describe('api.auth.register', () => {
       ...baseCompanyFields,
       employeesCount: 12,
       website: 'https://acme.pl',
-      referralCode: 'BAMBOO-A1B2C3',
-      consents: { healthDataProcessing: true, aiDisclaimer: true, emailNotifications: false },
+      consents: { termsAccepted: true, privacyPolicy: true, emailNotifications: false },
     });
 
     const [, options] = fetchMock.mock.calls[0] as [string, RequestInit];
@@ -145,7 +144,6 @@ describe('api.auth.register', () => {
     expect(body.firstName).toBe('Jan');
     expect(body.employeesCount).toBe(12);
     expect(body.website).toBe('https://acme.pl');
-    expect(body.referralCode).toBe('BAMBOO-A1B2C3');
   });
 });
 

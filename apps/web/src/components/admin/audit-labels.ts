@@ -47,10 +47,9 @@ export const ACTION_LABELS: Record<string, string> = {
   APPROVE_TESTIMONIAL: 'Zatwierdzenie opinii',
   REJECT_TESTIMONIAL: 'Odrzucenie opinii',
 
-  // — Referral —
-  REFERRAL_CODE_GENERATED: 'Wygenerowanie kodu polecającego',
-  REFERRAL_USED: 'Użycie kodu polecającego',
-  REFERRAL_DISCOUNT_APPLIED: 'Zastosowanie rabatu',
+  // — Consent —
+  CONSENT_GRANTED: 'Udzielenie zgody',
+  CONSENT_REVOKED: 'Cofnięcie zgody',
 
 };
 
@@ -60,7 +59,7 @@ export const RESOURCE_LABELS: Record<string, string> = {
   POST: 'Wpis blogowy',
   ORDER: 'Zamówienie',
   TESTIMONIAL: 'Opinia',
-  REFERRAL: 'Polecenie',
+  CONSENT: 'Zgoda',
   FEATURE_FLAG: 'Feature flag',
 
 };
@@ -68,11 +67,12 @@ export const RESOURCE_LABELS: Record<string, string> = {
 export type Severity = 'critical' | 'warning' | 'normal';
 
 export function getActionSeverity(action: string): Severity {
-  if (action.startsWith('DELETE_') || action === 'GENERATION_BLOCKED' || action === 'RED_FLAG_TRIGGERED' ||
+  if (action.startsWith('DELETE_') ||
       action === 'ACCOUNT_LOCKED' || action === 'LOGIN_FAILED') return 'critical';
   if (action.startsWith('EXPORT_') || action.startsWith('BULK_') || action === 'CHANGE_USER_ROLE' ||
       action === 'STRIPE_INVOICE_PAYMENT_FAILED' || action === 'STRIPE_REFUND' ||
-      action === 'REVOKE_USER_SESSIONS' || action === 'ADMIN_FORCE_PASSWORD_RESET') return 'warning';
+      action === 'REVOKE_USER_SESSIONS' || action === 'ADMIN_FORCE_PASSWORD_RESET' ||
+      action === 'CONSENT_REVOKED') return 'warning';
   return 'normal';
 }
 

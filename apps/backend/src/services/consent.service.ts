@@ -3,8 +3,6 @@ import { AppError } from '../utils/errors';
 import { logAudit } from './audit.service';
 
 type ConsentType =
-  | 'HEALTH_DATA_PROCESSING'
-  | 'AI_DISCLAIMER'
   | 'EMAIL_NOTIFICATIONS'
   | 'TERMS_ACCEPTANCE'
   | 'PRIVACY_POLICY'

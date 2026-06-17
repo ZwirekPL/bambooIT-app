@@ -19,8 +19,7 @@ export const authConfig: NextAuthConfig = {
       const { nextUrl } = request;
       const isLoggedIn = !!auth?.user;
       const isProtected =
-        nextUrl.pathname.includes('/dashboard') ||
-        nextUrl.pathname.includes('/dietetyk') ||
+        nextUrl.pathname.includes('/panel') ||
         nextUrl.pathname.includes('/admin');
       if (!isProtected) return true;
       if (!isLoggedIn) return false;
