@@ -2,9 +2,9 @@ import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { useTranslations } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
-import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { ResetPasswordForm } from '@/components/auth/ResetPasswordForm';
+import { BrandMark } from '@/components/brand/BrandMark';
 import { BRAND } from '@config/brand';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -25,14 +25,7 @@ export default function ResetPasswordPage() {
         <div className="rounded-2xl border border-border bg-white p-5 sm:p-8 shadow-sm">
           <div className="mb-6 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="/" className="flex-shrink-0">
-              <Image
-                src="/logo.png"
-                alt={BRAND.shortName}
-                width={200}
-                height={200}
-                className="h-14 sm:h-20 w-auto"
-                priority
-              />
+              <BrandMark className="text-4xl sm:text-5xl text-navy-deep" />
             </Link>
             <div className="text-left">
               <h1 className="text-2xl font-bold text-foreground">{t('resetTitle')}</h1>

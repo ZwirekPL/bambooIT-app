@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import {
   motion,
   useMotionValueEvent,
@@ -12,21 +12,27 @@ import { useTranslations } from 'next-intl';
 
 const CARD_IDS = ['1', '2', '3', '4', '5', '6'] as const;
 
+// How much faster the cards move than the finger/cursor while dragging.
+// 1 = 1:1 with the pointer; higher = a small drag travels further.
+const DRAG_SPEED = 35;
+
 /**
- * A9 — Horizontal pinned-scroll services section.
+ * A9 — Horizontal pinned-scroll services section, with drag support.
  *
- * Outer container is 300vh tall to give 6 cards ~50vh of scroll
- * distance each. Inner content is sticky top:0 h-screen — pins to viewport
- * while the user scrolls through the outer container. The horizontal
- * track inside the pinned area translates left (x: 0 → -trackOffset)
- * driven by scrollYProgress. As cards pass the viewport center the
- * active card flips: scale 0.85 → 1, opacity 0.4 → 1, bamboo border +
- * green-tinted shadow. Progress bar + counter ("NN / 06") at bottom
- * reflect current position.
+ * Outer container is 300vh tall; inner content is sticky top:0 h-screen and
+ * pins to the viewport while the user scrolls through the outer container.
+ * The horizontal track translates left (x: 0 → -trackOffset) driven by
+ * scrollYProgress — so the section still works on plain vertical scroll /
+ * mouse wheel exactly as before.
  *
- * prefers-reduced-motion: outer height collapses, sticky drops, cards
- * render as a normal vertical-then-grid layout (1/2/3 cols) matching
- * the previous static implementation. No pin, no horizontal scroll.
+ * ON TOP of that, the pinned area is grab-draggable: a horizontal drag
+ * (mouse or finger) is converted into an equivalent `window.scrollBy`, which
+ * feeds the SAME scrollYProgress → there's a single source of truth, so
+ * scroll and drag never fight. `touch-action: pan-y` keeps native vertical
+ * swipe-to-scroll working on touch; horizontal swipes become our drag.
+ *
+ * prefers-reduced-motion: outer height collapses, sticky + drag drop, cards
+ * render as a normal grid (1/2/3 cols).
  */
 export function HorizontalServicesSection() {
   const t = useTranslations('home.horizontalServices');
@@ -35,6 +41,15 @@ export function HorizontalServicesSection() {
   const trackRef = useRef<HTMLDivElement>(null);
   const [trackOffset, setTrackOffset] = useState(0);
   const [activeIdx, setActiveIdx] = useState(0);
+
+  // Drag-to-scroll state (mouse + touch). We translate horizontal pointer
+  // movement into vertical scroll so the existing scroll choreography drives
+  // the cards — no second source of truth.
+  const drag = useRef({ active: false, lastX: 0 });
+  const offsetRef = useRef(0);
+  useEffect(() => {
+    offsetRef.current = trackOffset;
+  }, [trackOffset]);
 
   useEffect(() => {
     function measure() {
@@ -63,6 +78,46 @@ export function HorizontalServicesSection() {
     setActiveIdx(Math.min(CARD_IDS.length - 1, Math.floor(p * CARD_IDS.length)));
   });
 
+  function handlePointerDown(e: ReactPointerEvent<HTMLDivElement>) {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    drag.current = { active: true, lastX: e.clientX };
+    // Capture the mouse so the drag keeps tracking if the cursor leaves the
+    // cards; on touch we skip capture so `pan-y` vertical scroll still works.
+    if (e.pointerType === 'mouse') {
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {
+        /* capture unsupported — drag still works while over the element */
+      }
+    }
+  }
+
+  function handlePointerMove(e: ReactPointerEvent<HTMLDivElement>) {
+    if (!drag.current.active) return;
+    const dx = e.clientX - drag.current.lastX;
+    if (dx === 0) return;
+    drag.current.lastX = e.clientX;
+    const offset = offsetRef.current;
+    if (offset <= 0) return;
+    // Scroll range over which progress goes 0→1 = outer(300vh) - sticky(100vh)
+    // = 200vh. Map a horizontal drag of `dx` px to the equivalent scroll,
+    // amplified by DRAG_SPEED so a short drag travels several cards.
+    const scrollRange = 2 * window.innerHeight;
+    const factor = (scrollRange / offset) * DRAG_SPEED;
+    window.scrollBy(0, -dx * factor);
+  }
+
+  function endDrag(e: ReactPointerEvent<HTMLDivElement>) {
+    drag.current.active = false;
+    if (e.pointerType === 'mouse') {
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
   const cards = CARD_IDS.map((id) => ({
     number: t(`cards.${id}.number`),
     title: t(`cards.${id}.title`),
@@ -79,7 +134,7 @@ export function HorizontalServicesSection() {
       id="services"
       // No `overflow-hidden` here: it would create a CSS scroll container,
       // which makes the inner `position: sticky` element pin to this section
-      // instead of the window — breaking the A9 pinned horizontal scroll.
+      // instead of the window — breaking the pinned horizontal scroll.
       // Horizontal clipping is handled by the sticky inner (line below).
       className="relative bg-navy-deep text-white"
     >
@@ -102,7 +157,7 @@ export function HorizontalServicesSection() {
         </div>
       </div>
 
-      {/* Pinned horizontal scroll OR fallback grid */}
+      {/* Pinned horizontal scroll (+ drag) OR fallback grid */}
       {shouldReduceMotion ? (
         <div className="mx-auto w-full max-w-[1440px] px-5 pb-24 md:px-12 md:pb-32">
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -114,14 +169,19 @@ export function HorizontalServicesSection() {
       ) : (
         <div ref={outerRef} className="relative h-[300vh]">
           {/* justify-center: vertically center the cards row in the sticky
-              viewport so they sit at the eye line instead of being pinned
-              to the top of the section (which left a large empty area below
-              the cards). */}
-          <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden pb-16">
+              viewport. The pinned area is grab-draggable (drag → scroll). */}
+          <div
+            className="sticky top-0 flex h-screen cursor-grab flex-col justify-center overflow-hidden pb-16 active:cursor-grabbing"
+            style={{ touchAction: 'pan-y' }}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={endDrag}
+            onPointerCancel={endDrag}
+          >
             <motion.div
               ref={trackRef}
               style={{ x }}
-              className="flex shrink-0 items-center gap-8 px-12 will-change-transform"
+              className="flex shrink-0 select-none items-center gap-8 px-12 will-change-transform"
             >
               {cards.map((card, idx) => (
                 <div
@@ -134,7 +194,7 @@ export function HorizontalServicesSection() {
               ))}
             </motion.div>
 
-            {/* Progress bar + counter */}
+            {/* Progress bar + drag hint + counter */}
             <div className="pointer-events-none absolute bottom-12 left-12 right-12 z-10">
               <div className="relative h-px bg-white/10">
                 <motion.div
@@ -142,7 +202,13 @@ export function HorizontalServicesSection() {
                   style={{ width: progressBarWidth }}
                 />
               </div>
-              <div className="mt-4 flex justify-end font-mono text-[11px] uppercase tracking-[0.2em] text-white/50">
+              <div className="mt-4 flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.2em] text-white/50">
+                <span className="inline-flex items-center gap-2">
+                  <svg width="22" height="12" viewBox="0 0 22 12" fill="none" aria-hidden="true">
+                    <path d="M5 1L1 6l4 5M17 1l4 5-4 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  {t('intro.dragHint')}
+                </span>
                 <span>
                   <span className="font-bold text-bamboo">
                     {String(activeIdx + 1).padStart(2, '0')}

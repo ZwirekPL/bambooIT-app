@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { LocaleSwitcher } from './LocaleSwitcher';
+import { BrandMark } from '@/components/brand/BrandMark';
 import { BRAND } from '@config/brand';
 import { cn } from '@/lib/utils';
 import { useSession } from 'next-auth/react';
@@ -62,18 +63,6 @@ const navItems: NavItem[] = [
   { type: 'link', href: '/audyt',    labelKey: 'audit' },
   { type: 'link', href: '/#faq',     labelKey: 'faq' },
 ];
-
-function BrandMark({ className }: { className?: string }) {
-  // bambooIT wordmark with bamboo-green accents on `m` and `it`.
-  return (
-    <span
-      className={cn('font-display font-black tracking-tight leading-none', className)}
-      aria-label={BRAND.shortName}
-    >
-      ba<span className="text-bamboo">m</span>boo<span className="text-bamboo">it</span>
-    </span>
-  );
-}
 
 export function Header() {
   const t = useTranslations('nav');

@@ -30,7 +30,8 @@ const TIERS: TierConfig[] = [
 /**
  * A10 — Pricing 3D stack assembly.
  *
- * Outer container is 150vh tall; inner is sticky top:0 h-screen.
+ * Outer container is 118vh tall (tight, so the assembly finishes fast and
+ * the section releases the scroll quickly); inner is sticky top:0 h-screen.
  * scrollYProgress 0..1 across the section drives:
  *   0..0.6   — three tier cards animate from scattered 3D start positions
  *               (left/center/right with different rotations + z-depth) to
@@ -88,7 +89,7 @@ function AnimatedPricingTiers({
 
   return (
     <section id="pricing" className="relative bg-paper">
-      <div ref={outerRef} className="relative h-[150vh]">
+      <div ref={outerRef} className="relative h-[118vh]">
         <div
           className="sticky top-0 flex h-screen items-center justify-center overflow-hidden px-5 md:px-12"
           style={{ perspective: '1500px' }}

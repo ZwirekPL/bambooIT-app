@@ -20,12 +20,12 @@ const variantStyles: Record<Variant, string> = {
 /**
  * A6 — Pinned-scroll word reveal.
  *
- * Outer section is 170vh tall to give scroll room. Inner content is
- * position: sticky top:0 height:100vh, so it stays pinned while the
- * scroll progress 0→1 plays out across the second viewport-worth of
- * scroll. Each word animates in / holds / animates out as mockup did.
- * The hold window is deliberately wide (40% of scroll) so the phrase
- * stays fully legible long enough to actually read it:
+ * Outer section is 118vh tall (kept tight so the phrase doesn't pin for
+ * long — the reveal finishes within ~18vh of scroll and releases). Inner
+ * content is position: sticky top:0 height:100vh, so it stays pinned while
+ * the scroll progress 0→1 plays out. Each word animates in / holds /
+ * animates out as mockup did. The hold window (40% of scroll) keeps the
+ * phrase legible without trapping the scroll:
  *   - progress 0..0.3: words fade in + slide up from y:40 (staggered
  *     by word index via wp * 0.4 offset)
  *   - progress 0.3..0.7: hold at opacity:1 y:0
@@ -71,7 +71,7 @@ export function NarrativeSection({ children, variant = 'navy' }: Props) {
   return (
     <section
       ref={ref}
-      className={`relative h-[170vh] ${variantStyles[variant]}`}
+      className={`relative h-[118vh] ${variantStyles[variant]}`}
     >
       <div className="sticky top-0 flex h-screen items-center justify-center overflow-hidden px-5 md:px-12">
         <p className="max-w-[18ch] text-center font-display text-4xl font-light italic leading-[1] tracking-[-0.04em] md:text-5xl lg:text-6xl xl:text-7xl">

@@ -285,31 +285,35 @@ export function PandaHelper() {
   }
 
   return (
-    <div className="pointer-events-none fixed bottom-[222px] right-4 z-40 flex max-w-[min(82vw,320px)] flex-col items-end gap-2 md:bottom-[230px] md:right-6">
-      <AnimatePresence>
-        {bubble && (
-          <motion.div
-            key={bubble.text}
-            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.96 }}
-            animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
-            exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.96 }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            className="pointer-events-auto relative rounded-2xl rounded-br-md border border-line bg-white px-4 py-3 text-sm leading-[1.45] text-navy shadow-[0_12px_32px_-12px_rgba(44,62,80,0.4)]"
-          >
-            <span className="mb-1 block font-mono text-[10px] uppercase tracking-[0.18em] text-bamboo-deep">
-              {t('name')}
-            </span>
-            {bubble.text}
-            {/* little tail toward the panda */}
-            <span
-              aria-hidden="true"
-              className="absolute -bottom-[7px] right-6 h-3 w-3 rotate-45 border-b border-r border-line bg-white"
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
+    <div className="pointer-events-none fixed bottom-[222px] right-4 z-40 md:bottom-[230px] md:right-6">
       <div className="pointer-events-auto group relative">
+        {/* Speech bubble — anchored ABOVE the panda and taken out of flow
+            (absolute) so its height changes never shift the panda below it.
+            mode="wait" lets one bubble fully exit before the next enters, so
+            section-to-section text changes never overlap or flicker. */}
+        <AnimatePresence mode="wait" initial={false}>
+          {bubble && (
+            <motion.div
+              key={bubble.text}
+              initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 6, scale: 0.97 }}
+              animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
+              exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 6, scale: 0.97 }}
+              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+              className="pointer-events-auto absolute bottom-full right-0 mb-3 w-max max-w-[min(78vw,300px)] rounded-2xl rounded-br-md border border-line bg-white px-4 py-3 text-sm leading-[1.45] text-navy shadow-[0_12px_32px_-12px_rgba(44,62,80,0.4)]"
+            >
+              <span className="mb-1 block font-mono text-[10px] uppercase tracking-[0.18em] text-bamboo-deep">
+                {t('name')}
+              </span>
+              {bubble.text}
+              {/* little tail toward the panda */}
+              <span
+                aria-hidden="true"
+                className="absolute -bottom-[7px] right-6 h-3 w-3 rotate-45 border-b border-r border-line bg-white"
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* dismiss — subtle, fades in on hover */}
         <button
           type="button"
