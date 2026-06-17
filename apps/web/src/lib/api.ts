@@ -52,7 +52,7 @@ export async function apiFetch<T>(
   const isBrowser = typeof window !== 'undefined';
   const url = isBrowser
     ? `/api/proxy${path.startsWith('/') ? path : '/' + path}`
-    : `${getApiBaseUrl()}${path}`;
+    : `${process.env.API_URL ?? getApiBaseUrl()}${path}`;
 
   const res = await fetch(url, {
     headers: {
