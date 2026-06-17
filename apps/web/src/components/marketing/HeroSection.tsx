@@ -9,6 +9,7 @@ import {
   type Variants,
 } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { LOADER_DURATION_MS, LOADER_FADE_MS } from '@/components/layout/BambooLoader';
 
@@ -63,177 +64,26 @@ function HeroGrid({ yShift }: { yShift?: ReturnType<typeof useTransform<number, 
 }
 
 function PandaMascot() {
-  // A3 — entrance choreography. Each path/polygon is a motion element so it
-  // can independently animate (lines draw, fills fade, leaves scale).
+  // A3 — entrance. The hand-drawn SVG panda was replaced with the official
+  // bambooIT logo panda (geometric low-poly head + bamboo sprigs), so the
+  // mascot matches the brand mark exactly. A static asset can't draw itself
+  // line-by-line, so the entrance is a soft fade + scale settle instead of the
+  // old pathLength choreography.
   return (
-    <motion.svg
-      viewBox="0 0 400 400"
-      aria-hidden="true"
-      className="h-auto w-full overflow-visible"
-      initial="hidden"
-      animate="visible"
-      transition={{ delayChildren: 0.4 }}
+    <motion.div
+      initial={{ opacity: 0, scale: 0.94 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 1.1, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
     >
-      {/* Bamboo leaves left — scale-in with back ease, random stagger */}
-      <g>
-        {[
-          'M50 180 Q40 170 30 175 Q35 185 50 180',
-          'M55 200 Q35 195 25 205 Q40 215 55 200',
-          'M60 220 Q40 220 30 230 Q45 240 60 220',
-        ].map((d, idx) => (
-          <motion.path
-            key={`leaf-l-${idx}`}
-            d={d}
-            className="fill-bamboo"
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{
-              duration: 0.6,
-              delay: 1.4 + Math.random() * 0.3,
-              ease: [0.34, 1.56, 0.64, 1],
-            }}
-            style={{ transformOrigin: 'center' }}
-          />
-        ))}
-      </g>
-
-      {/* Ears (filled navy) */}
-      <motion.polygon
-        className="fill-navy"
-        points="120,120 145,100 160,135"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 1.3 }}
+      <Image
+        src="/panda.png"
+        alt=""
+        width={1300}
+        height={1045}
+        priority
+        className="h-auto w-full"
       />
-      <motion.polygon
-        className="fill-navy"
-        points="280,120 255,100 240,135"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 1.33 }}
-      />
-
-      {/* Head outline + facets — pathLength draw (path elements are the most
-          reliable framer-motion target for pathLength animation). */}
-      <motion.path
-        d="M160 135 L200 115 L240 135 L270 180 L260 240 L200 290 L140 240 L130 180 Z"
-        fill="none"
-        className="stroke-navy"
-        strokeWidth={2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        initial={{ pathLength: 0 }}
-        animate={{ pathLength: 1 }}
-        transition={{ duration: 1.6, delay: 0.7, ease: [0.4, 0, 0.2, 1] }}
-      />
-
-      {[
-        'M200 115 L200 290',
-        'M160 135 L200 200',
-        'M240 135 L200 200',
-        'M130 180 L200 200',
-        'M270 180 L200 200',
-        'M140 240 L200 200',
-        'M260 240 L200 200',
-      ].map((d, idx) => (
-        <motion.path
-          key={`facet-${idx}`}
-          d={d}
-          fill="none"
-          className="stroke-navy"
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          initial={{ pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{
-            duration: 1.6,
-            delay: 0.7 + idx * 0.04,
-            ease: [0.4, 0, 0.2, 1],
-          }}
-        />
-      ))}
-
-      {/* Eye patches */}
-      <motion.polygon
-        className="fill-navy"
-        points="155,175 180,165 185,200 165,210"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 1.36 }}
-      />
-      <motion.polygon
-        className="fill-navy"
-        points="245,175 220,165 215,200 235,210"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 1.39 }}
-      />
-
-      {/* Eyes (white dots) */}
-      <motion.circle
-        className="fill-white"
-        cx={172}
-        cy={188}
-        r={4}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: 1.7 }}
-      />
-      <motion.circle
-        className="fill-white"
-        cx={228}
-        cy={188}
-        r={4}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: 1.8 }}
-      />
-
-      {/* Nose */}
-      <motion.polygon
-        className="fill-navy"
-        points="195,225 205,225 200,235"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 1.42 }}
-      />
-
-      {/* Mouth */}
-      <motion.path
-        d="M195 245 Q200 252 205 245"
-        fill="none"
-        className="stroke-navy"
-        strokeWidth={2}
-        strokeLinecap="round"
-        initial={{ pathLength: 0 }}
-        animate={{ pathLength: 1 }}
-        transition={{ duration: 0.8, delay: 1.9, ease: [0.4, 0, 0.2, 1] }}
-      />
-
-      {/* Bamboo leaves right */}
-      <g>
-        {[
-          'M350 180 Q360 170 370 175 Q365 185 350 180',
-          'M345 200 Q365 195 375 205 Q360 215 345 200',
-          'M340 220 Q360 220 370 230 Q355 240 340 220',
-        ].map((d, idx) => (
-          <motion.path
-            key={`leaf-r-${idx}`}
-            d={d}
-            className="fill-bamboo"
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{
-              duration: 0.6,
-              delay: 1.4 + Math.random() * 0.3,
-              ease: [0.34, 1.56, 0.64, 1],
-            }}
-            style={{ transformOrigin: 'center' }}
-          />
-        ))}
-      </g>
-    </motion.svg>
+    </motion.div>
   );
 }
 

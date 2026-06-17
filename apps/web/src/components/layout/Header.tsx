@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { Menu, LogOut, ChevronDown, UserRound, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -92,9 +93,16 @@ export function Header() {
       )}
     >
       <div className="container mx-auto flex items-center justify-between px-4 md:px-6 py-4">
-        {/* Logo */}
+        {/* Logo — full bambooIT lockup (panda + wordmark + tagline) */}
         <Link href="/" className="hover:opacity-80 transition-opacity" aria-label={BRAND.shortName}>
-          <BrandMark className="text-2xl" />
+          <Image
+            src="/logo.png"
+            alt={BRAND.shortName}
+            width={1400}
+            height={408}
+            priority
+            className="h-10 w-auto md:h-12"
+          />
         </Link>
 
         {/* Desktop nav links */}
